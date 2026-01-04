@@ -11,6 +11,7 @@ type StoreSchema = {
     aiLocalModel: string
     aiLocalUrl: string
     aiProvider: 'offline' | 'local' | 'cloud'
+    aiPersona: 'standard' | 'cybersecurity'
     aiRedactionEnabled: boolean
     aiTimeoutSec: number
     defaultAccountId?: string
@@ -43,6 +44,7 @@ const DEFAULT_SETTINGS: StoreSchema['settings'] = {
   aiLocalModel: 'qwen2.5-coder:7b',
   aiLocalUrl: 'http://localhost:11434/api/generate',
   aiProvider: 'offline',
+  aiPersona: 'standard',
   aiRedactionEnabled: true,
   aiTimeoutSec: 8,
   defaultAccountId: undefined,
@@ -76,7 +78,9 @@ async function ensureKeysDir(): Promise<void> {
 
 function ensureEncryptionAvailable(): void {
   if (!safeStorage.isEncryptionAvailable()) {
-    throw new Error('Safe storage is not available on this system.')
+    throw new Error(
+      'Secure storage is not available on this system. This may occur if the system keychain is locked or unavailable. Please unlock your system keychain and try again.'
+    )
   }
 }
 
@@ -194,6 +198,7 @@ export async function getSettingsPublic(): Promise<{
   aiLocalModel: string
   aiLocalUrl: string
   aiProvider: 'offline' | 'local' | 'cloud'
+  aiPersona: 'standard' | 'cybersecurity'
   aiRedactionEnabled: boolean
   aiTimeoutSec: number
   defaultAccountId?: string
@@ -215,6 +220,7 @@ export async function getSettingsPublic(): Promise<{
     aiLocalModel: settings.aiLocalModel,
     aiLocalUrl: settings.aiLocalUrl,
     aiProvider: settings.aiProvider,
+    aiPersona: settings.aiPersona || 'standard',
     aiRedactionEnabled: settings.aiRedactionEnabled,
     aiTimeoutSec: settings.aiTimeoutSec,
     defaultAccountId: settings.defaultAccountId,

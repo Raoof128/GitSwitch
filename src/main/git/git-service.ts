@@ -3,7 +3,7 @@
 const simpleGitModule = require('simple-git')
 const simpleGit = simpleGitModule.simpleGit || simpleGitModule.default?.simpleGit || simpleGitModule
 import type { GitResponseError } from 'simple-git'
-import { promises as fs, rmSync } from 'fs'
+import { promises as fs, rmSync, existsSync } from 'fs'
 import { tmpdir } from 'os'
 import { dirname, join } from 'path'
 import { spawn } from 'child_process'
@@ -19,17 +19,53 @@ const MAX_TEMP_PATH_LENGTH = 256
 const DEFAULT_DIFF_BYTES = 80 * 1024 // 80KB
 const DEFAULT_DIFF_LINES = 400
 
+// User-friendly error message translations
+const ERROR_TRANSLATIONS: Array<{ pattern: RegExp; message: string }> = [
+  { pattern: /Permission denied \(publickey\)/i, message: 'SSH key not authorized. Please ensure your SSH key is added to your GitHub/GitLab account.' },
+  { pattern: /Host key verification failed/i, message: 'Host key verification failed. Try enabling "Trust new hosts" in Settings → Advanced, or manually add the host to known_hosts.' },
+  { pattern: /Could not resolve hostname/i, message: 'Could not connect to remote server. Check your internet connection and the remote URL.' },
+  { pattern: /Connection refused/i, message: 'Connection refused. The remote server is not responding.' },
+  { pattern: /repository not found/i, message: 'Repository not found. Check that the remote URL is correct and you have access.' },
+  { pattern: /fatal: not a git repository/i, message: 'This folder is not a Git repository. Run "git init" to create one.' },
+  { pattern: /nothing to commit/i, message: 'Nothing to commit. Stage some changes first.' },
+  { pattern: /no changes added to commit/i, message: 'No changes staged. Use "Stage All" or stage files manually.' },
+  { pattern: /failed to push some refs/i, message: 'Push failed. Your branch may be behind the remote. Try pulling first.' },
+  { pattern: /Updates were rejected/i, message: 'Push rejected. The remote has changes you don\'t have locally. Pull first, then push.' },
+  { pattern: /Could not read from remote/i, message: 'Could not read from remote. Check your SSH key and network connection.' },
+  { pattern: /Authentication failed/i, message: 'Authentication failed. Check your credentials or SSH key.' },
+  { pattern: /remote origin already exists/i, message: 'Remote "origin" already exists. Use "Update Origin" to change it.' },
+  { pattern: /does not appear to be a git repository/i, message: 'Remote URL is not a valid Git repository.' },
+  { pattern: /pathspec .* did not match/i, message: 'File not found or not tracked by Git.' },
+  { pattern: /CONFLICT/i, message: 'Merge conflict detected. Resolve conflicts manually before committing.' },
+  { pattern: /detached HEAD/i, message: 'You are in detached HEAD state. Create or checkout a branch before committing.' },
+  { pattern: /cannot lock ref/i, message: 'Git lock error. Another Git process may be running, or there\'s a stale lock file.' },
+  { pattern: /index\.lock/i, message: 'Git is locked. If no other Git operation is running, delete .git/index.lock manually.' }
+]
+
 const getGitErrorMessage = (error: unknown, fallback = 'Git operation failed.'): string => {
+  let rawMessage = fallback
+
   if (error && typeof error === 'object' && 'git' in error) {
     const gitMessage = (error as GitResponseError).git?.message
     if (gitMessage) {
-      return gitMessage.replace(/[a-f0-9]{40}/g, '[HASH]').replace(/\/.*?\//g, '/[PATH]/')
+      rawMessage = gitMessage
+    }
+  } else if (error instanceof Error) {
+    rawMessage = error.message
+  }
+
+  // Try to find a user-friendly translation
+  for (const { pattern, message } of ERROR_TRANSLATIONS) {
+    if (pattern.test(rawMessage)) {
+      return message
     }
   }
-  if (error instanceof Error) {
-    return error.message.replace(/[a-f0-9]{40}/g, '[HASH]').replace(/\/.*?\//g, '/[PATH]/')
-  }
-  return fallback
+
+  // If no translation found, sanitize and return the original
+  return rawMessage
+    .replace(/[a-f0-9]{40}/g, '[HASH]') // Redact commit hashes
+    .replace(/\/Users\/[^\/]+\//g, '~/') // Redact user paths
+    .slice(0, 300) // Limit length
 }
 
 async function writeTempKeyFile(privateKey: string): Promise<string> {
@@ -86,6 +122,37 @@ export async function getStatus(repoPath: string): Promise<GitStatus> {
   }
 }
 
+export async function getRemotes(repoPath: string): Promise<Array<{ name: string; url: string }>> {
+  try {
+    const git = simpleGit({ baseDir: repoPath })
+    const remotes = await git.getRemotes(true)
+    return remotes.map((remote) => ({
+      name: remote.name,
+      url: remote.refs?.fetch || remote.refs?.push || ''
+    }))
+  } catch (error) {
+    throw new Error(getGitErrorMessage(error, 'Failed to get remotes.'))
+  }
+}
+
+export async function setRemoteOrigin(repoPath: string, url: string): Promise<void> {
+  try {
+    const git = simpleGit({ baseDir: repoPath })
+    const remotes = await git.getRemotes()
+    const hasOrigin = remotes.some((r) => r.name === 'origin')
+
+    if (hasOrigin) {
+      // Update existing origin
+      await git.remote(['set-url', 'origin', url])
+    } else {
+      // Add new origin
+      await git.addRemote('origin', url)
+    }
+  } catch (error) {
+    throw new Error(getGitErrorMessage(error, 'Failed to set remote origin.'))
+  }
+}
+
 export async function getDiff(repoPath: string, mode: DiffMode = 'unstaged'): Promise<string> {
   const git = simpleGit({ baseDir: repoPath })
   let hasHead = true
@@ -122,8 +189,54 @@ export async function getDiff(repoPath: string, mode: DiffMode = 'unstaged'): Pr
 }
 
 export async function getStagedDiff(repoPath: string): Promise<string> {
-  const git = simpleGit({ baseDir: repoPath })
-  return git.diff(['--cached'])
+  try {
+    const git = simpleGit({ baseDir: repoPath })
+    return await git.diff(['--cached'])
+  } catch (error) {
+    throw new Error(getGitErrorMessage(error, 'Failed to get staged diff.'))
+  }
+}
+
+export async function stageAll(repoPath: string): Promise<void> {
+  try {
+    const git = simpleGit({ baseDir: repoPath })
+    await git.add('.')
+  } catch (error) {
+    throw new Error(getGitErrorMessage(error, 'Failed to stage files.'))
+  }
+}
+
+export async function addToGitignore(repoPath: string, filePath: string): Promise<void> {
+  const gitignorePath = join(repoPath, '.gitignore')
+  try {
+    const git = simpleGit({ baseDir: repoPath })
+    // Ensure the file exists
+    if (!existsSync(gitignorePath)) {
+      await fs.writeFile(gitignorePath, '', 'utf-8')
+    }
+
+    // Read current content
+    const currentContent = await fs.readFile(gitignorePath, 'utf-8')
+    
+    // Check if already ignored (simplistic check to avoid duplicate lines)
+    if (currentContent.split('\n').includes(filePath)) {
+      return
+    }
+
+    // Append file path
+    const prefix = currentContent && !currentContent.endsWith('\n') ? '\n' : ''
+    await fs.appendFile(gitignorePath, `${prefix}${filePath}\n`, 'utf-8')
+
+    // Untrack the file if it was previously tracked
+    // using --cached to remove from index but keep file on disk
+    try {
+      await git.rm([filePath, '--cached'])
+    } catch {
+      // Ignore if file wasn't tracked
+    }
+  } catch (error) {
+    throw new Error(getGitErrorMessage(error, 'Failed to add to .gitignore.'))
+  }
 }
 
 export async function commit(

@@ -24,6 +24,14 @@ const api = {
     ipcRenderer.invoke('git:commit', repoPath, title, body),
   generateCommitMessage: (repoPath: string): Promise<CommitMessage> =>
     ipcRenderer.invoke('git:generateCommitMessage', repoPath),
+  gitStageAll: (repoPath: string): Promise<{ ok: boolean }> =>
+    ipcRenderer.invoke('git:stageAll', repoPath),
+  gitGetRemotes: (repoPath: string): Promise<Array<{ name: string; url: string }>> =>
+    ipcRenderer.invoke('git:getRemotes', repoPath),
+  gitSetRemoteOrigin: (repoPath: string, url: string): Promise<{ ok: boolean }> =>
+    ipcRenderer.invoke('git:setRemoteOrigin', repoPath, url),
+  gitIgnore: (repoPath: string, filePath: string): Promise<{ ok: boolean }> =>
+    ipcRenderer.invoke('git:ignore', repoPath, filePath),
   gitPush: (repoPath: string, accountId: string): Promise<PushResult> =>
     ipcRenderer.invoke('git:push', repoPath, accountId),
   createPullRequest: (repoPath: string, options: PullRequestOptions): Promise<PullRequestResult> =>

@@ -2,7 +2,7 @@ import { GoogleGenAI } from '@google/genai'
 import type { CommitMessage } from '../../../index'
 import { loadAiKey } from '../../secure/key-manager'
 
-const MODEL = 'gemini-2.0-flash-exp'
+const DEFAULT_MODEL = 'gemini-1.5-flash'
 const MAX_CHARS = 80_000
 const TIMEOUT_MS = 8_000
 
@@ -96,11 +96,14 @@ export async function tryGemini(
   diffSnippet: string,
   files: Array<{ path: string; status: string }>,
   branch: string | null,
-  redact: boolean
+  redact: boolean,
+  modelName?: string,
+  persona?: string
 ): Promise<CommitMessage | null> {
   let apiKey = await loadAiKey()
   if (!apiKey) return null
 
+  const modelToUse = modelName || DEFAULT_MODEL
   let safeInput = diffSnippet
   if (redact) safeInput = redactSecrets(diffSnippet)
 
@@ -117,6 +120,12 @@ export async function tryGemini(
     safeInput
   ].join('\n')
 
+  const personaInstruction =
+    persona === 'cybersecurity'
+      ? '\n\nADDITIONAL INSTRUCTIONS:\nFocus significantly on security implications, vulnerability fixes, and code safety. Highlight any security improvements or risks in the body.'
+      : ''
+
+  console.log('[Gemini] Initializing with model:', modelToUse)
   const ai = new GoogleGenAI({ apiKey })
   // Immediately wipe API key from local scope
   apiKey = ''
@@ -127,10 +136,14 @@ export async function tryGemini(
   })
 
   try {
+    console.log('[Gemini] Sending request...')
     const responsePromise = ai.models.generateContent({
-      model: MODEL,
+      model: modelToUse,
       contents: [
-        { role: 'user', parts: [{ text: GEMINI_COMMIT_PROMPT + '\n\n---\n\n' + context }] }
+        {
+          role: 'user',
+          parts: [{ text: GEMINI_COMMIT_PROMPT + personaInstruction + '\n\n---\n\n' + context }]
+        }
       ],
       config: {
         temperature: 0.2,
@@ -141,10 +154,17 @@ export async function tryGemini(
 
     // Race between API call and timeout
     const response = await Promise.race([responsePromise, timeoutPromise])
-    if (!response) return null
+    if (!response) {
+      console.error('[Gemini] No response received')
+      return null
+    }
 
+    console.log('[Gemini] Response received')
     const text = response.text?.trim()
-    if (!text) return null
+    if (!text) {
+      console.error('[Gemini] Empty text in response')
+      return null
+    }
 
     let jsonText = text
 
@@ -174,7 +194,10 @@ export async function tryGemini(
     if (hasUnknownPaths(result, allowedPaths)) return null
 
     return result
-  } catch {
+  } catch (error) {
+    const errorDetails = error instanceof Error ? error.message : String(error)
+    console.error('[Gemini] Generation failed details:', errorDetails)
+    console.error('[Gemini] Full error:', JSON.stringify(error, null, 2))
     return null
   }
 }

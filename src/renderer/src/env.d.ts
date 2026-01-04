@@ -24,6 +24,10 @@ declare global {
       getGitDiff: (repoPath: string, mode: DiffMode) => Promise<string>
       gitCommit: (repoPath: string, title: string, body?: string) => Promise<CommitResult>
       generateCommitMessage: (repoPath: string) => Promise<CommitMessage>
+      gitStageAll: (repoPath: string) => Promise<{ ok: boolean }>
+      gitGetRemotes: (repoPath: string) => Promise<Array<{ name: string; url: string }>>
+      gitSetRemoteOrigin: (repoPath: string, url: string) => Promise<{ ok: boolean }>
+      gitIgnore: (repoPath: string, filePath: string) => Promise<{ ok: boolean }>
       gitPush: (repoPath: string, accountId: string) => Promise<PushResult>
       createPullRequest: (
         repoPath: string,
@@ -34,6 +38,7 @@ declare global {
         aiLocalModel: string
         aiLocalUrl: string
         aiProvider: 'offline' | 'local' | 'cloud'
+        aiPersona: 'standard' | 'cybersecurity'
         aiRedactionEnabled: boolean
         aiTimeoutSec: number
         defaultAccountId?: string | null

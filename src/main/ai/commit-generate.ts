@@ -91,18 +91,23 @@ const truncateDiff = (input: string, maxLines: number, maxBytes: number): string
   return result.join('\n')
 }
 
-const buildPrompt = (payload: ContextPayload): string => {
+const buildPrompt = (payload: ContextPayload, persona?: string): string => {
   const files = payload.files.map((file) => `- ${file.status} ${file.path}`).join('\n')
   const diffBlock = payload.diffSnippet
     ? `\nDiff snippet:\n${payload.diffSnippet}\n`
     : '\nDiff snippet: (none)\n'
+
+  const personaInstruction =
+    persona === 'cybersecurity'
+      ? 'Focus on security implications, vulnerability fixes, and code safety. Highlight any security improvements or risks.'
+      : 'Describe WHAT changed, never invent WHY.'
 
   return [
     'You are a commit message generator.',
     'Return JSON only: {"title":"...","body":"..."}',
     'Rules:',
     '- Title: imperative, <= 72 chars preferred, no trailing period.',
-    '- Body: bullet list, max 4 bullets, describe WHAT changed, never invent WHY.',
+    `- Body: bullet list, max 4 bullets, ${personaInstruction}`,
     '- Do not hallucinate files or behavior.',
     '',
     `Branch: ${payload.branch ?? 'unknown'}`,
@@ -436,10 +441,13 @@ export async function generateCommitMessage(repoPath: string): Promise<CommitMes
     return offline
   }
 
-  const promptBase = buildPrompt({
-    ...payload,
-    diffSnippet: payload.diffSnippet
-  })
+  const promptBase = buildPrompt(
+    {
+      ...payload,
+      diffSnippet: payload.diffSnippet
+    },
+    settings.aiPersona
+  )
   const prompt = settings.aiRedactionEnabled ? redactSecrets(promptBase) : promptBase
 
   if (settings.aiProvider === 'local') {
@@ -450,10 +458,7 @@ export async function generateCommitMessage(repoPath: string): Promise<CommitMes
     return offline
   }
 
-  const local = await tryLocalLlm(prompt, settings.aiLocalUrl, settings.aiLocalModel, timeoutMs)
-  if (local && !hasUnknownPaths(local, allowedPaths)) {
-    return local
-  }
+
 
   const isGemini = settings.aiCloudModel?.toLowerCase().includes('gemini')
   const cloud = isGemini
@@ -461,7 +466,9 @@ export async function generateCommitMessage(repoPath: string): Promise<CommitMes
         payload.diffSnippet,
         payload.files,
         payload.branch,
-        settings.aiRedactionEnabled
+        settings.aiRedactionEnabled,
+        settings.aiCloudModel,
+        settings.aiPersona
       )
     : await tryCloudLlm(prompt, settings.aiCloudModel, timeoutMs)
 

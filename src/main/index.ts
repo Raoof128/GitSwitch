@@ -5,7 +5,16 @@ import { homedir } from 'os'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { createRepoWatcher } from './git/watcher'
-import { commit, getDiff, getStatus, pushWithIdentity } from './git/git-service'
+import {
+  commit,
+  getDiff,
+  getRemotes,
+  getStatus,
+  pushWithIdentity,
+  setRemoteOrigin,
+  stageAll,
+  addToGitignore
+} from './git/git-service'
 import {
   addAccount,
   clearAiKey,
@@ -183,7 +192,9 @@ async function ensureGitRepository(repoPath: string): Promise<void> {
   try {
     await fs.stat(gitPath)
   } catch {
-    throw new Error('Path is not a Git repository.')
+    throw new Error(
+      'This folder is not a Git repository. Initialize it with "git init" or choose a different folder.'
+    )
   }
 }
 
@@ -247,6 +258,41 @@ async function registerIpcHandlers(): Promise<void> {
     return generateCommitMessage(normalized)
   })
 
+  ipcMain.handle('git:stageAll', async (_event, repoPath: string) => {
+    const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
+    await stageAll(normalized)
+    return { ok: true }
+  })
+
+  ipcMain.handle('git:getRemotes', async (_event, repoPath: string) => {
+    const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
+    return getRemotes(normalized)
+  })
+
+  ipcMain.handle('git:setRemoteOrigin', async (_event, repoPath: string, url: string) => {
+    const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
+    const safeUrl = assertString(url, 'url').trim()
+
+    // Validate URL format (SSH or HTTPS)
+    const isValidUrl =
+      safeUrl.startsWith('git@') ||
+      safeUrl.startsWith('https://') ||
+      safeUrl.startsWith('ssh://')
+    if (!safeUrl || !isValidUrl) {
+      throw new Error('Invalid remote URL format. Use SSH (git@...) or HTTPS (https://...).')
+    }
+
+    await setRemoteOrigin(normalized, safeUrl)
+    return { ok: true }
+  })
+
+  ipcMain.handle('git:ignore', async (_event, repoPath: string, filePath: string) => {
+    const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
+    const safeFilePath = assertString(filePath, 'filePath')
+    await addToGitignore(normalized, safeFilePath)
+    return { ok: true }
+  })
+
   ipcMain.handle('git:push', async (_event, repoPath: string, accountId: string) => {
     const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
     const safeAccountId = assertString(accountId, 'accountId')
@@ -306,7 +352,8 @@ async function registerIpcHandlers(): Promise<void> {
           'likeApp',
           'reducedMotion',
           'strictHostKeyChecking',
-          'theme'
+          'theme',
+          'aiPersona'
         ],
         'settings payload'
       )
@@ -316,6 +363,13 @@ async function registerIpcHandlers(): Promise<void> {
       if ('aiLocalModel' in input)
         safeInput.aiLocalModel = assertString(input.aiLocalModel, 'aiLocalModel')
       if ('aiLocalUrl' in input) safeInput.aiLocalUrl = assertString(input.aiLocalUrl, 'aiLocalUrl')
+      if ('aiPersona' in input) {
+        const persona = assertString(input.aiPersona, 'aiPersona')
+        if (persona !== 'standard' && persona !== 'cybersecurity') {
+          throw new Error('Invalid aiPersona.')
+        }
+        safeInput.aiPersona = persona as 'standard' | 'cybersecurity'
+      }
       if ('aiProvider' in input) {
         const provider = assertString(input.aiProvider, 'aiProvider')
         if (!['offline', 'local', 'cloud'].includes(provider)) {

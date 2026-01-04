@@ -18,6 +18,7 @@ type RepoState = {
   aiLocalModel: string
   aiLocalUrl: string
   aiProvider: 'offline' | 'local' | 'cloud'
+  aiPersona: 'standard' | 'cybersecurity'
   aiRedactionEnabled: boolean
   aiTimeoutSec: number
   applyStatusUpdate: (repoPath: string, status: GitStatus) => void
@@ -69,6 +70,8 @@ type RepoState = {
   setSelectedAccountId: (id: string | null) => void
   setSettingsOpen: (open: boolean) => void
   settingsOpen: boolean
+  stageAll: () => Promise<void>
+  stageStatus: 'idle' | 'loading'
   stagedDiffText: string
   stagedSummary: {
     count: number
@@ -78,6 +81,10 @@ type RepoState = {
   strictHostKeyChecking: boolean
   submitPullRequest: () => Promise<void>
   theme: 'dark'
+  remotes: Array<{ name: string; url: string }>
+  refreshRemotes: () => Promise<void>
+  setRemoteOrigin: (url: string) => Promise<{ ok: boolean; error?: string }>
+  addToIgnore: (filePath: string) => Promise<{ ok: boolean; error?: string }>
   updatePrForm: (input: Partial<PullRequestOptions>) => void
   updateSettings: (
     input: Partial<{
@@ -85,6 +92,7 @@ type RepoState = {
       aiLocalModel: string
       aiLocalUrl: string
       aiProvider: 'offline' | 'local' | 'cloud'
+      aiPersona: 'standard' | 'cybersecurity'
       aiRedactionEnabled: boolean
       aiTimeoutSec: number
       defaultAccountId: string | null
@@ -132,6 +140,7 @@ export const useRepoStore = create<RepoState>((set, get) => ({
   aiLocalModel: 'qwen2.5-coder:7b',
   aiLocalUrl: 'http://localhost:11434/api/generate',
   aiProvider: 'offline',
+  aiPersona: 'standard',
   aiRedactionEnabled: true,
   aiTimeoutSec: 7,
   defaultAccountId: null,
@@ -144,6 +153,7 @@ export const useRepoStore = create<RepoState>((set, get) => ({
   likeApp: false,
   reducedMotion: false,
   settingsOpen: false,
+  stageStatus: 'idle',
   strictHostKeyChecking: true,
   theme: 'dark',
   prModalOpen: false,
@@ -158,6 +168,7 @@ export const useRepoStore = create<RepoState>((set, get) => ({
   publishStatus: null,
   selectedAccountId: null,
   accounts: [],
+  remotes: [],
   addRepo: async () => {
     if (!window.api?.selectFolder) {
       return
@@ -208,9 +219,10 @@ export const useRepoStore = create<RepoState>((set, get) => ({
     }
   },
   setActiveRepo: async (path) => {
-    set({ activeRepoPath: path, publishStatus: null })
+    set({ activeRepoPath: path, publishStatus: null, remotes: [] })
     await get().refreshStatus()
     await get().loadDiff('unstaged')
+    await get().refreshRemotes()
   },
   refreshStatus: async () => {
     const repoPath = get().activeRepoPath
@@ -272,6 +284,62 @@ export const useRepoStore = create<RepoState>((set, get) => ({
   },
   refreshPublishStatus: async () => {
     set({ publishStatus: null })
+  },
+  stageAll: async () => {
+    const repoPath = get().activeRepoPath
+    if (!repoPath || !window.api?.gitStageAll) {
+      return
+    }
+
+    try {
+      set({ stageStatus: 'loading' })
+      await window.api.gitStageAll(repoPath)
+      await get().refreshStatus()
+      await get().loadDiff('unstaged')
+      await get().loadStagedDiff()
+      set({ stageStatus: 'idle' })
+    } catch {
+      set({ stageStatus: 'idle' })
+    }
+  },
+  refreshRemotes: async () => {
+    const repoPath = get().activeRepoPath
+    if (!repoPath || !window.api?.gitGetRemotes) {
+      return
+    }
+    try {
+      const remotes = await window.api.gitGetRemotes(repoPath)
+      set({ remotes })
+    } catch {
+      set({ remotes: [] })
+    }
+  },
+  setRemoteOrigin: async (url: string) => {
+    const repoPath = get().activeRepoPath
+    if (!repoPath || !window.api?.gitSetRemoteOrigin) {
+      return { ok: false, error: 'No repository selected.' }
+    }
+    try {
+      await window.api.gitSetRemoteOrigin(repoPath, url)
+      await get().refreshRemotes()
+      return { ok: true }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to set remote origin.'
+      return { ok: false, error: message }
+    }
+  },
+  addToIgnore: async (filePath: string) => {
+    const repoPath = get().activeRepoPath
+    if (!repoPath || !window.api?.gitIgnore) {
+      return { ok: false, error: 'No active repository.' }
+    }
+    try {
+      await window.api.gitIgnore(repoPath, filePath)
+      await get().refreshStatus()
+      return { ok: true }
+    } catch (e) {
+      return { ok: false, error: e instanceof Error ? e.message : 'Failed to ignore file.' }
+    }
   },
   setCommitTitle: (title) => set({ commitTitle: title, commitError: null, commitStatus: 'idle' }),
   setCommitBody: (body) => set({ commitBody: body, commitError: null, commitStatus: 'idle' }),
@@ -369,6 +437,7 @@ export const useRepoStore = create<RepoState>((set, get) => ({
       aiLocalModel: settings.aiLocalModel,
       aiLocalUrl: settings.aiLocalUrl,
       aiProvider: settings.aiProvider,
+      aiPersona: settings.aiPersona,
       aiRedactionEnabled: settings.aiRedactionEnabled,
       aiTimeoutSec: settings.aiTimeoutSec,
       defaultAccountId: settings.defaultAccountId ?? null,

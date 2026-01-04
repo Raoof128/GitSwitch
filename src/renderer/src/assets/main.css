@@ -3,24 +3,52 @@
 @tailwind utilities;
 
 :root {
+  /* Fluid typography */
+  font-size: clamp(13px, 0.8vw + 8px, 16px);
   color-scheme: dark;
-  --ui-bg: #36454f;
-  --ui-panel: #3a4a55;
-  --ui-panel-muted: #32414a;
-  --ui-border: #0f1316;
-  --ui-border-soft: #171c20;
-  --ui-hover: #252d33;
-  --ui-accent: #8fb3c7;
-  --ui-text: #ffffff;
-  --ui-text-muted: #ffffff;
-  --ui-status-added: #18f26f;
-  --ui-status-modified: #ffd166;
-  --ui-status-deleted: #ff2d2d;
-  --ui-status-untracked: #3f82ff;
-  --ui-diff-insert: #0d5a2c;
-  --ui-diff-delete: #7a1b24;
-  --ui-diff-gutter-insert: #0a4a24;
-  --ui-diff-gutter-delete: #61151d;
+
+  /* Arasaka Tower Palette */
+  --ui-bg: #0b0e14;
+  /* Void Black */
+  --ui-panel: #121212;
+  /* Panel Grey */
+  --ui-panel-muted: #1a1a1a;
+  /* Input Fields */
+  --ui-border: #333333;
+  /* Subtle separation */
+  --ui-border-soft: #262626;
+  --ui-hover: #1f1f1f;
+
+  --ui-accent: #c5003c;
+  /* Arasaka Red (Primary Action) */
+  --ui-text: #e5e5e5;
+  /* Off-white */
+  --ui-text-muted: #999999;
+  /* Secondary Grey */
+
+  /* Functional Status */
+  --ui-status-added: #00e676;
+  /* Neon Matrix Green */
+  --ui-status-modified: #ff9100;
+  /* Safety Orange */
+  --ui-status-deleted: #ff1744;
+  /* Bright Failure Red */
+  --ui-status-untracked: #2979ff;
+  /* Terminal Blue */
+
+  /* Code Syntax (Netrunner) */
+  --code-keyword: #ff0055;
+  --code-function: #00ff9f;
+  --code-string: #fcee0a;
+
+  /* Additional Cyberpunk Accents */
+  --brand-cyan: #00f0ff;
+  /* Focus/Links */
+
+  --ui-diff-insert: rgba(0, 230, 118, 0.1);
+  --ui-diff-delete: rgba(255, 23, 68, 0.1);
+  --ui-diff-gutter-insert: rgba(0, 230, 118, 0.2);
+  --ui-diff-gutter-delete: rgba(255, 23, 68, 0.2);
 }
 
 body {
@@ -31,6 +59,7 @@ body {
     system-ui,
     -apple-system,
     sans-serif;
+  overflow-wrap: break-word;
 }
 
 html {
@@ -43,9 +72,26 @@ html {
   }
 }
 
+/* Scanlines (CRT Effect) */
+body::before {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  z-index: 9999;
+  background-size: 100% 2px, 3px 100%;
+  pointer-events: none;
+}
+
+/* Enforce squared corners for Cyberpunk feel */
 * {
   scrollbar-width: thin;
   scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
+  border-radius: 0px !important;
 }
 
 ::-webkit-scrollbar {
@@ -59,7 +105,8 @@ html {
 
 ::-webkit-scrollbar-thumb {
   background-color: rgba(148, 163, 184, 0.25);
-  border-radius: 999px;
+  background-color: rgba(148, 163, 184, 0.25);
+  border-radius: 0px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
@@ -69,8 +116,9 @@ html {
 }
 
 ::selection {
-  background: rgba(143, 179, 199, 0.35);
-  color: var(--ui-text);
+  background: rgba(197, 0, 60, 0.2);
+  /* #c5003c33 */
+  color: #e5e5e5;
 }
 
 .text-slate-100,
@@ -93,7 +141,7 @@ html {
 
 input::placeholder,
 textarea::placeholder {
-  color: #ffffff;
+  color: var(--ui-text-muted);
   opacity: 0.9;
 }
 
@@ -161,7 +209,7 @@ input[type='radio']:focus-visible {
 }
 
 button:disabled {
-  color: #ffffff;
+  color: var(--ui-text-muted);
 }
 
 button {
@@ -196,7 +244,7 @@ button:hover:not(:disabled) {
 }
 
 .hover-card:hover {
-  background-color: rgba(255, 255, 255, 0.04);
+  background-color: rgba(197, 0, 60, 0.1);
   box-shadow: 0 0 0 1px var(--ui-border-soft);
 }
 
@@ -312,7 +360,7 @@ button:hover:not(:disabled) {
 }
 
 .diff-view .diff-line:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(197, 0, 60, 0.08);
 }
 
 .diff-view .diff-code-insert {

@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useRepoStore } from '../../store/useRepoStore'
 import { CommitPanel } from './CommitPanel'
+import { RemoteConfig } from './RemoteConfig'
 import { RepoList } from './RepoList'
 
 type SidebarProps = {
@@ -32,6 +33,7 @@ export function Sidebar({ width = 256 }: SidebarProps) {
         ) : (
           <>
             <RepoList />
+            <RemoteConfig />
             <CommitPanel />
           </>
         )}

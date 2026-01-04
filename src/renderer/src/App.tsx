@@ -9,7 +9,7 @@ import { FileList } from './components/sidebar/FileList'
 import { PullRequestModal } from './components/pr/PullRequestModal'
 import { SettingsView } from './components/settings/SettingsView'
 
-function App: () {
+function App() {
   const {
     activeRepoPath,
     status,

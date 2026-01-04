@@ -6,7 +6,7 @@ import { SettingsIntegrations } from './SettingsIntegrations'
 
 type SettingsTab = 'accounts' | 'advanced' | 'general' | 'integrations'
 
-export function SettingsView: () {
+export function SettingsView() {
   const [tab, setTab] = useState<SettingsTab>('general')
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
 

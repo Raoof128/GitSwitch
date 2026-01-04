@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useRepoStore } from '../../store/useRepoStore'
 import { scaleTap, useReducedMotionSafe } from '../motion/motion'
 
-export function CommitPanel: () {
+export function CommitPanel() {
   const {
     activeRepoPath,
     status,

@@ -8,7 +8,7 @@ import { fadeSlideIn, scaleTap, useReducedMotionSafe } from '../motion/motion'
 
 const cx = (...inputs: Array<string | false | null | undefined>) => twMerge(clsx(inputs))
 
-export function RepoList: () {
+export function RepoList() {
   const { repos, activeRepoPath, addRepo, setActiveRepo, reducedMotion } = useRepoStore()
   const reduceMotion = useReducedMotionSafe(reducedMotion)
   const listVariants = useMemo(() => fadeSlideIn(reduceMotion), [reduceMotion])

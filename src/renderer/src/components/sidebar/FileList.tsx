@@ -13,7 +13,7 @@ const getStatusCode = (index: string, workingDir: string): string => {
   return '?'
 }
 
-export function FileList: () {
+export function FileList() {
   const { status, reducedMotion } = useRepoStore()
   const files = useMemo(() => status?.files ?? [], [status])
   const reduceMotion = useReducedMotionSafe(reducedMotion)

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useRepoStore } from '../../store/useRepoStore'
 
-export function SettingsAccounts: () {
+export function SettingsAccounts() {
   const {
     accounts,
     addAccount,

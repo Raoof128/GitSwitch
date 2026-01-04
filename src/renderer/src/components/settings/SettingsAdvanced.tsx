@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useRepoStore } from '../../store/useRepoStore'
 
-export function SettingsAdvanced: () {
+export function SettingsAdvanced() {
   const {
     aiRedactionEnabled,
     aiTimeoutSec,

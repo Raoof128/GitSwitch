@@ -2,7 +2,7 @@ import { useCallback, useMemo, useEffect, useRef } from 'react'
 import type { ChangeEvent } from 'react'
 import { useRepoStore } from '../../store/useRepoStore'
 
-export function PullRequestModal: () {
+export function PullRequestModal() {
   const {
     prModalOpen,
     prForm,
@@ -101,8 +101,8 @@ export function PullRequestModal: () {
   )
 
   const handleOpenPr = useCallback(() => {
-    if (prResult.url) {
-      window.open(prResult.url, '_blank', 'noopener')
+    if (prResult.url && window.api?.openExternal) {
+      void window.api.openExternal(prResult.url)
     }
   }, [prResult.url])
 

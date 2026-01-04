@@ -25,7 +25,12 @@
 
 body {
   @apply bg-[var(--ui-bg)] text-[var(--ui-text)] antialiased;
-  font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-family:
+    'IBM Plex Sans',
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    sans-serif;
 }
 
 html {
@@ -160,7 +165,10 @@ button:disabled {
 }
 
 button {
-  transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease,
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease,
     box-shadow 150ms ease;
 }
 
@@ -171,7 +179,9 @@ button:focus-visible {
 
 input,
 textarea {
-  transition: border-color 150ms ease, box-shadow 150ms ease;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
 }
 
 button:hover:not(:disabled) {
@@ -179,7 +189,10 @@ button:hover:not(:disabled) {
 }
 
 .hover-card {
-  transition: background-color 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+  transition:
+    background-color 150ms ease,
+    box-shadow 150ms ease,
+    border-color 150ms ease;
 }
 
 .hover-card:hover {
@@ -278,7 +291,9 @@ button:hover:not(:disabled) {
 .diff-view-container {
   overflow: auto;
   max-width: 100%;
-  transition: box-shadow 150ms ease, border-color 150ms ease;
+  transition:
+    box-shadow 150ms ease,
+    border-color 150ms ease;
 }
 
 .diff-view-container:hover {

@@ -1,4 +1,7 @@
-import { simpleGit } from 'simple-git'
+// Handle ESM/CJS interop for simple-git
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const simpleGitModule = require('simple-git')
+const simpleGit = simpleGitModule.simpleGit || simpleGitModule.default?.simpleGit || simpleGitModule
 import type { GitResponseError } from 'simple-git'
 import { promises as fs, rmSync } from 'fs'
 import { tmpdir } from 'os'
@@ -193,6 +196,14 @@ export async function pushWithIdentity(
   const strictValue = strictHostKeyChecking ? 'yes' : 'no'
   const sshCommand = `ssh -i "${tempKeyPath}" -o IdentitiesOnly=yes -o StrictHostKeyChecking=${strictValue}`
 
+  // Get current branch name first
+  const git = simpleGit({ baseDir: repoPath })
+  const status = await git.status()
+  const currentBranch = status.current
+  if (!currentBranch) {
+    throw new Error('Cannot push: not on a branch.')
+  }
+
   try {
     const result = await new Promise<PushResult>((resolve, reject) => {
       const controller = new AbortController()
@@ -201,7 +212,8 @@ export async function pushWithIdentity(
       let stdout = ''
       let stderr = ''
 
-      const child = spawn('git', ['push'], {
+      // Use -u to set upstream tracking, and specify origin + branch
+      const child = spawn('git', ['push', '-u', 'origin', currentBranch], {
         cwd: repoPath,
         env: {
           ...process.env,
@@ -238,7 +250,17 @@ export async function pushWithIdentity(
         if (code === 0) {
           resolve({ stdout, stderr })
         } else {
-          const error = new Error(`git push failed with code ${code}`)
+          // Extract the meaningful part of stderr for the error message
+          const stderrLines = stderr.trim().split('\n')
+          const meaningfulError = stderrLines
+            .filter((line) => !line.startsWith('remote:') || line.includes('error'))
+            .slice(-3)
+            .join(' ')
+            .replace(/[a-f0-9]{40}/g, '[HASH]') // Redact commit hashes
+            .slice(0, 200) // Limit error message length
+          const error = new Error(
+            `Push failed: ${meaningfulError || `git push failed with code ${code}`}`
+          )
           Object.assign(error, { stdout, stderr })
           reject(error)
         }

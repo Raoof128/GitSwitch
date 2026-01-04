@@ -1,5 +1,4 @@
 import { app, safeStorage } from 'electron'
-import ElectronStoreConstructor from 'electron-store'
 import { promises as fs } from 'fs'
 import { join } from 'path'
 import { randomUUID } from 'crypto'
@@ -32,7 +31,12 @@ type ElectronStoreType<T> = {
   set(value: Partial<T>): void
 }
 
-const ElectronStore = ElectronStoreConstructor as new <T>(options: unknown) => ElectronStoreType<T>
+// Handle ESM/CJS interop for electron-store
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const ElectronStoreModule = require('electron-store')
+const ElectronStore = (
+  ElectronStoreModule.default || ElectronStoreModule
+) as new <T>(options: unknown) => ElectronStoreType<T>
 
 const DEFAULT_SETTINGS: StoreSchema['settings'] = {
   aiCloudModel: 'gpt-4o-mini',
@@ -162,9 +166,20 @@ export async function loadKey(accountId: string): Promise<string> {
   const encrypted = await fs.readFile(filePath)
   const decrypted = safeStorage.decryptString(encrypted)
 
-  // Basic validation - ensure it looks like a private key
-  if (!decrypted.includes('-----BEGIN') || !decrypted.includes('PRIVATE KEY-----')) {
-    throw new Error('Invalid key format')
+  // Validate key format - support common SSH private key formats:
+  // - RSA: -----BEGIN RSA PRIVATE KEY-----
+  // - OpenSSH (new format): -----BEGIN OPENSSH PRIVATE KEY-----
+  // - EC: -----BEGIN EC PRIVATE KEY-----
+  // - PKCS8: -----BEGIN PRIVATE KEY-----
+  // - DSA: -----BEGIN DSA PRIVATE KEY-----
+  const validKeyPatterns = [
+    /-----BEGIN (RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----/,
+    /-----BEGIN PRIVATE KEY-----/
+  ]
+
+  const isValidKey = validKeyPatterns.some((pattern) => pattern.test(decrypted))
+  if (!isValidKey) {
+    throw new Error('Invalid key format. Expected PEM-encoded SSH private key.')
   }
 
   return decrypted

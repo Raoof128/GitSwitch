@@ -47,6 +47,7 @@ const resolvePreloadPath = (): string => {
 
 function createWindow(): void {
   const preloadPath = resolvePreloadPath()
+  // Dev-only logging - these lines will not execute in production builds
   if (isDev) {
     console.log('[dev] preload path:', preloadPath)
     console.log('[dev] ELECTRON_PRELOAD:', process.env['ELECTRON_PRELOAD'] || '(unset)')
@@ -484,6 +485,15 @@ async function registerIpcHandlers(): Promise<void> {
         }
       }
     }
+  })
+
+  ipcMain.handle('shell:openExternal', async (_event, url: string) => {
+    const safeUrl = assertString(url, 'url')
+    if (!isAllowedExternalUrl(safeUrl)) {
+      throw new Error('URL not allowed.')
+    }
+    await shell.openExternal(safeUrl)
+    return { ok: true }
   })
 }
 

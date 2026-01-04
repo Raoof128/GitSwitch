@@ -88,6 +88,7 @@ declare global {
       saveSecret: (input: SecretsSaveInput) => Promise<SecretsResult>
       deleteSecret: (input: SecretsDeleteInput) => Promise<SecretsResult>
       onStatusChange: (callback: (payload: GitStatusPayload) => void) => () => void
+      openExternal: (url: string) => Promise<{ ok: boolean }>
     }
   }
 }

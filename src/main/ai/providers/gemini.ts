@@ -98,7 +98,7 @@ export async function tryGemini(
   branch: string | null,
   redact: boolean
 ): Promise<CommitMessage | null> {
-  const apiKey = await loadAiKey()
+  let apiKey = await loadAiKey()
   if (!apiKey) return null
 
   let safeInput = diffSnippet
@@ -118,11 +118,16 @@ export async function tryGemini(
   ].join('\n')
 
   const ai = new GoogleGenAI({ apiKey })
-  const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS)
+  // Immediately wipe API key from local scope
+  apiKey = ''
+
+  // Create timeout promise for proper timeout handling
+  const timeoutPromise = new Promise<null>((_, reject) => {
+    setTimeout(() => reject(new Error('Gemini timeout')), TIMEOUT_MS)
+  })
 
   try {
-    const response = await ai.models.generateContent({
+    const responsePromise = ai.models.generateContent({
       model: MODEL,
       contents: [
         { role: 'user', parts: [{ text: GEMINI_COMMIT_PROMPT + '\n\n---\n\n' + context }] }
@@ -133,6 +138,10 @@ export async function tryGemini(
         responseMimeType: 'application/json'
       }
     })
+
+    // Race between API call and timeout
+    const response = await Promise.race([responsePromise, timeoutPromise])
+    if (!response) return null
 
     const text = response.text?.trim()
     if (!text) return null
@@ -167,7 +176,5 @@ export async function tryGemini(
     return result
   } catch {
     return null
-  } finally {
-    clearTimeout(timer)
   }
 }

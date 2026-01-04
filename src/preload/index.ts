@@ -80,7 +80,9 @@ const api = {
     }
     ipcRenderer.on('git:status-changed', listener)
     return () => ipcRenderer.removeListener('git:status-changed', listener)
-  }
+  },
+  openExternal: (url: string): Promise<{ ok: boolean }> =>
+    ipcRenderer.invoke('shell:openExternal', url)
 }
 
 contextBridge.exposeInMainWorld('api', api)

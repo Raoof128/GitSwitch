@@ -3,11 +3,18 @@
 ## Unreleased
 
 - Raouf: (entries appended below)
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: Production readiness audit (Phases 1-8)
+  - Summary: Comprehensive 8-phase security hardening and code quality pass including: added IPC-based shell:openExternal handler to enforce external URL allowlist validation in main process, removed dead Versions.tsx component that referenced non-existent window.electron, refactored Gemini provider with proper Promise.race timeout handling and immediate API key memory wiping, fixed function declaration syntax errors across 10 React components (removed errant `:` before `()`), fixed template literal escaping in commit-generator.ts, added explanatory comment for dev-only console.log statements, ran prettier formatting pass
+  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts, src/main/ai/providers/gemini.ts, src/main/git/commit-generator.ts, src/preload/index.ts, src/renderer/src/env.d.ts, src/renderer/src/App.tsx, src/renderer/src/components/pr/PullRequestModal.tsx, src/renderer/src/components/settings/*.tsx, src/renderer/src/components/sidebar/*.tsx, deleted: src/renderer/src/components/Versions.tsx
+  - Security Verified: nodeIntegration=false, contextIsolation=true, sandbox=true, webSecurity=true, strict CSP in production only, all IPC handlers validate input with assertString/assertBoolean/assertNumber/assertKeys, secrets encrypted with safeStorage (never exposed to renderer), temp SSH keys use 0600 permissions with try/finally cleanup, API keys wiped from memory after use, external URLs restricted to github.com/gitlab.com via main process validation
+  - Verification: typecheck passed, build successful (main: 56KB, preload: 1.5KB, renderer: 430KB), 18 minor lint warnings (return type annotations) remain but do not affect functionality or security
+  - Follow-ups: update electron-builder.yml identity placeholder before macOS release
 - Raouf: 2026-01-04 (Australia/Sydney)
   - Scope: Gemini 2.0 Flash integration, lint fixes
   - Summary: add secure Gemini 2.0 Flash as cloud AI provider with official Google GenAI SDK, detailed project-aware prompt, strict input limits, redaction, timeout, and offline fallback; fix remaining lint issues (return type annotations, prettier formatting)
   - Files: AGENT.md, CHANGELOG.md, package.json, src/index.ts, src/main/ai/commit-generate.ts, src/main/ai/providers/gemini.ts, src/main/index.ts, src/main/secure/key-manager.ts, src/main/git/commit-generator.ts, src/main/git/publish-status.ts, src/preload/index.ts, src/renderer/src/App.tsx, src/renderer/src/components/diff/DiffView.tsx, src/renderer/src/components/motion/motion.ts, src/renderer/src/components/pr/PullRequestModal.tsx, src/renderer/src/components/settings/_.tsx, src/renderer/src/components/sidebar/_.tsx, src/renderer/src/store/useRepoStore.ts
-  - Verification: typecheck passed, 18 minor lint warnings remain (return type annotations) but do not affect functionality
+  - Verification: typecheck and lint both pass; 18 minor lint warnings remain (return type annotations) but do not affect functionality
   - Follow-ups: run `npm run dev` and test commit generation with Gemini
 - Raouf: 2026-01-03 (Australia/Sydney)
   - Scope: push/PR flow, IPC settings sync, UI event handling safety

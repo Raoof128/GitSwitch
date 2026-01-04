@@ -1,11 +1,15 @@
-import * as chokidar from 'chokidar'
+// Handle ESM/CJS interop for chokidar
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const chokidarModule = require('chokidar')
+const chokidar = chokidarModule.default || chokidarModule
+import type { FSWatcher } from 'chokidar'
 import { join } from 'path'
 import { getStatus } from './git-service'
 import type { GitStatusPayload } from '../../index'
 
 type StatusHandler = (payload: GitStatusPayload) => void
 
-export function createRepoWatcher(repoPath: string, onStatus: StatusHandler): chokidar.FSWatcher {
+export function createRepoWatcher(repoPath: string, onStatus: StatusHandler): FSWatcher {
   if (repoPath.length > 4096) {
     throw new Error('Repository path too long for watching.')
   }
@@ -58,5 +62,5 @@ export function createRepoWatcher(repoPath: string, onStatus: StatusHandler): ch
 
   // poller = setInterval(scheduleStatus, 5000)
 
-  return watcher as chokidar.FSWatcher
+  return watcher as FSWatcher
 }

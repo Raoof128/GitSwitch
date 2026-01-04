@@ -1,0 +1,187 @@
+# AGENT
+
+## Project Rules
+
+- Keep the renderer sandboxed: contextIsolation true, nodeIntegration false, sandbox true.
+- Run all filesystem and git operations in the main process via IPC.
+- Store key metadata in electron-store; encrypt private keys with safeStorage at ~/.gitswitch/keys/{id}.enc.
+- Create temp SSH key files with 0600 permissions and always clean them up.
+- Maintain the sidebar/files/diff layout structure; avoid random redesigns.
+
+## Log
+
+- Raouf: (entries appended below)
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: Gemini 2.0 Flash integration, lint fixes
+  - Summary: add secure Gemini 2.0 Flash as cloud AI provider with official Google GenAI SDK, detailed project-aware prompt, strict input limits, redaction, timeout, and offline fallback; fix remaining lint issues
+  - Files: AGENT.md, CHANGELOG.md, package.json, src/index.ts, src/main/ai/commit-generate.ts, src/main/ai/providers/gemini.ts, src/main/git/commit-generator.ts, src/main/index.ts, src/main/secure/key-manager.ts, src/main/git/publish-status.ts, src/preload/index.ts, src/renderer/src/App.tsx, src/renderer/src/components/diff/DiffView.tsx, src/renderer/src/components/motion/motion.ts, src/renderer/src/components/pr/PullRequestModal.tsx, src/renderer/src/components/settings/_.tsx, src/renderer/src/components/sidebar/_.tsx, src/renderer/src/store/useRepoStore.ts
+  - Verification: typecheck passed, 18 minor lint warnings (return type annotations) remain but do not affect functionality
+  - Follow-ups: run `npm run dev` and test commit generation with Gemini
+- Raouf: 2026-01-03 (Australia/Sydney)
+  - Scope: push/PR flow, IPC settings sync, UI event handling safety
+  - Summary: harden push->PR gating, align settings typing, add safe external open, and clear commit timers on teardown
+  - Files: AGENT.md, CHANGELOG.md, src/preload/index.ts, src/renderer/src/env.d.ts, src/renderer/src/App.tsx, src/renderer/src/components/pr/PullRequestModal.tsx, src/renderer/src/components/sidebar/Sidebar.tsx, src/renderer/src/store/useRepoStore.ts
+  - Verification: not run (not requested)
+  - Follow-ups: run `npm run dev` and validate push→PR flow with token
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: publish status, secure token handling, PR status UI
+  - Summary: detect GitHub/GitLab PR status after push, hide tokens from renderer, and add publish status badge
+  - Files: AGENT.md, CHANGELOG.md, src/index.ts, src/main/index.ts, src/main/git/publish-status.ts, src/main/secure/key-manager.ts, src/preload/index.ts, src/renderer/src/App.tsx, src/renderer/src/components/pr/PullRequestModal.tsx, src/renderer/src/components/sidebar/Sidebar.tsx, src/renderer/src/env.d.ts, src/renderer/src/store/useRepoStore.ts
+  - Verification: not run (not requested)
+  - Follow-ups: run `npm run dev`, push changes, and confirm PR status badge/link
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: build fix
+  - Summary: remove stray parenthesis in IPC handler registration
+  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts
+  - Verification: not run (error reproduction only)
+  - Follow-ups: rerun `npm run dev`
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: build fix
+  - Summary: add parentheses around nullish coalescing to satisfy esbuild
+  - Files: AGENT.md, CHANGELOG.md, src/renderer/src/store/useRepoStore.ts
+  - Verification: not run (error reproduction only)
+  - Follow-ups: rerun `npm run dev`
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: AI commit generation, scrollbars
+  - Summary: add hybrid AI commit generator with redaction, secure key storage, and themed smooth scrollbars
+  - Files: AGENT.md, CHANGELOG.md, src/main/ai/commit-generate.ts, src/main/index.ts, src/main/secure/key-manager.ts, src/renderer/src/assets/main.css, src/renderer/src/components/sidebar/CommitPanel.tsx
+  - Verification: not run (not requested)
+  - Follow-ups: run `npm run dev` and test Generate ✨ with and without local/cloud AI
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: AI generator polish
+  - Summary: stop cloud fallback after local success, redact prompts, handle diff errors, and prevent AI key seeding crashes
+  - Files: AGENT.md, CHANGELOG.md, src/main/ai/commit-generate.ts, src/main/secure/key-manager.ts
+  - Verification: not run (not requested)
+  - Follow-ups: run `npm run dev` and test Generate ✨ with new fallback order
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: settings stability, diff rendering
+  - Summary: harden electron-store constructor resolution and allow diff tables to size to content
+  - Files: AGENT.md, CHANGELOG.md, src/main/secure/key-manager.ts, src/renderer/src/assets/main.css
+  - Verification: not run (not requested)
+  - Follow-ups: run `npm run dev` and confirm the diff view no longer wraps mid-word
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: UI header
+  - Summary: add quick account switcher next to Push for fast identity swaps
+  - Files: AGENT.md, CHANGELOG.md, src/renderer/src/App.tsx
+  - Verification: not run (not requested)
+  - Follow-ups: run `npm run dev` and verify account selection updates Push state
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: theme consistency
+  - Summary: centralize status and diff colors into theme tokens and align publish badge styling
+  - Files: AGENT.md, CHANGELOG.md, src/renderer/src/App.tsx, src/renderer/src/assets/main.css
+  - Verification: not run (not requested)
+  - Follow-ups: run `npm run dev` and confirm status + diff colors match the unified palette
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: theme polish
+  - Summary: standardize form control backgrounds, borders, and checkbox accent colors
+  - Files: AGENT.md, CHANGELOG.md, src/renderer/src/assets/main.css
+  - Verification: not run (not requested)
+  - Follow-ups: run `npm run dev` and confirm selects/checkboxes match the dark theme
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: theme polish
+  - Summary: restyle checkboxes/radios to match panel/border palette with custom checked indicator
+  - Files: AGENT.md, CHANGELOG.md, src/renderer/src/assets/main.css
+  - Verification: not run (not requested)
+  - Follow-ups: run `npm run dev` and confirm checkbox colors match the theme
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: security hardening, git errors
+  - Summary: normalize and validate repo paths in IPC and improve simple-git commit error reporting
+  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts, src/main/git/git-service.ts
+  - Verification: not run (not requested)
+  - Follow-ups: run `npm run dev` and confirm repo selection + commits still work
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: Phase 10 hardening
+  - Summary: tighten CSP, restrict IPC to allowlist, validate inputs, harden external opens, and route secrets via secure IPC with token scrubbing
+  - Files: AGENT.md, CHANGELOG.md, src/index.ts, src/main/index.ts, src/main/ai/commit-generate.ts, src/main/git/git-service.ts, src/main/git/publish-status.ts, src/main/git/pull-request.ts, src/preload/index.ts, src/renderer/index.html, src/renderer/src/App.tsx, src/renderer/src/env.d.ts, src/renderer/src/store/useRepoStore.ts, src/renderer/src/components/pr/PullRequestModal.tsx, src/renderer/src/components/settings/SettingsAdvanced.tsx, src/renderer/src/components/settings/SettingsIntegrations.tsx
+  - Verification: not run (not requested)
+  - Follow-ups: run `npm run dev` and verify add-repo prompt, secrets flows, and PR creation still work
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: CSP dev unblock
+  - Summary: move CSP to main process with dev-only inline style allowance for HMR while keeping strict prod policy
+  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts, src/renderer/index.html
+  - Verification: not run (not requested)
+  - Follow-ups: run `npm run dev` and confirm renderer no longer white-screens
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: repo onboarding
+  - Summary: expand home paths in repo allowlist checks and surface a user-friendly add-repo error
+  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts, src/renderer/src/store/useRepoStore.ts
+  - Verification: not run (not requested)
+  - Follow-ups: run `npm run dev` and confirm Add repo accepts ~/ paths
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: CSP dev unblock
+  - Summary: allow inline/eval scripts in dev CSP for Vite preamble while keeping strict prod policy
+  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts
+  - Verification: not run (not requested)
+  - Follow-ups: run `npm run dev` and confirm renderer loads without CSP errors
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: CSP dev unblock
+  - Summary: ensure CSP override replaces any existing header by normalizing header keys
+  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts
+  - Verification: not run (not requested)
+  - Follow-ups: run `npm run dev` and confirm the CSP now reflects dev policy
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: dev boot fixes
+  - Summary: harden CSP header override and force dev renderer URL fallback to avoid stale local HTML
+  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts
+  - Verification: not run (not requested)
+  - Follow-ups: run `npm run dev` and confirm Vite preamble loads without CSP errors
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: dev boot fixes
+  - Summary: align dev server URL fallback to electron-vite port and allow 127.0.0.1 CSP connections
+  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts
+  - Verification: not run (not requested)
+  - Follow-ups: run `npm run dev` and confirm CSP errors are resolved
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: dev boot fixes
+  - Summary: use electron-vite preload env path and disable CSP in dev to unblock Vite preamble
+  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts
+  - Verification: not run (not requested)
+  - Follow-ups: run `npm run dev` and verify window.api is defined
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: dev boot fixes
+  - Summary: resolve preload path from env/app/out fallback to ensure window.api is defined in dev
+  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts
+  - Verification: not run (not requested)
+  - Follow-ups: run `npm run dev` and verify preload API exists
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: dev boot fixes
+  - Summary: prefer dev out/preload path in preload resolution to ensure window.api is exposed
+  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts
+  - Verification: not run (not requested)
+  - Follow-ups: run `npm run dev` and verify preload API exists
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: dev boot fixes
+  - Summary: prefer ELECTRON_PRELOAD when available before falling back to dev out/preload
+  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts
+  - Verification: not run (not requested)
+  - Follow-ups: run `npm run dev` and verify window.api is defined
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: dev boot fixes
+  - Summary: log resolved preload path and ELECTRON_PRELOAD to diagnose missing window.api
+  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts
+  - Verification: not run (not requested)
+  - Follow-ups: run `npm run dev` and share preload log output
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: dev boot fixes, repo input
+  - Summary: simplify preload resolution and dev CSP handling, add inline repo path input, and guard settings/IPC calls when preload is missing
+  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts, src/renderer/src/App.tsx, src/renderer/src/components/sidebar/RepoList.tsx, src/renderer/src/store/useRepoStore.ts
+  - Verification: not run (not requested)
+  - Follow-ups: run `npm run dev` and confirm Add repo input and preload API availability
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: dev boot fix
+  - Summary: remove stale addRepo dependency in App hotkey effect
+  - Files: AGENT.md, CHANGELOG.md, src/renderer/src/App.tsx
+  - Verification: not run (not requested)
+  - Follow-ups: run `npm run dev` and confirm app loads without addRepo errors
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: repo selection
+  - Summary: switch Add repo back to system folder picker via IPC and clean up repo list UI
+  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts, src/preload/index.ts, src/renderer/src/App.tsx, src/renderer/src/components/sidebar/RepoList.tsx, src/renderer/src/env.d.ts, src/renderer/src/store/useRepoStore.ts
+  - Verification: not run (not requested)
+  - Follow-ups: run `npm run dev` and confirm Add repo opens a native folder picker
+- Raouf: 2026-01-04 (Australia/Sydney)
+  - Scope: git diff
+  - Summary: handle repos without HEAD by falling back to index/working tree diffs
+  - Files: AGENT.md, CHANGELOG.md, src/main/git/git-service.ts
+  - Verification: not run (not requested)
+  - Follow-ups: run `npm run dev` and confirm new repos no longer error on diff

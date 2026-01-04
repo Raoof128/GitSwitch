@@ -1,0 +1,324 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --ui-bg: #36454f;
+  --ui-panel: #3a4a55;
+  --ui-panel-muted: #32414a;
+  --ui-border: #0f1316;
+  --ui-border-soft: #171c20;
+  --ui-hover: #252d33;
+  --ui-accent: #8fb3c7;
+  --ui-text: #ffffff;
+  --ui-text-muted: #ffffff;
+  --ui-status-added: #18f26f;
+  --ui-status-modified: #ffd166;
+  --ui-status-deleted: #ff2d2d;
+  --ui-status-untracked: #3f82ff;
+  --ui-diff-insert: #0d5a2c;
+  --ui-diff-delete: #7a1b24;
+  --ui-diff-gutter-insert: #0a4a24;
+  --ui-diff-gutter-delete: #61151d;
+}
+
+body {
+  @apply bg-[var(--ui-bg)] text-[var(--ui-text)] antialiased;
+  font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.25);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(148, 163, 184, 0.45);
+}
+
+::selection {
+  background: rgba(143, 179, 199, 0.35);
+  color: var(--ui-text);
+}
+
+.text-slate-100,
+.text-slate-200 {
+  color: var(--ui-text) !important;
+}
+
+.text-slate-300,
+.text-slate-400,
+.text-slate-500 {
+  color: var(--ui-text-muted) !important;
+}
+
+.text-emerald-400,
+.text-amber-400,
+.text-rose-400,
+.text-sky-400 {
+  color: var(--ui-text) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #ffffff;
+  opacity: 0.9;
+}
+
+input,
+textarea,
+select {
+  color: var(--ui-text);
+  background-color: var(--ui-panel);
+  border-color: var(--ui-border);
+}
+
+select option {
+  background-color: var(--ui-panel);
+  color: var(--ui-text);
+}
+
+input:disabled,
+textarea:disabled,
+select:disabled {
+  color: var(--ui-text-muted);
+}
+
+input[type='checkbox'],
+input[type='radio'] {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 2px solid var(--ui-border);
+  background-color: var(--ui-panel-muted);
+  display: inline-grid;
+  place-content: center;
+  color: var(--ui-text);
+  accent-color: var(--ui-accent);
+}
+
+input[type='radio'] {
+  border-radius: 999px;
+}
+
+input[type='checkbox']::after,
+input[type='radio']::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  transform: scale(0);
+  transition: transform 120ms ease;
+  background: var(--ui-accent);
+  border-radius: 2px;
+}
+
+input[type='radio']::after {
+  border-radius: 999px;
+}
+
+input[type='checkbox']:checked::after,
+input[type='radio']:checked::after {
+  transform: scale(1);
+}
+
+input[type='checkbox']:focus-visible,
+input[type='radio']:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ui-accent);
+}
+
+button:disabled {
+  color: #ffffff;
+}
+
+button {
+  transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ui-accent);
+}
+
+input,
+textarea {
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+button:hover:not(:disabled) {
+  background-color: var(--ui-hover);
+}
+
+.hover-card {
+  transition: background-color 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+}
+
+.hover-card:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 0 0 1px var(--ui-border-soft);
+}
+
+.status-indicator {
+  color: var(--ui-text);
+}
+
+.status-indicator[data-status='A'] {
+  color: var(--ui-status-added);
+}
+
+.status-indicator[data-status='M'] {
+  color: var(--ui-status-modified);
+}
+
+.status-indicator[data-status='D'] {
+  color: var(--ui-status-deleted);
+}
+
+.status-indicator[data-status='?'] {
+  color: var(--ui-status-untracked);
+}
+
+.split-resizer {
+  width: 6px;
+  cursor: col-resize;
+  background: var(--ui-border);
+  position: relative;
+}
+
+.split-resizer::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 10%;
+  width: 2px;
+  height: 80%;
+  background: var(--ui-border-soft);
+}
+
+.split-resizer:hover::after {
+  background: var(--ui-accent);
+}
+
+#root {
+  @apply min-h-screen;
+}
+
+.diff-view {
+  @apply text-sm;
+}
+
+.diff-view,
+.diff-view code,
+.diff-view pre,
+.diff-view .diff-line,
+.diff-view .diff-gutter {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+  letter-spacing: 0;
+}
+
+.diff-view pre,
+.diff-view .diff-line,
+.diff-view .diff-gutter,
+.diff-view .diff-code,
+.diff-view .diff-content {
+  white-space: pre !important;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.diff-view pre {
+  margin: 0;
+}
+
+.diff-view table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: auto;
+}
+
+.diff-view tr {
+  vertical-align: top;
+}
+
+.diff-view td {
+  vertical-align: top;
+}
+
+.diff-view-container {
+  overflow: auto;
+  max-width: 100%;
+  transition: box-shadow 150ms ease, border-color 150ms ease;
+}
+
+.diff-view-container:hover {
+  box-shadow: 0 0 0 1px var(--ui-border-soft);
+}
+
+.diff-view .diff-gutter {
+  width: 6ch;
+  min-width: 6ch;
+  text-align: right;
+  padding-right: 0.75rem;
+}
+
+.diff-view .diff-code {
+  width: auto;
+}
+
+.diff-view .diff-line:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.diff-view .diff-code-insert {
+  background: var(--ui-diff-insert);
+}
+
+.diff-view .diff-code-delete {
+  background: var(--ui-diff-delete);
+}
+
+.diff-view .diff-code-insert .diff-line,
+.diff-view .diff-code-delete .diff-line {
+  color: #ffffff;
+}
+
+.diff-view .diff-gutter-insert {
+  background: var(--ui-diff-gutter-insert);
+  color: var(--ui-text);
+}
+
+.diff-view .diff-gutter-delete {
+  background: var(--ui-diff-gutter-delete);
+  color: var(--ui-text);
+}

@@ -1,14 +1,14 @@
 import { motion } from 'framer-motion'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, JSX } from 'react'
 import type { MouseEvent } from 'react'
 import clsx from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import { useRepoStore } from '../../store/useRepoStore'
 import { fadeSlideIn, scaleTap, useReducedMotionSafe } from '../motion/motion'
 
-const cx = (...inputs: Array<string | false | null | undefined>) => twMerge(clsx(inputs))
+const cx = (...inputs: Array<string | false | null | undefined>): string => twMerge(clsx(inputs))
 
-export function RepoList() {
+export function RepoList(): JSX.Element {
   const { repos, activeRepoPath, addRepo, setActiveRepo, reducedMotion } = useRepoStore()
   const reduceMotion = useReducedMotionSafe(reducedMotion)
   const listVariants = useMemo(() => fadeSlideIn(reduceMotion), [reduceMotion])

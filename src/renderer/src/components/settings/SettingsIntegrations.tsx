@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, JSX } from 'react'
 import { useRepoStore } from '../../store/useRepoStore'
 
-export function SettingsIntegrations() {
+export function SettingsIntegrations(): JSX.Element {
   const {
     aiCloudModel,
     aiLocalModel,

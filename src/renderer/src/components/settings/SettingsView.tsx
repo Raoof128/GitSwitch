@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useRef } from 'react'
+import { useMemo, useState, useEffect, useRef, JSX } from 'react'
 import { SettingsAccounts } from './SettingsAccounts'
 import { SettingsAdvanced } from './SettingsAdvanced'
 import { SettingsGeneral } from './SettingsGeneral'
@@ -6,12 +6,12 @@ import { SettingsIntegrations } from './SettingsIntegrations'
 
 type SettingsTab = 'accounts' | 'advanced' | 'general' | 'integrations'
 
-export function SettingsView() {
+export function SettingsView(): JSX.Element {
   const [tab, setTab] = useState<SettingsTab>('general')
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
 
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
+    const handleKeyDown = (event: KeyboardEvent): void => {
       const tabs: SettingsTab[] = ['general', 'integrations', 'accounts', 'advanced']
       const currentIndex = tabs.indexOf(tab)
 

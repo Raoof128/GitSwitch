@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, JSX } from 'react'
 import { useRepoStore } from '../../store/useRepoStore'
 import { CommitPanel } from './CommitPanel'
 import { RemoteConfig } from './RemoteConfig'
@@ -8,7 +8,7 @@ type SidebarProps = {
   width?: number
 }
 
-export function Sidebar({ width = 256 }: SidebarProps) {
+export function Sidebar({ width = 256 }: SidebarProps): JSX.Element {
   const { refreshSettings, refreshAccounts, settingsOpen } = useRepoStore()
 
   useEffect(() => {

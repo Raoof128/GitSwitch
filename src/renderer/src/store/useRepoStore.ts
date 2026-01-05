@@ -450,22 +450,22 @@ export const useRepoStore = create<RepoState>((set, get) => ({
 
     try {
       set({ commitStatus: 'loading' })
-      const message = await window.api.gitPull(repoPath, accountId)
-      
+      await window.api.gitPull(repoPath, accountId)
+
       await get().refreshStatus()
       await get().loadDiff('unstaged')
       await get().loadStagedDiff()
-      
+
       set({ commitStatus: 'idle' })
       return true
     } catch (error) {
-       const message = error instanceof Error ? error.message : 'Pull failed.'
-       set({
-         commitError: `Pull failed: ${message}`,
-         commitStatus: 'error'
-       })
-       setTimeout(() => set({ commitError: null, commitStatus: 'idle' }), 8000)
-       return false
+      const message = error instanceof Error ? error.message : 'Pull failed.'
+      set({
+        commitError: `Pull failed: ${message}`,
+        commitStatus: 'error'
+      })
+      setTimeout(() => set({ commitError: null, commitStatus: 'idle' }), 8000)
+      return false
     }
   },
   fetch: async () => {
@@ -478,7 +478,7 @@ export const useRepoStore = create<RepoState>((set, get) => ({
       await window.api.gitFetch(repoPath, accountId)
       await get().refreshStatus()
     } catch {
-       // Silent failure for background fetch
+      // Silent failure for background fetch
     }
   },
   refreshSettings: async () => {

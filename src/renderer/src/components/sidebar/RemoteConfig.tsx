@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useState, JSX } from 'react'
 import { motion } from 'framer-motion'
 import { useRepoStore } from '../../store/useRepoStore'
 import { scaleTap, useReducedMotionSafe } from '../motion/motion'
 
-export function RemoteConfig() {
+export function RemoteConfig(): JSX.Element | null {
   const { activeRepoPath, remotes, setRemoteOrigin, reducedMotion } = useRepoStore()
   const [remoteUrl, setRemoteUrl] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -14,7 +14,7 @@ export function RemoteConfig() {
   const originRemote = remotes.find((r) => r.name === 'origin')
   const hasOrigin = Boolean(originRemote)
 
-  const handleSave = async () => {
+  const handleSave = async (): Promise<void> => {
     if (!remoteUrl.trim()) {
       setError('Please enter a remote URL.')
       return

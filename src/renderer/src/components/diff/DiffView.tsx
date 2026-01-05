@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useMemo } from 'react'
+import { useMemo, JSX } from 'react'
 import { Diff, Hunk, parseDiff } from 'react-diff-view'
 import { fadeSlideIn, useReducedMotionSafe } from '../motion/motion'
 import { useRepoStore } from '../../store/useRepoStore'
@@ -8,7 +8,7 @@ type DiffViewProps = {
   diffText: string
 }
 
-export function DiffView({ diffText }: DiffViewProps) {
+export function DiffView({ diffText }: DiffViewProps): JSX.Element {
   const reducedMotion = useRepoStore((state) => state.reducedMotion)
   const reduceMotion = useReducedMotionSafe(reducedMotion)
   const variants = useMemo(() => fadeSlideIn(reduceMotion), [reduceMotion])
@@ -21,7 +21,10 @@ export function DiffView({ diffText }: DiffViewProps) {
     )
   }
 
-  const files = parseDiff(diffText)
+  const allFiles = parseDiff(diffText)
+  const MAX_DISPLAY_FILES = 50
+  const files = allFiles.slice(0, MAX_DISPLAY_FILES)
+  const isTruncated = allFiles.length > MAX_DISPLAY_FILES;
 
   return (
     <AnimatePresence mode="wait">
@@ -33,6 +36,11 @@ export function DiffView({ diffText }: DiffViewProps) {
         exit="exit"
         className="diff-view space-y-6"
       >
+        {isTruncated && (
+          <div className="rounded-md border border-yellow-500/50 bg-yellow-500/10 p-3 text-xs text-yellow-200">
+            ⚠️ Showing first {MAX_DISPLAY_FILES} of {allFiles.length} changed files for performance.
+          </div>
+        )}
         {files.map((file) => (
           <div
             key={`${file.oldPath}-${file.newPath}`}

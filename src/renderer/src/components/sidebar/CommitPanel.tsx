@@ -1,9 +1,9 @@
-import { useMemo } from 'react'
+import { useMemo, JSX } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useRepoStore } from '../../store/useRepoStore'
 import { scaleTap, useReducedMotionSafe } from '../motion/motion'
 
-export function CommitPanel() {
+export function CommitPanel(): JSX.Element {
   const {
     activeRepoPath,
     status,

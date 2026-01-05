@@ -1,4 +1,4 @@
-import { GoogleGenAI } from '@google/genai'
+import { GoogleGenAI, HarmCategory, HarmBlockThreshold } from '@google/genai'
 import type { AiContext, AiProvider, CommitMessage } from '../interfaces'
 import { buildUserPrompt, CYBERSECURITY_INSTRUCTION, SYSTEM_PROMPT } from '../prompts'
 import { parseAiResponse } from '../helpers'
@@ -53,10 +53,22 @@ export class GeminiProvider implements AiProvider {
         */
         // @ts-ignore - SDK types might be strict, but we want to disable safety checks for code
         safetySettings: [
-          { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
-          { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
-          { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
-          { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
+          {
+            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+            threshold: HarmBlockThreshold.BLOCK_NONE
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+            threshold: HarmBlockThreshold.BLOCK_NONE
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+            threshold: HarmBlockThreshold.BLOCK_NONE
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+            threshold: HarmBlockThreshold.BLOCK_NONE
+          }
         ]
       }
     })
@@ -73,16 +85,19 @@ export class GeminiProvider implements AiProvider {
 
     let text = ''
     try {
-      // @ts-ignore - Handle various SDK return shapes dynamically for robustness
-      if (typeof result.text === 'function') {
-        // @ts-ignore
-        text = result.text()
-      } else if (result.response && typeof result.response.text === 'function') {
-        // Standard path for GoogleGenAI SDK
-        text = result.response.text()
+      // The @google/genai SDK returns a result that can have different structures
+      // depending on the model and configuration. We handle the most common ones.
+      const res = result as {
+        text?: () => string
+        response?: { text: () => string }
+      }
+      if (typeof res.text === 'function') {
+        text = res.text()
+      } else if (res.response && typeof res.response.text === 'function') {
+        text = res.response.text()
       } else {
         // Fallback: try to read candidates directly if methods fail
-        // @ts-ignore
+        // @ts-ignore: Fallback for different SDK response structures
         const candidate = result.response?.candidates?.[0] || result.candidates?.[0]
         if (
           candidate &&

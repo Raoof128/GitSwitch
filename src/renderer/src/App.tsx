@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, JSX } from 'react'
 import { Sidebar } from './components/sidebar/Sidebar'
 import { DiffView } from './components/diff/DiffView'
 import { useRepoStore } from './store/useRepoStore'
@@ -9,7 +9,7 @@ import { FileList } from './components/sidebar/FileList'
 import { PullRequestModal } from './components/pr/PullRequestModal'
 import { SettingsView } from './components/settings/SettingsView'
 
-function App() {
+function App(): JSX.Element {
   const {
     activeRepoPath,
     status,
@@ -312,7 +312,7 @@ function App() {
                 {canCreatePr && (
                   <button
                     type="button"
-                    onClick={openPrModal}
+                    onClick={() => openPrModal()}
                     title="Create Pull Request"
                     className="rounded-md border border-[var(--ui-border)] px-3 py-1 text-xs font-semibold text-slate-200 hover:bg-[var(--ui-hover)]"
                   >
@@ -344,10 +344,11 @@ function App() {
                       type="button"
                       onClick={handleDiffModeUnstaged}
                       title="Show unstaged changes (Ctrl/⌘+1)"
-                      className={`rounded-md border px-2 py-1 text-[10px] ${diffMode === 'unstaged'
-                        ? 'border-[var(--ui-border-soft)] text-white'
-                        : 'border-[var(--ui-border)] text-[var(--ui-text-muted)]'
-                        }`}
+                      className={`rounded-md border px-2 py-1 text-[10px] ${
+                        diffMode === 'unstaged'
+                          ? 'border-[var(--ui-border-soft)] text-white'
+                          : 'border-[var(--ui-border)] text-[var(--ui-text-muted)]'
+                      }`}
                     >
                       Unstaged
                     </button>
@@ -355,10 +356,11 @@ function App() {
                       type="button"
                       onClick={handleDiffModeStaged}
                       title="Show staged changes (Ctrl/⌘+2)"
-                      className={`rounded-md border px-2 py-1 text-[10px] ${diffMode === 'staged'
-                        ? 'border-[var(--ui-border-soft)] text-white'
-                        : 'border-[var(--ui-border)] text-[var(--ui-text-muted)]'
-                        }`}
+                      className={`rounded-md border px-2 py-1 text-[10px] ${
+                        diffMode === 'staged'
+                          ? 'border-[var(--ui-border-soft)] text-white'
+                          : 'border-[var(--ui-border)] text-[var(--ui-text-muted)]'
+                      }`}
                     >
                       Staged
                     </button>

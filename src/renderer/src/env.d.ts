@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-
+/// <reference types="react" />
 /// <reference types="react/jsx-runtime" />
 
 import type {
@@ -29,6 +29,8 @@ declare global {
       gitSetRemoteOrigin: (repoPath: string, url: string) => Promise<{ ok: boolean }>
       gitIgnore: (repoPath: string, filePath: string) => Promise<{ ok: boolean }>
       gitPush: (repoPath: string, accountId: string) => Promise<PushResult>
+      gitPull: (repoPath: string, accountId: string) => Promise<string>
+      gitFetch: (repoPath: string, accountId: string) => Promise<{ ok: boolean }>
       createPullRequest: (
         repoPath: string,
         options: PullRequestOptions
@@ -52,6 +54,7 @@ declare global {
         reducedMotion: boolean
         strictHostKeyChecking: boolean
         theme: 'dark'
+        autoPush: boolean
       }>
       updateSettings: (
         input: Partial<{
@@ -69,12 +72,14 @@ declare global {
           reducedMotion: boolean
           strictHostKeyChecking: boolean
           theme: 'dark'
+          autoPush: boolean
         }>
       ) => Promise<{
         aiCloudModel: string
         aiLocalModel: string
         aiLocalUrl: string
         aiProvider: 'offline' | 'local' | 'cloud'
+        aiPersona: 'standard' | 'cybersecurity'
         aiRedactionEnabled: boolean
         aiTimeoutSec: number
         defaultAccountId?: string | null
@@ -88,6 +93,7 @@ declare global {
         reducedMotion: boolean
         strictHostKeyChecking: boolean
         theme: 'dark'
+        autoPush: boolean
       }>
       listSecrets: () => Promise<SecretsResult>
       saveSecret: (input: SecretsSaveInput) => Promise<SecretsResult>

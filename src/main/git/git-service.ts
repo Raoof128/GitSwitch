@@ -118,7 +118,7 @@ const getGitErrorMessage = (error: unknown, fallback = 'Git operation failed.'):
   // If no translation found, sanitize and return the original
   return rawMessage
     .replace(/[a-f0-9]{40}/g, '[HASH]') // Redact commit hashes
-    .replace(/\/Users\/[^\/]+\//g, '~/') // Redact user paths
+    .replace(/\/Users\/[^/]+\//g, '~/') // Redact user paths
     .slice(0, 300) // Limit length
 }
 
@@ -163,16 +163,20 @@ export async function getStatus(repoPath: string): Promise<GitStatus> {
   const git = simpleGit({ baseDir: repoPath })
   const status = await git.status()
 
+  // Limit number of files reported to renderer to prevent IPC congestion
+  const MAX_FILES = 1000
+  const files = status.files.slice(0, MAX_FILES).map((file) => ({
+    path: file.path,
+    index: file.index,
+    working_dir: file.working_dir
+  }))
+
   return {
     current: status.current,
     ahead: status.ahead,
     behind: status.behind,
-    files: status.files.map((file) => ({
-      path: file.path,
-      index: file.index,
-      working_dir: file.working_dir
-    })),
-    staged: status.staged
+    files,
+    staged: status.staged.slice(0, MAX_FILES)
   }
 }
 
@@ -207,39 +211,68 @@ export async function setRemoteOrigin(repoPath: string, url: string): Promise<vo
   }
 }
 
+async function checkDiffSize(
+  git: ReturnType<typeof simpleGit>,
+  args: string[],
+  maxBytes: number,
+  maxLines: number
+): Promise<{ ok: boolean; reason?: string }> {
+  try {
+    const stats = await git.diff([...args, '--shortstat'])
+    // Example output: " 1 file changed, 1 insertion(+), 1 deletion(-)"
+    // Or: " 2 files changed, 100 insertions(+), 50 deletions(-)"
+    const linesMatch = stats.match(/(\d+)\s+insertion/)
+    const deletionsMatch = stats.match(/(\d+)\s+deletion/)
+
+    const totalLines =
+      parseInt(linesMatch?.[1] || '0') + parseInt(deletionsMatch?.[1] || '0')
+
+    if (totalLines > maxLines) {
+      return { ok: false, reason: `Diff is too large (${totalLines} lines > ${maxLines} limit).` }
+    }
+
+    // Rough byte check - if it's many files, it might be large
+    const filesMatch = stats.match(/(\d+)\s+file/)
+    const totalFiles = parseInt(filesMatch?.[1] || '0')
+    if (totalFiles > 100) {
+      return { ok: false, reason: `Too many files in diff (${totalFiles} files).` }
+    }
+
+    return { ok: true }
+  } catch {
+    // If shortstat fails, fall back to a safer restricted diff
+    return { ok: true }
+  }
+}
+
 export async function getDiff(repoPath: string, mode: DiffMode = 'unstaged'): Promise<string> {
   const git = simpleGit({ baseDir: repoPath })
-  let hasHead = true
-  try {
-    await git.revparse(['--verify', 'HEAD'])
-  } catch {
-    hasHead = false
-  }
-
-  // Pre-check diff size limits from user settings
   const settings = getSettings()
   const maxBytes = settings.diffLimitKb > 0 ? settings.diffLimitKb * 1024 : DEFAULT_DIFF_BYTES
   const maxLines = settings.diffLimitLines > 0 ? settings.diffLimitLines : DEFAULT_DIFF_LINES
 
-  if (mode === 'staged') {
-    return git.diff(['--cached'])
+  const diffArgs = mode === 'staged' ? ['--cached'] : ['HEAD']
+
+  // Safety check before loading full diff into memory
+  const sizeCheck = await checkDiffSize(git, diffArgs, maxBytes, maxLines)
+  if (!sizeCheck.ok) {
+    return `[DIFF TOO LARGE] ${sizeCheck.reason}\n\nConsider adjusting limits in Settings > Advanced.`
   }
 
-  if (!hasHead) {
-    return git.diff()
+  try {
+    const rawDiff = await git.diff(diffArgs)
+    // Final guard for IPC and Renderer stability
+    const MAX_IPC_SIZE = 512 * 1024 // 512KB hard limit for IPC
+    if (rawDiff.length > MAX_IPC_SIZE) {
+      return (
+        rawDiff.slice(0, MAX_IPC_SIZE) +
+        '\n\n[TRUNCATED DUE TO IPC LIMITS - Use git diff via terminal for full view]'
+      )
+    }
+    return rawDiff
+  } catch (error) {
+    throw new Error(getGitErrorMessage(error, 'Failed to get diff content.'))
   }
-
-  // For HEAD diff, do a quick size estimate first
-  const headPreview = await git.diff(['HEAD', '--stat'])
-  const headPreviewSize = headPreview.includes('\n') ? headPreview.split('\n')[0].length * 50 : 1000 // Rough estimate: 50 chars per line
-
-  // If diff is likely too large, warn user and use truncated version
-  if (headPreviewSize > maxBytes || headPreview.length > maxLines) {
-    console.warn(`Diff size may exceed limits. Consider adjusting diff limits in settings.`)
-    return '[DIFF TOO LARGE - Consider adjusting limits in settings]'
-  }
-
-  return git.diff(['HEAD'])
 }
 
 export async function getStagedDiff(repoPath: string): Promise<string> {
@@ -462,16 +495,16 @@ export async function pullWithIdentity(
     const git = simpleGit({ baseDir: repoPath })
     // Configure git to use the SSH command for this operation
     const env = { ...process.env, GIT_SSH_COMMAND: sshCommand }
-    
+
     // We can use simpleGit directly here as it supports env vars in options or we can spawn if needed for streaming
-    // But pull usually isn't as long-running/streaming as push can be for large repos, 
+    // But pull usually isn't as long-running/streaming as push can be for large repos,
     // though simpleGit is fine. Let's use simpleGit's pull with env.
     const result = await git.env(env).pull()
-    return result.summary.changes + result.summary.insertions + result.summary.deletions > 0 
-      ? 'Updated' 
+    return result.summary.changes + result.summary.insertions + result.summary.deletions > 0
+      ? 'Updated'
       : 'Already up to date'
   } catch (error) {
-     throw new Error(getGitErrorMessage(error, 'Pull failed.'))
+    throw new Error(getGitErrorMessage(error, 'Pull failed.'))
   } finally {
     await cleanupTempKey(tempKeyPath)
   }
@@ -494,7 +527,7 @@ export async function fetchWithIdentity(
     const env = { ...process.env, GIT_SSH_COMMAND: sshCommand }
     await git.env(env).fetch(['--all'])
   } catch (error) {
-     throw new Error(getGitErrorMessage(error, 'Fetch failed.'))
+    throw new Error(getGitErrorMessage(error, 'Fetch failed.'))
   } finally {
     await cleanupTempKey(tempKeyPath)
   }

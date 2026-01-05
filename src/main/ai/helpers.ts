@@ -12,9 +12,9 @@ export function parseAiResponse(text: string): CommitMessage | null {
   } else {
     // Handle unclosed blocks or simple framing
     jsonText = jsonText
-        .replace(/^```(?:json)?\s*/i, '')
-        .replace(/\s*```$/i, '')
-        .trim()
+      .replace(/^```(?:json)?\s*/i, '')
+      .replace(/\s*```$/i, '')
+      .trim()
   }
 
   // Attempt to clean simple leading/trailing characters if strict parse fails
@@ -37,20 +37,24 @@ export function parseAiResponse(text: string): CommitMessage | null {
     return validateAndReturn(parsed)
   } catch (initialError) {
     console.warn('[AI Parser] detailed JSON parse failed, attempting regex fallback:', initialError)
-    
+
     // We look for title and description specifically
     const titleMatch = jsonText.match(/"title"\s*:\s*"((?:[^"\\]|\\.)*)"/)
-    
+
     // Check for "description" (our new field) or "body" (legacy/fallback)
     const descMatchString = jsonText.match(/"description"\s*:\s*"((?:[^"\\]|\\.)*)"/)
     const bodyMatchString = jsonText.match(/"body"\s*:\s*"((?:[^"\\]|\\.)*)"/)
-    
+
     const descMatch = descMatchString || bodyMatchString
 
     if (titleMatch) {
       // Unescape the string content captured by regex (e.g. \" becomes ")
-      const unescape = (str: string) => {
-          try { return JSON.parse(`"${str}"`) } catch { return str }
+      const unescape = (str: string): string => {
+        try {
+          return JSON.parse(`"${str}"`)
+        } catch {
+          return str
+        }
       }
       return {
         title: unescape(titleMatch[1]),
@@ -63,27 +67,29 @@ export function parseAiResponse(text: string): CommitMessage | null {
   }
 }
 
-function validateAndReturn(parsed: any): CommitMessage | null {
+function validateAndReturn(parsed: unknown): CommitMessage | null {
   if (!parsed || typeof parsed !== 'object') {
     console.error('[AI Parser] Result is not an object:', parsed)
     return null
   }
 
-  if (typeof parsed.title !== 'string') {
-    console.error('[AI Parser] Title is not a string:', parsed.title)
+  const p = parsed as Record<string, unknown>
+
+  if (typeof p.title !== 'string') {
+    console.error('[AI Parser] Title is not a string:', p.title)
     return null
   }
 
   // Normalize
-  const title = parsed.title.trim()
+  const title = p.title.trim()
   if (!title) return null
 
   // Support both 'description' (new) and 'body' (legacy) keys
-  let body = undefined
-  if (typeof parsed.description === 'string') {
-      body = parsed.description.trim()
-  } else if (typeof parsed.body === 'string') {
-      body = parsed.body.trim()
+  let body: string | undefined = undefined
+  if (typeof p.description === 'string') {
+    body = p.description.trim()
+  } else if (typeof p.body === 'string') {
+    body = p.body.trim()
   }
 
   return {

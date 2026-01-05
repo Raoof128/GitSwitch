@@ -1,8 +1,8 @@
-import { useCallback, useMemo, useEffect, useRef } from 'react'
+import { useCallback, useMemo, useEffect, useRef, JSX } from 'react'
 import type { ChangeEvent } from 'react'
 import { useRepoStore } from '../../store/useRepoStore'
 
-export function PullRequestModal() {
+export function PullRequestModal(): JSX.Element | null {
   const {
     prModalOpen,
     prForm,
@@ -22,13 +22,13 @@ export function PullRequestModal() {
       firstInputRef.current.focus()
     }
 
-    const handleEscape = (event: KeyboardEvent) => {
+    const handleEscape = (event: KeyboardEvent): void => {
       if (event.key === 'Escape' && prModalOpen) {
         closePrModal()
       }
     }
 
-    const handleKeyDown = (event: KeyboardEvent) => {
+    const handleKeyDown = (event: KeyboardEvent): void => {
       if (event.key === 'Tab' && modalRef.current) {
         const focusableElements = modalRef.current.querySelectorAll(
           'input, textarea, button, [tabindex]:not([tabindex="-1"])'

@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, JSX } from 'react'
 import { useRepoStore } from '../../store/useRepoStore'
 
-export function SettingsGeneral() {
+export function SettingsGeneral(): JSX.Element {
   const { defaultBaseBranch, likeApp, reducedMotion, theme, updateSettings } = useRepoStore()
   const [baseBranch, setBaseBranch] = useState(defaultBaseBranch)
   const [motion, setMotion] = useState(reducedMotion)

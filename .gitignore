@@ -1,9 +1,39 @@
 node_modules
 dist
 out
+coverage
+npm-cache
+# OS
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE - VSCode
+.vscode/*
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# IDE - JetBrains
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# IDE - Other
+*.sublime-project
+*.sublime-workspace
+
+# Logs
 .eslintcache
 *.log*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # Security - exclude sensitive files
 *.pem
@@ -15,11 +45,5 @@ out
 .env
 .env.*
 *.env
-
-# IDE
-.vscode/settings.json
-.idea/
-*.swp
-*.swo
 *~
 AGENT.md

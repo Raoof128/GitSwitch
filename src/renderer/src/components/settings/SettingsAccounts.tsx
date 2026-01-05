@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, JSX } from 'react'
 import { useRepoStore } from '../../store/useRepoStore'
 
-export function SettingsAccounts() {
+export function SettingsAccounts(): JSX.Element {
   const {
     accounts,
     addAccount,
@@ -73,9 +73,9 @@ export function SettingsAccounts() {
           {accounts.map((account) => (
             <div
               key={account.id}
-              className={`flex items-center justify-between rounded-md border border-[var(--ui-border)] px-2 py-1 ${
+              className={`flex items - center justify - between rounded - md border border - [var(--ui - border)]px - 2 py - 1 ${
                 selectedAccountId === account.id ? 'bg-[var(--ui-hover)]' : ''
-              }`}
+              } `}
             >
               {editingId === account.id ? (
                 <input

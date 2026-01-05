@@ -155,7 +155,7 @@ export function generateOfflineCommitMessage(input: GeneratorInput): CommitMessa
     .map(([scope]) => scope)
 
   const multipleScopes = new Set(scopes).size > 1
-  const containsKeyword = (keywords: string[]) =>
+  const containsKeyword = (keywords: string[]): boolean =>
     lowerPaths.some((path) => hasKeyword(path, keywords))
 
   let type = 'chore'

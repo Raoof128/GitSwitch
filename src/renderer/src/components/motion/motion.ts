@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { Variants } from 'framer-motion'
+import type { Variants, TargetAndTransition } from 'framer-motion'
 import { useReducedMotion } from 'framer-motion'
 
 export function useReducedMotionSafe(forceReduced?: boolean): boolean {
@@ -63,5 +63,5 @@ export const listItem = (reduceMotion: boolean): Variants => ({
   }
 })
 
-export const scaleTap = (reduceMotion: boolean) =>
+export const scaleTap = (reduceMotion: boolean): TargetAndTransition | undefined =>
   reduceMotion ? undefined : { scale: 0.98, transition: { duration: 0.08 } }

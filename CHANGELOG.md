@@ -4,6 +4,55 @@
 
 - Raouf: (entries appended below)
 - Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: Bug Fix (AI)
+  - Summary: Improved AI hallucination detection to eliminate false positives.
+    1.  Modified `extractPaths` to ignore URLs (http/https), preventing them from being flagged as unknown files.
+    2.  Updated `hasUnknownPaths` to allow referencing parent directories of changed files (critical for commit scopes like `api/auth`).
+    3.  Added a whitelist for common external paths like `github.com` and `npm`.
+  - Files: src/main/ai/commit-generate.ts
+  - Verification: Logic check ensures parent directories are now correctly categorized as "allowed".
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: Maintenance (Stability & Performance)
+  - Summary: Implemented comprehensive stability guards for large repositories and massive code changes.
+    1.  Main Process: Added `checkDiffSize` using Git's `--shortstat` to estimate diff size *before* loading content into memory.
+    2.  Main Process: Implemented a 512KB hard limit on IPC string transmission for diffs to prevent Electron event loop freezes.
+    3.  Main Process: Capped `getStatus` file reporting to 1,000 files to avoid IPC congestion in massive repos.
+    4.  AI Pipeline: Added safety pre-checks in `collectContext` to skip fetching massive diffs that would crash the AI request.
+    5.  Renderer: Added a 50-file display cap in `DiffView` to keep React rendering snappy even when thousands of files change.
+  - Files: src/main/git/git-service.ts, src/main/ai/commit-generate.ts, src/renderer/src/components/diff/DiffView.tsx
+  - Verification: Manual review of buffers and list slicing.
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: Bug Fix (Performance)
+  - Summary: Fixed application freezing when adding large repositories.
+    1.  Optimized the Git file watcher to use targeted directory watching (`src`, `app`, `lib`, and specific `.git` files) instead of a global recursive watch.
+    2.  Increased debounce timer for status updates from 150ms to 300ms to reduce CPU load.
+    3.  Added explicit ignores for `node_modules`, `.next`, and nested `.git` directories.
+    4.  Enabled `atomic` save detection in `chokidar` for better stability.
+  - Files: src/main/git/watcher.ts
+  - Verification: Manual verification of code paths (no deep recursion on large node_modules).
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: Maintenance (Linting & Typing)
+  - Summary: Fixed all ESLint and TypeScript errors/warnings across the codebase.
+    1.  Resolved `no-unused-vars` in `commit-generate.ts`, `useRepoStore.ts`, and `SettingsAccounts.tsx`.
+    2.  Fixed all `prettier/prettier` formatting issues via `eslint --fix`.
+    3.  Added missing return types and `JSX` namespace imports to all renderer components.
+    4.  Fixed 20+ TypeScript errors in `helpers.ts`, `local.ts`, `gemini.ts`, and `useRepoStore.ts`.
+    5.  Synchronized `env.d.ts` and `preload/index.ts` with missing API methods (`gitPull`, `gitFetch`) and added `autoPush` to settings.
+    6.  Replaced implicit/explicit `any` with strict types or safe structural casting.
+    7.  Fixed `no-useless-escape` regex error in `git-service.ts`.
+  - Files: src/main/**/*, src/renderer/src/**/*, src/preload/*, src/env.d.ts
+  - Verification: `npm run lint` and `npm run typecheck` now pass with 0 errors/warnings.
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: Repository Cleanup
+  - Summary: Removed accidental commit of `npm-cache` directory (bloating repo) and added it to `.gitignore` along with `coverage`.
+  - Files: `.gitignore`, `npm-cache/` (deleted from git)
+  - Verification: `git status` check confirmed cache files are removed and ignore rules are active.
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: Configuration (`.gitignore`)
+  - Summary: Expanded `.gitignore` to strictly ignore personal IDE files (`.vscode/settings.json`, `.idea/`, etc.) and OS junk files (`.DS_Store`, `Thumbs.db`), while preserving shared team configurations (`launch.json`, `extensions.json`).
+  - Files: `.gitignore`
+  - Verification: Manual review of ignore rules.
+- Raouf: 2026-01-05 (Australia/Sydney)
   - Scope: AI Configuration (Fix)
   - Summary: Increased default AI generation timeout from 8s to 30s to prevent premature timeouts on slower connections.
   - Files: src/main/secure/key-manager.ts, src/main/ai/commit-generate.ts

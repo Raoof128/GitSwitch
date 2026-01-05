@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useMemo } from 'react'
+import { useMemo, JSX } from 'react'
 import { useRepoStore } from '../../store/useRepoStore'
 import { fadeSlideIn, listItem, useReducedMotionSafe } from '../motion/motion'
 
@@ -13,7 +13,7 @@ const getStatusCode = (index: string, workingDir: string): string => {
   return '?'
 }
 
-export function FileList() {
+export function FileList(): JSX.Element {
   const { status, reducedMotion, addToIgnore } = useRepoStore()
   const files = useMemo(() => status?.files ?? [], [status])
   const reduceMotion = useReducedMotionSafe(reducedMotion)
@@ -21,7 +21,7 @@ export function FileList() {
   const containerVariants = useMemo(() => fadeSlideIn(reduceMotion), [reduceMotion])
   const shouldAnimate = files.length <= 20
 
-  const handleIgnore = async (path: string, e: React.MouseEvent) => {
+  const handleIgnore = async (path: string, e: React.MouseEvent): Promise<void> => {
     e.stopPropagation()
     if (confirm(`Are you sure you want to add "${path}" to .gitignore?`)) {
       await addToIgnore(path)

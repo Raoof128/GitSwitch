@@ -1,3 +1,5 @@
+import type { AiContext } from './interfaces'
+
 export const SYSTEM_PROMPT = `
 You are an expert Git commit message author for a professional open-source project.
 

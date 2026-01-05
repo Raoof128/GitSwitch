@@ -3,7 +3,7 @@
 // -------------------------------------------------------------------------- //
 
 import { simpleGit } from 'simple-git'
-import type { CommitMessage, GitStatus } from '../../index'
+import type { CommitMessage } from '../../index'
 import { generateOfflineCommitMessage } from '../git/commit-generator'
 import { getSettings, loadAiKey } from '../secure/key-manager'
 
@@ -62,17 +62,36 @@ const truncateDiff = (input: string, maxLines: number, maxBytes: number): string
 }
 
 const extractPaths = (text: string): string[] => {
-  const matches = text.match(/[A-Za-z0-9._-]+(?:\/[A-Za-z0-9._-]+)+/g)
+  // Ignore URLs (starting with http/https)
+  const noUrls = text.replace(/https?:\/\/[^\s$.?#].[^\s]*/gi, '')
+  const matches = noUrls.match(/[A-Za-z0-9._-]+(?:\/[A-Za-z0-9._-]+)+/g)
   if (!matches) {
     return []
   }
   return matches.map((match) => match.replace(/[.,:;)]$/, ''))
 }
 
-const hasUnknownPaths = (message: CommitMessage, allowed: Set<string>): boolean => {
+const hasUnknownPaths = (message: CommitMessage, allowedFiles: Set<string>): boolean => {
   const combined = `${message.title}\n${message.body ?? ''}`
   const paths = extractPaths(combined)
-  return paths.some((path) => !allowed.has(path))
+
+  // Expand allowed paths to include parent directories (for scopes like fix(src/main): ...)
+  const allowed = new Set<string>()
+  for (const file of allowedFiles) {
+    allowed.add(file)
+    const segments = file.split('/')
+    for (let i = 1; i < segments.length; i++) {
+      allowed.add(segments.slice(0, i).join('/'))
+    }
+  }
+
+  // Common false positives to ignore
+  const ignored = new Set(['node_modules', 'github.com', 'gitlab.com', 'npm', 'yarn'])
+
+  return paths.some((path) => {
+    if (ignored.has(path.split('/')[0])) return false
+    return !allowed.has(path)
+  })
 }
 
 const collectContext = async (
@@ -91,15 +110,26 @@ const collectContext = async (
     }))
 
   const diffArgs = status.staged.length ? ['--cached'] : ['HEAD']
+  const maxBytes = options.diffLimitKb > 0 ? options.diffLimitKb * 1024 : DEFAULT_DIFF_BYTES
+  const maxLines = options.diffLimitLines > 0 ? options.diffLimitLines : DEFAULT_DIFF_LINES
+
   let diff = ''
   try {
-    diff = await git.diff(diffArgs)
+    // Safety check: get shortstat first
+    const stats = await git.diff([...diffArgs, '--shortstat'])
+    const linesMatch = stats.match(/(\d+)\s+insertion/)
+    const deletionsMatch = stats.match(/(\d+)\s+deletion/)
+    const totalLines = parseInt(linesMatch?.[1] || '0') + parseInt(deletionsMatch?.[1] || '0')
+
+    if (totalLines > maxLines * 5) {
+      // Hard limit for AI context: if it's 5x the desired limit, skip even trying to fetch full text
+      diff = `[DIFF TOO LARGE FOR AI - ${totalLines} lines changes]`
+    } else {
+      diff = await git.diff(diffArgs)
+    }
   } catch {
     diff = ''
   }
-
-  const maxBytes = options.diffLimitKb > 0 ? options.diffLimitKb * 1024 : DEFAULT_DIFF_BYTES
-  const maxLines = options.diffLimitLines > 0 ? options.diffLimitLines : DEFAULT_DIFF_LINES
 
   const diffContent = options.redact ? redactSecrets(diff) : diff
   const diffSnippet = truncateDiff(diffContent, maxLines, maxBytes)

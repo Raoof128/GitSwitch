@@ -16,11 +16,13 @@ export function createRepoWatcher(repoPath: string, onStatus: StatusHandler): FS
 
   const headPath = join(repoPath, '.git', 'HEAD')
   const indexPath = join(repoPath, '.git', 'index')
-  // Use more specific pattern with depth limit to prevent excessive watching
-  const workdirPattern = join(repoPath, '**/*')
+  const configPath = join(repoPath, '.git', 'config')
+  // Targeted watching of directories that actually change frequently
+  const srcPath = join(repoPath, 'src')
+  const appPath = join(repoPath, 'app')
+  const libPath = join(repoPath, 'lib')
 
   let timer: NodeJS.Timeout | null = null
-  // let poller: ReturnType<typeof setInterval> | null = null
 
   const scheduleStatus = (): void => {
     if (timer) {
@@ -34,33 +36,30 @@ export function createRepoWatcher(repoPath: string, onStatus: StatusHandler): FS
       } catch (error) {
         console.error('Watcher status error:', error)
       }
-    }, 150)
+    }, 300) // Increase debounce to 300ms
   }
 
-  const watcher = chokidar.watch([headPath, indexPath, workdirPattern], {
+  const watcher = chokidar.watch([headPath, indexPath, configPath, srcPath, appPath, libPath], {
     ignored: (path) => {
-      if (path.length > 8192) {
-        return true // Skip excessively long paths
-      }
-      if (path.includes('node_modules')) {
-        return true
-      }
-      if (path.includes(join(repoPath, '.git'))) {
-        const isHead = path.endsWith(join('.git', 'HEAD'))
-        const isIndex = path.endsWith(join('.git', 'index'))
-        return !(isHead || isIndex)
+      if (path.length > 4096) return true
+      if (path.includes('node_modules')) return true
+      if (path.includes('.next')) return true
+      if (path.includes('.git')) {
+        return !(path.endsWith('HEAD') || path.endsWith('index') || path.endsWith('config'))
       }
       return false
     },
     ignoreInitial: true,
-    depth: 10 // Limit directory depth to prevent deep traversal
+    persistent: true,
+    ignorePermissionErrors: true,
+    atomic: true // Detect atomic saves
   })
 
   watcher.on('add', scheduleStatus)
+  watcher.on('addDir', scheduleStatus)
   watcher.on('change', scheduleStatus)
   watcher.on('unlink', scheduleStatus)
-
-  // poller = setInterval(scheduleStatus, 5000)
+  watcher.on('unlinkDir', scheduleStatus)
 
   return watcher as FSWatcher
 }

@@ -59,13 +59,16 @@ export class LocalProvider implements AiProvider {
 
       if (!response.ok) return null
 
-      const data = (await response.json()) as any
+      const data = (await response.json()) as {
+        response?: string
+        choices?: Array<{ message?: { content?: string } }>
+      }
       let rawText = ''
 
       if (isOllamaGenerate) {
-        rawText = data.response
+        rawText = data.response || ''
       } else {
-        rawText = data.choices?.[0]?.message?.content
+        rawText = data.choices?.[0]?.message?.content || ''
       }
 
       return parseAiResponse(rawText || '')

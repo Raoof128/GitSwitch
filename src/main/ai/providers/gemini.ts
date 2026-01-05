@@ -43,9 +43,9 @@ export class GeminiProvider implements AiProvider {
           type: 'OBJECT',
           properties: {
             title: { type: 'STRING' },
-            body: { type: 'STRING' }
+            description: { type: 'STRING' }
           },
-          required: ['title']
+          required: ['title', 'description']
         },
         // @ts-ignore - SDK types might be strict, but we want to disable safety checks for code
         safetySettings: [

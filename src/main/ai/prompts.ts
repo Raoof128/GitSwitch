@@ -15,14 +15,15 @@ OUTPUT FORMAT (STRICT)
 Return JSON ONLY in this exact shape:
 
 {
-  "title": "string",
-  "body": "string | null"
+  "title": "Raouf-type: summary",
+  "description": "bulleted list of changes"
 }
 
 No markdown.
-No explanations.
-No extra keys.
-No surrounding text.
+Title must NOT contain newlines.
+Description MUST be a string containing a detailed explanation.
+Description MUST be at least 10 characters long.
+Do NOT use null.
 
 COMMIT TITLE RULES
 - Imperative mood (e.g. add, fix, refine, update)
@@ -35,11 +36,11 @@ Allowed types:
 feat, fix, refactor, style, docs, chore, test, perf, security
 
 COMMIT BODY RULES
-- Optional
-- Use only if more than 3 files changed OR multiple scopes OR security-related
-- Bullet list
-- Max 4 bullets
-- Describe WHAT changed, never WHY
+COMMIT BODY RULES
+- REQUIRED. Always generate a detailed description.
+- Use a bulleted list.
+- Describe WHAT changed and the context.
+- Max 5 bullets.
 
 ABSOLUTE CONSTRAINTS
 - Do NOT invent files or behaviour

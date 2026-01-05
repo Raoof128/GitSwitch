@@ -4,6 +4,31 @@
 
 - Raouf: (entries appended below)
 - Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: AI Configuration (Fix)
+  - Summary: Enhanced `parseAiResponse` to aggressively strip markdown code block syntax (backticks) even if unclosed, preventing JSON parse errors from formatted AI responses.
+  - Files: src/main/ai/helpers.ts
+  - Verification: Code check.
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: AI Configuration (Fix)
+  - Summary: Renamed `body` to `description` in AI schema and prompts to strictly interpret the field as required content. Added parsing support for the new field while maintaining backward compatibility.
+  - Files: src/main/ai/providers/gemini.ts, src/main/ai/prompts.ts, src/main/ai/helpers.ts
+  - Verification: Code check.
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: AI Configuration (Fix)
+  - Summary: Fixed JSON parsing logic that was aggressively stripping newlines and breaking valid responses. Improved Regex fallback to correctly extract commit body. Updated prompt to explicitly forbid `null` values for descriptions.
+  - Files: src/main/ai/helpers.ts, src/main/ai/prompts.ts
+  - Verification: Code review of parsing logic.
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: AI Configuration (Fix)
+  - Summary: Enforced `body` field in Gemini JSON schema and updated prompt to prevent description merging into the title. The AI will now reliably populate the description field.
+  - Files: src/main/ai/providers/gemini.ts, src/main/ai/prompts.ts
+  - Verification: Code check of schema and prompt.
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: AI Configuration (Tweak)
+  - Summary: Updated AI prompt to strictly require a Commit Body (Description) for all generated messages, not just large ones. Reinforced the `Raouf-` prefix template.
+  - Files: src/main/ai/prompts.ts
+  - Verification: Code check of prompt rules.
+- Raouf: 2026-01-05 (Australia/Sydney)
   - Scope: Git Workflow (Tweak)
   - Summary: Updated the auto-fetch interval from 60 seconds to 40 seconds for faster reconciliation with remote changes.
   - Files: src/renderer/src/App.tsx

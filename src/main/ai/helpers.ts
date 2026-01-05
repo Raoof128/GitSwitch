@@ -9,6 +9,12 @@ export function parseAiResponse(text: string): CommitMessage | null {
   const codeBlockMatch = jsonText.match(/```(?:json)?\s*([\s\S]*?)```/)
   if (codeBlockMatch) {
     jsonText = codeBlockMatch[1].trim()
+  } else {
+    // Handle unclosed blocks or simple framing
+    jsonText = jsonText
+        .replace(/^```(?:json)?\s*/i, '')
+        .replace(/\s*```$/i, '')
+        .trim()
   }
 
   // Attempt to clean simple leading/trailing characters if strict parse fails
@@ -30,28 +36,30 @@ export function parseAiResponse(text: string): CommitMessage | null {
     const parsed = JSON.parse(jsonText)
     return validateAndReturn(parsed)
   } catch (initialError) {
-    // Fallback: Try to "fix" common JSON issues from LLMs
-    try {
-      // 1. Replace real newlines with \n inside the string
-      const fixed = jsonText.replace(/\n/g, '\\n').replace(/\r/g, '')
-      const parsed = JSON.parse(fixed)
-      return validateAndReturn(parsed)
-    } catch {
-      // 2. Last resort: regex extraction for title/body logic if JSON is hopelessly broken
-      // This is a "fuzzy" parser
-      const titleMatch = jsonText.match(/"title"\s*:\s*"((?:[^"\\]|\\.)*)"/)
-      const bodyMatch = jsonText.match(/"body"\s*:\s*"((?:[^"\\]|\\.)*)"/)
+    console.warn('[AI Parser] detailed JSON parse failed, attempting regex fallback:', initialError)
+    
+    // We look for title and description specifically
+    const titleMatch = jsonText.match(/"title"\s*:\s*"((?:[^"\\]|\\.)*)"/)
+    
+    // Check for "description" (our new field) or "body" (legacy/fallback)
+    const descMatchString = jsonText.match(/"description"\s*:\s*"((?:[^"\\]|\\.)*)"/)
+    const bodyMatchString = jsonText.match(/"body"\s*:\s*"((?:[^"\\]|\\.)*)"/)
+    
+    const descMatch = descMatchString || bodyMatchString
 
-      if (titleMatch) {
-        return {
-          title: titleMatch[1],
-          body: bodyMatch ? bodyMatch[1] : undefined
-        }
+    if (titleMatch) {
+      // Unescape the string content captured by regex (e.g. \" becomes ")
+      const unescape = (str: string) => {
+          try { return JSON.parse(`"${str}"`) } catch { return str }
       }
-
-      console.error('[AI Parser] All parsing attempts failed on:', jsonText)
-      return null
+      return {
+        title: unescape(titleMatch[1]),
+        body: descMatch ? unescape(descMatch[1]) : undefined
+      }
     }
+
+    console.error('[AI Parser] All parsing attempts failed on:', jsonText)
+    return null
   }
 }
 
@@ -68,14 +76,19 @@ function validateAndReturn(parsed: any): CommitMessage | null {
 
   // Normalize
   const title = parsed.title.trim()
-  // 200 char limit is good but let's relax just a bit for long summary commits if user wants
-  // or just truncate it. Let's return valid object and let UI handle truncation if absolutely needed.
-  // Actually the app enforces 200 limit in validation layers.
   if (!title) return null
+
+  // Support both 'description' (new) and 'body' (legacy) keys
+  let body = undefined
+  if (typeof parsed.description === 'string') {
+      body = parsed.description.trim()
+  } else if (typeof parsed.body === 'string') {
+      body = parsed.body.trim()
+  }
 
   return {
     title,
-    body: typeof parsed.body === 'string' ? parsed.body.trim() : undefined
+    body
   }
 }
 

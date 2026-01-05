@@ -4,6 +4,11 @@
 
 - Raouf: (entries appended below)
 - Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: AI Configuration (Clean)
+  - Summary: Removed OpenAI and Anthropic models from the UI as requested, focusing the app entirely on Google Gemini models. Updated backend logic to default to Gemini for all "cloud" operations.
+  - Files: src/renderer/src/components/settings/SettingsIntegrations.tsx, src/main/ai/commit-generate.ts
+  - Verification: Visual check of settings dropdown.
+- Raouf: 2026-01-05 (Australia/Sydney)
   - Scope: AI Reliability (Gemini)
   - Summary: Implemented proper `responseSchema` in Gemini provider to enforce strictly structured JSON output. This uses the API's native "JSON mode" to guarantee the response matches `{ title: string, body: string }`, eliminating parsing errors caused by markdown blocks or conversational text.
   - Files: src/main/ai/providers/gemini.ts

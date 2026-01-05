@@ -132,18 +132,18 @@ function getProvider(settings: ReturnType<typeof getSettings>): { provider: AiPr
       return { provider: new GeminiProvider(), model: settings.aiCloudModel, apiKeyNeeded: true }
     }
     
-    if (model.includes('gpt') || model.includes('o1') || model.includes('o3')) { // OpenAI
+    // Default behavior for "cloud" provider is now Google Gemini
+    // We check specific models just in case, but fallback is Gemini
+    if (model.includes('gpt') || model.includes('o1') || model.includes('o3')) { // OpenAI Legacy support
       return { provider: new OpenAIProvider(), model: settings.aiCloudModel, apiKeyNeeded: true }
     }
 
-    if (model.includes('claude')) {
+    if (model.includes('claude')) { // Claude Legacy support
       return { provider: new AnthropicProvider(), model: settings.aiCloudModel, apiKeyNeeded: true }
     }
 
-    // Default to OpenAI if unrecognizable but "cloud" selected? 
-    // Or maybe default to Gemini as it was previous default?
-    // Let's default to OpenAI as 'gpt-4o-mini' is the default constant in key-manager.
-    return { provider: new OpenAIProvider(), model: settings.aiCloudModel, apiKeyNeeded: true }
+    // Default to Gemini (most robust implementation currently)
+    return { provider: new GeminiProvider(), model: settings.aiCloudModel || 'gemini-1.5-flash', apiKeyNeeded: true }
   }
 
   return null

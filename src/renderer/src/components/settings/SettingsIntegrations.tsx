@@ -172,25 +172,6 @@ export function SettingsIntegrations() {
             onChange={(event) => setCloudModel(event.target.value)}
             className="mb-2 w-full rounded-md border border-[var(--ui-border)] bg-[var(--ui-panel-muted)] px-2 py-1 text-xs"
           >
-            <optgroup label="OpenAI GPT-5.x (Latest)">
-              <option value="gpt-5.2">GPT-5.2 (Recommended)</option>
-              <option value="gpt-5.2-pro">GPT-5.2 Pro (Deep Reasoning)</option>
-              <option value="gpt-5.2-codex">GPT-5.2 Codex (Coding)</option>
-              <option value="gpt-5.1">GPT-5.1</option>
-            </optgroup>
-            <optgroup label="OpenAI GPT-4.x">
-              <option value="gpt-4.1">GPT-4.1</option>
-              <option value="gpt-4.1-mini">GPT-4.1 Mini (Fast)</option>
-              <option value="gpt-4.1-nano">GPT-4.1 Nano (Fastest)</option>
-              <option value="gpt-4o">GPT-4o</option>
-              <option value="gpt-4o-mini">GPT-4o Mini (Budget)</option>
-            </optgroup>
-            <optgroup label="OpenAI o-Series (Reasoning)">
-              <option value="o4-mini">o4-mini (Latest Reasoning)</option>
-              <option value="o3">o3 (Powerful Reasoning)</option>
-              <option value="o3-mini">o3-mini (Fast Reasoning)</option>
-              <option value="o1">o1</option>
-            </optgroup>
             <optgroup label="Google Gemini 1.5 (Recommended)">
               <option value="gemini-1.5-flash">Gemini 1.5 Flash (Fast & Cheap)</option>
               <option value="gemini-1.5-flash-8b">Gemini 1.5 Flash 8B (Fastest)</option>
@@ -202,19 +183,6 @@ export function SettingsIntegrations() {
             </optgroup>
             <optgroup label="Legacy">
               <option value="gemini-1.0-pro">Gemini 1.0 Pro</option>
-            </optgroup>
-            <optgroup label="Anthropic Claude 4.x (Latest)">
-              <option value="claude-opus-4.5">Claude Opus 4.5 (Most Intelligent)</option>
-              <option value="claude-sonnet-4.5">Claude Sonnet 4.5 (Best for Coding)</option>
-              <option value="claude-haiku-4.5">Claude Haiku 4.5 (Fast)</option>
-              <option value="claude-opus-4.1">Claude Opus 4.1</option>
-              <option value="claude-sonnet-4">Claude Sonnet 4</option>
-              <option value="claude-opus-4">Claude Opus 4</option>
-            </optgroup>
-            <optgroup label="Anthropic Claude 3.x">
-              <option value="claude-3.7-sonnet">Claude 3.7 Sonnet (Hybrid Reasoning)</option>
-              <option value="claude-3.5-sonnet">Claude 3.5 Sonnet</option>
-              <option value="claude-3.5-haiku">Claude 3.5 Haiku (Fast)</option>
             </optgroup>
           </select>
           <div className="flex items-center gap-2">

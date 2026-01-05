@@ -39,6 +39,9 @@ export class GeminiProvider implements AiProvider {
         temperature: 0.2,
         maxOutputTokens: 1024,
         responseMimeType: 'application/json',
+        // responseSchema can cause issues with Gemini Flash returning null/empty fields
+        // We rely on the prompt to enforce JSON structure and our robust parser to handle it.
+        /*
         responseSchema: {
           type: 'OBJECT',
           properties: {
@@ -47,6 +50,7 @@ export class GeminiProvider implements AiProvider {
           },
           required: ['title', 'description']
         },
+        */
         // @ts-ignore - SDK types might be strict, but we want to disable safety checks for code
         safetySettings: [
           { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },

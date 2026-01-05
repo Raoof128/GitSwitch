@@ -5,6 +5,11 @@
 - Raouf: (entries appended below)
 - Raouf: 2026-01-05 (Australia/Sydney)
   - Scope: AI Configuration (Fix)
+  - Summary: Disabled strict `responseSchema` for Gemini provider. Research confirmed Gemini 1.5 Flash often fails to populate required fields when schema is active. Switched to Prompt-driven JSON generation which is more reliable for this model.
+  - Files: src/main/ai/providers/gemini.ts
+  - Verification: Manual test (expected).
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: AI Configuration (Fix)
   - Summary: Enhanced `parseAiResponse` to aggressively strip markdown code block syntax (backticks) even if unclosed, preventing JSON parse errors from formatted AI responses.
   - Files: src/main/ai/helpers.ts
   - Verification: Code check.

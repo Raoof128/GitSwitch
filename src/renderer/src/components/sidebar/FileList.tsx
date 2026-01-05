@@ -80,7 +80,10 @@ export function FileList() {
                       <line x1="1" y1="1" x2="23" y2="23" />
                     </svg>
                   </button>
-                  <span data-status={code} className="status-indicator font-semibold w-4 text-center">
+                  <span
+                    data-status={code}
+                    className="status-indicator font-semibold w-4 text-center"
+                  >
                     {code}
                   </span>
                 </div>

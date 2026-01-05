@@ -11,6 +11,8 @@ import {
   getRemotes,
   getStatus,
   pushWithIdentity,
+  pullWithIdentity,
+  fetchWithIdentity,
   setRemoteOrigin,
   stageAll,
   addToGitignore
@@ -275,9 +277,7 @@ async function registerIpcHandlers(): Promise<void> {
 
     // Validate URL format (SSH or HTTPS)
     const isValidUrl =
-      safeUrl.startsWith('git@') ||
-      safeUrl.startsWith('https://') ||
-      safeUrl.startsWith('ssh://')
+      safeUrl.startsWith('git@') || safeUrl.startsWith('https://') || safeUrl.startsWith('ssh://')
     if (!safeUrl || !isValidUrl) {
       throw new Error('Invalid remote URL format. Use SSH (git@...) or HTTPS (https://...).')
     }
@@ -298,6 +298,21 @@ async function registerIpcHandlers(): Promise<void> {
     const safeAccountId = assertString(accountId, 'accountId')
     const settings = getSettings()
     return pushWithIdentity(normalized, safeAccountId, settings.strictHostKeyChecking)
+  })
+
+  ipcMain.handle('git:pull', async (_event, repoPath: string, accountId: string) => {
+    const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
+    const safeAccountId = assertString(accountId, 'accountId')
+    const settings = getSettings()
+    return pullWithIdentity(normalized, safeAccountId, settings.strictHostKeyChecking)
+  })
+
+  ipcMain.handle('git:fetch', async (_event, repoPath: string, accountId: string) => {
+    const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
+    const safeAccountId = assertString(accountId, 'accountId')
+    const settings = getSettings()
+    await fetchWithIdentity(normalized, safeAccountId, settings.strictHostKeyChecking)
+    return { ok: true }
   })
 
   ipcMain.handle(

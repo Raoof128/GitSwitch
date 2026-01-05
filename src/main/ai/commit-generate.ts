@@ -1,4 +1,3 @@
-
 // -------------------------------------------------------------------------- //
 //                                   IMPORTS                                  //
 // -------------------------------------------------------------------------- //
@@ -101,7 +100,7 @@ const collectContext = async (
 
   const maxBytes = options.diffLimitKb > 0 ? options.diffLimitKb * 1024 : DEFAULT_DIFF_BYTES
   const maxLines = options.diffLimitLines > 0 ? options.diffLimitLines : DEFAULT_DIFF_LINES
-  
+
   const diffContent = options.redact ? redactSecrets(diff) : diff
   const diffSnippet = truncateDiff(diffContent, maxLines, maxBytes)
 
@@ -116,34 +115,42 @@ const collectContext = async (
 //                                   FACTORY                                  //
 // -------------------------------------------------------------------------- //
 
-function getProvider(settings: ReturnType<typeof getSettings>): { provider: AiProvider, model: string, apiKeyNeeded: boolean } | null {
+function getProvider(
+  settings: ReturnType<typeof getSettings>
+): { provider: AiProvider; model: string; apiKeyNeeded: boolean } | null {
   if (settings.aiProvider === 'local') {
-     return {
-        provider: new LocalProvider(settings.aiLocalUrl),
-        model: settings.aiLocalModel,
-        apiKeyNeeded: false
-     }
+    return {
+      provider: new LocalProvider(settings.aiLocalUrl),
+      model: settings.aiLocalModel,
+      apiKeyNeeded: false
+    }
   }
 
   if (settings.aiProvider === 'cloud') {
     const model = settings.aiCloudModel.toLowerCase()
-    
+
     if (model.includes('gemini')) {
       return { provider: new GeminiProvider(), model: settings.aiCloudModel, apiKeyNeeded: true }
     }
-    
+
     // Default behavior for "cloud" provider is now Google Gemini
     // We check specific models just in case, but fallback is Gemini
-    if (model.includes('gpt') || model.includes('o1') || model.includes('o3')) { // OpenAI Legacy support
+    if (model.includes('gpt') || model.includes('o1') || model.includes('o3')) {
+      // OpenAI Legacy support
       return { provider: new OpenAIProvider(), model: settings.aiCloudModel, apiKeyNeeded: true }
     }
 
-    if (model.includes('claude')) { // Claude Legacy support
+    if (model.includes('claude')) {
+      // Claude Legacy support
       return { provider: new AnthropicProvider(), model: settings.aiCloudModel, apiKeyNeeded: true }
     }
 
     // Default to Gemini (most robust implementation currently)
-    return { provider: new GeminiProvider(), model: settings.aiCloudModel || 'gemini-1.5-flash', apiKeyNeeded: true }
+    return {
+      provider: new GeminiProvider(),
+      model: settings.aiCloudModel || 'gemini-1.5-flash',
+      apiKeyNeeded: true
+    }
   }
 
   return null
@@ -155,12 +162,12 @@ function getProvider(settings: ReturnType<typeof getSettings>): { provider: AiPr
 
 export async function generateCommitMessage(repoPath: string): Promise<CommitMessage> {
   const settings = getSettings()
-  console.log('[AI] Settings state:', { 
-    provider: settings.aiProvider, 
+  console.log('[AI] Settings state:', {
+    provider: settings.aiProvider,
     cloudModel: settings.aiCloudModel,
     timeout: settings.aiTimeoutSec
   })
-  
+
   // 1. Collect Context
   let context: AiContext
   try {
@@ -169,13 +176,13 @@ export async function generateCommitMessage(repoPath: string): Promise<CommitMes
       diffLimitLines: settings.diffLimitLines,
       redact: settings.aiRedactionEnabled
     })
-    
+
     // Add persona to context
     context.persona = settings.aiPersona
   } catch (error) {
     console.error('Context collection failed:', error)
-     // Fallback context
-     context = {
+    // Fallback context
+    context = {
       branch: null,
       files: [],
       diff: ''
@@ -184,24 +191,24 @@ export async function generateCommitMessage(repoPath: string): Promise<CommitMes
 
   // 2. Prepare Offline Fallback
   // We reconstruct the internal GitStatus shape needed for the legacy offline generator if needed
-  // But strictly speaking, the offline generator needs specific shape. 
+  // But strictly speaking, the offline generator needs specific shape.
   // Let's just create a minimal compliant object or pass the context.
-  // The 'generateOfflineCommitMessage' expects { branch, status: GitStatus, files }. 
-  // Our 'context' doesn't have full GitStatus object. 
+  // The 'generateOfflineCommitMessage' expects { branch, status: GitStatus, files }.
+  // Our 'context' doesn't have full GitStatus object.
   // We can re-fetch or just mock it. Ideally we should have kept the status object in collectContext if we needed it.
   // Let's quickly fix collectContext to return what we need or just re-fetch for offline (cheap).
   // Actually, let's just make `generateOfflineCommitMessage` usage safe.
-  
+
   const offlineFallback = generateOfflineCommitMessage({
-     branch: context.branch,
-     files: context.files.map(f => ({ ...f, index: '?', working_dir: '?' })), // Close enough for the minimal offline generator
-     status: { 
-        current: context.branch, 
-        ahead: 0, 
-        behind: 0, 
-        files: [], // It's only used for length check usually
-        staged: []
-     }
+    branch: context.branch,
+    files: context.files.map((f) => ({ ...f, index: '?', working_dir: '?' })), // Close enough for the minimal offline generator
+    status: {
+      current: context.branch,
+      ahead: 0,
+      behind: 0,
+      files: [], // It's only used for length check usually
+      staged: []
+    }
   })
 
   // 3. Early Exit if Offline
@@ -212,7 +219,10 @@ export async function generateCommitMessage(repoPath: string): Promise<CommitMes
   // 4. Rate Limit
   if (!checkRateLimit()) {
     console.warn('Rate limit exceeded')
-    return { title: 'Error: Rate limit exceeded', body: 'Please wait a minute before trying again.' }
+    return {
+      title: 'Error: Rate limit exceeded',
+      body: 'Please wait a minute before trying again.'
+    }
   }
 
   // 5. Select Provider
@@ -227,7 +237,10 @@ export async function generateCommitMessage(repoPath: string): Promise<CommitMes
     apiKey = await loadAiKey()
     if (!apiKey) {
       console.warn('Missing API Key for cloud provider')
-      return { title: 'Error: Missing API Key', body: 'Please add your API Key in Settings > Integrations.' }
+      return {
+        title: 'Error: Missing API Key',
+        body: 'Please add your API Key in Settings > Integrations.'
+      }
     }
   }
 
@@ -235,43 +248,51 @@ export async function generateCommitMessage(repoPath: string): Promise<CommitMes
   try {
     const timeout = settings.aiTimeoutSec > 0 ? settings.aiTimeoutSec * 1000 : DEFAULT_TIMEOUT_MS
     const result = await selection.provider.generate(context, apiKey, selection.model, timeout)
-    
+
     // Wipe key
     apiKey = ''
 
     if (!result) {
-        return { title: 'Error: AI generation failed', body: 'The provider returned an empty response. Check your network or API key permissions.' }
+      return {
+        title: 'Error: AI generation failed',
+        body: 'The provider returned an empty response. Check your network or API key permissions.'
+      }
     }
 
     // 8. Security Validation
     const allowedPaths = new Set(context.files.map((file) => file.path))
     if (hasUnknownPaths(result, allowedPaths)) {
       console.warn('AI generated unknown paths.')
-      return { title: 'Error: AI Hallucination Detected', body: 'The AI attempted to reference files not in the diff. This was blocked for safety.' }
+      return {
+        title: 'Error: AI Hallucination Detected',
+        body: 'The AI attempted to reference files not in the diff. This was blocked for safety.'
+      }
     }
 
     return result
-
   } catch (error) {
     console.error('Generation failed:', error)
-    return { title: 'Error: Generation Exception', body: error instanceof Error ? error.message : String(error) }
+    return {
+      title: 'Error: Generation Exception',
+      body: error instanceof Error ? error.message : String(error)
+    }
   }
 }
 
 // Legacy export for testing connectivity
 export async function testLocalLlm(url: string, model: string): Promise<boolean> {
-   if (!url || !model) return false
-   try {
-     const provider = new LocalProvider(url)
-     // Mock context
-     const context: AiContext = {
-       branch: 'test',
-       diff: 'test',
-       files: []
-     }
-     const res = await provider.generate(context, '', model, 5000)
-     return !!res
-   } catch {
-     return false
-   }
+  if (!url || !model) return false
+  try {
+    const provider = new LocalProvider(url)
+    // Mock context
+    const context: AiContext = {
+      branch: 'test',
+      diff: 'test',
+      files: []
+    }
+    const res = await provider.generate(context, '', model, 5000)
+    return !!res
+  } catch {
+    return false
+  }
 }

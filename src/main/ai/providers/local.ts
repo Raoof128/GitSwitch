@@ -1,4 +1,3 @@
-
 import type { AiContext, AiProvider, CommitMessage } from '../interfaces'
 import { buildUserPrompt, CYBERSECURITY_INSTRUCTION, SYSTEM_PROMPT } from '../prompts'
 import { parseAiResponse } from '../helpers'
@@ -15,13 +14,13 @@ export class LocalProvider implements AiProvider {
   ): Promise<CommitMessage | null> {
     const instruction = context.persona === 'cybersecurity' ? CYBERSECURITY_INSTRUCTION : ''
     const userContent = buildUserPrompt(context) + instruction
-    
+
     // Check if it's Ollama or OpenAI-compatible local (like LM Studio)
     // Heuristic: Ollama typically uses /api/generate or /api/chat. LM Studio uses /v1/chat/completions.
     // The previous implementation inferred this from URL.
-    
+
     const isOllamaGenerate = this.baseUrl.includes('/api/generate')
-    
+
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), timeoutMs)
 
@@ -37,20 +36,20 @@ export class LocalProvider implements AiProvider {
             prompt: `${SYSTEM_PROMPT}\n${userContent}`,
             stream: false,
             // Force JSON mode if supported (Ollama supports format: 'json')
-            format: 'json' 
+            format: 'json'
           }),
           signal: controller.signal
         })
       } else {
-         // OpenAI compatible (LM Studio, etc)
-         response = await fetch(this.baseUrl, {
+        // OpenAI compatible (LM Studio, etc)
+        response = await fetch(this.baseUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             model: model || 'local-model',
             messages: [
-                { role: 'system', content: SYSTEM_PROMPT },
-                { role: 'user', content: userContent }
+              { role: 'system', content: SYSTEM_PROMPT },
+              { role: 'user', content: userContent }
             ],
             temperature: 0.2
           }),
@@ -59,10 +58,10 @@ export class LocalProvider implements AiProvider {
       }
 
       if (!response.ok) return null
-      
-      const data = await response.json() as any
+
+      const data = (await response.json()) as any
       let rawText = ''
-      
+
       if (isOllamaGenerate) {
         rawText = data.response
       } else {

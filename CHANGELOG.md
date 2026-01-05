@@ -4,6 +4,21 @@
 
 - Raouf: (entries appended below)
 - Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: Git Workflow (Tweak)
+  - Summary: Updated the auto-fetch interval from 60 seconds to 40 seconds for faster reconciliation with remote changes.
+  - Files: src/renderer/src/App.tsx
+  - Verification: Code check.
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: Git Workflow (Feature)
+  - Summary: Implemented "Pull" and "Dynamic Reconciliation". Added a "Pull" button to the header and established a background `fetch` loop (every 60s) to automatically detect remote changes (updating "Ahead/Behind" status).
+  - Files: src/main/git/git-service.ts, src/main/index.ts, src/preload/index.ts, src/renderer/src/store/useRepoStore.ts, src/renderer/src/App.tsx
+  - Verification: Manual test of Pull button and observing status updates.
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: Git Workflow (Feature)
+  - Summary: Implemented "Auto Push" functionality. Added a checkbox "Push immediately after commit" in the Commit Panel. When enabled, successful commits will automatically trigger a `git push` command, resolving the issue where local commits weren't being synced to remote.
+  - Files: src/renderer/src/store/useRepoStore.ts, src/renderer/src/components/sidebar/CommitPanel.tsx
+  - Verification: Manual test of commit + auto-push flow.
+- Raouf: 2026-01-05 (Australia/Sydney)
   - Scope: AI Configuration (Clean)
   - Summary: Removed OpenAI and Anthropic models from the UI as requested, focusing the app entirely on Google Gemini models. Updated backend logic to default to Gemini for all "cloud" operations.
   - Files: src/renderer/src/components/settings/SettingsIntegrations.tsx, src/main/ai/commit-generate.ts

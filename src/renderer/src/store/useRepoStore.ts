@@ -21,6 +21,7 @@ type RepoState = {
   aiPersona: 'standard' | 'cybersecurity'
   aiRedactionEnabled: boolean
   aiTimeoutSec: number
+  autoPush: boolean
   applyStatusUpdate: (repoPath: string, status: GitStatus) => void
   clearAiKey: () => Promise<void>
   clearCommitResetTimer: () => void
@@ -52,6 +53,8 @@ type RepoState = {
   prModalOpen: boolean
   prResult: { status: 'idle' | 'loading' | 'success' | 'error'; message?: string; url?: string }
   publishStatus: PublishStatus | null
+  pull: () => Promise<boolean>
+  fetch: () => Promise<void>
   push: () => Promise<boolean>
   reducedMotion: boolean
   refreshAccounts: () => Promise<void>
@@ -95,6 +98,7 @@ type RepoState = {
       aiPersona: 'standard' | 'cybersecurity'
       aiRedactionEnabled: boolean
       aiTimeoutSec: number
+      autoPush: boolean
       defaultAccountId: string | null
       defaultBaseBranch: 'main' | 'master'
       diffLimitKb: number
@@ -143,6 +147,7 @@ export const useRepoStore = create<RepoState>((set, get) => ({
   aiPersona: 'standard',
   aiRedactionEnabled: true,
   aiTimeoutSec: 20,
+  autoPush: false,
   defaultAccountId: null,
   defaultBaseBranch: 'main',
   diffLimitKb: 80,
@@ -391,6 +396,15 @@ export const useRepoStore = create<RepoState>((set, get) => ({
       if (commitResetTimer) {
         clearTimeout(commitResetTimer)
       }
+
+      // Auto Push Logic
+      if (get().autoPush) {
+        // We reuse the push logic but without setting 'commitStatus: error' aggressively if account missing?
+        // Actually the push() function in store handles UI feedback.
+        // We'll just call it.
+        await get().push()
+      }
+
       commitResetTimer = setTimeout(() => {
         set({ commitStatus: 'idle' })
         commitResetTimer = null
@@ -427,6 +441,46 @@ export const useRepoStore = create<RepoState>((set, get) => ({
       return false
     }
   },
+  pull: async () => {
+    const repoPath = get().activeRepoPath
+    const accountId = get().selectedAccountId
+    if (!repoPath || !accountId) {
+      return false
+    }
+
+    try {
+      set({ commitStatus: 'loading' })
+      const message = await window.api.gitPull(repoPath, accountId)
+      
+      await get().refreshStatus()
+      await get().loadDiff('unstaged')
+      await get().loadStagedDiff()
+      
+      set({ commitStatus: 'idle' })
+      return true
+    } catch (error) {
+       const message = error instanceof Error ? error.message : 'Pull failed.'
+       set({
+         commitError: `Pull failed: ${message}`,
+         commitStatus: 'error'
+       })
+       setTimeout(() => set({ commitError: null, commitStatus: 'idle' }), 8000)
+       return false
+    }
+  },
+  fetch: async () => {
+    const repoPath = get().activeRepoPath
+    const accountId = get().selectedAccountId
+    if (!repoPath || !accountId) {
+      return
+    }
+    try {
+      await window.api.gitFetch(repoPath, accountId)
+      await get().refreshStatus()
+    } catch {
+       // Silent failure for background fetch
+    }
+  },
   refreshSettings: async () => {
     if (!window.api?.getSettings) {
       return
@@ -440,6 +494,7 @@ export const useRepoStore = create<RepoState>((set, get) => ({
       aiPersona: settings.aiPersona,
       aiRedactionEnabled: settings.aiRedactionEnabled,
       aiTimeoutSec: settings.aiTimeoutSec,
+      autoPush: settings.autoPush ?? false,
       defaultAccountId: settings.defaultAccountId ?? null,
       defaultBaseBranch: settings.defaultBaseBranch,
       diffLimitKb: settings.diffLimitKb,
@@ -465,6 +520,7 @@ export const useRepoStore = create<RepoState>((set, get) => ({
       aiProvider: settings.aiProvider,
       aiRedactionEnabled: settings.aiRedactionEnabled,
       aiTimeoutSec: settings.aiTimeoutSec,
+      autoPush: settings.autoPush,
       defaultAccountId: settings.defaultAccountId ?? null,
       defaultBaseBranch: settings.defaultBaseBranch,
       diffLimitKb: settings.diffLimitKb,

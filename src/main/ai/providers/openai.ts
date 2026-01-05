@@ -1,4 +1,3 @@
-
 import type { AiContext, AiProvider, CommitMessage } from '../interfaces'
 import { buildUserPrompt, CYBERSECURITY_INSTRUCTION, SYSTEM_PROMPT } from '../prompts'
 import { parseAiResponse } from '../helpers'
@@ -42,7 +41,9 @@ export class OpenAIProvider implements AiProvider {
         return null
       }
 
-      const data = (await response.json()) as { choices?: Array<{ message?: { content?: string } }> }
+      const data = (await response.json()) as {
+        choices?: Array<{ message?: { content?: string } }>
+      }
       return parseAiResponse(data.choices?.[0]?.message?.content || '')
     } catch (error) {
       console.error('OpenAI generation failed:', error)

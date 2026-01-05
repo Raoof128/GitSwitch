@@ -198,6 +198,20 @@ function App() {
     return () => window.removeEventListener('keydown', handler)
   }, [addRepo, commit, generateCommitMessage, refreshStatus, setSettingsOpen, settingsOpen])
 
+  // Background Fetch / Dynamic Reconciliation Loop
+  useEffect(() => {
+    if (!activeRepoPath || !selectedAccountId) return
+
+    // Initial fetch on mount/change
+    useRepoStore.getState().fetch()
+
+    const intervalId = setInterval(() => {
+      useRepoStore.getState().fetch()
+    }, 40000) // 40 seconds interval
+
+    return () => clearInterval(intervalId)
+  }, [activeRepoPath, selectedAccountId])
+
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[var(--ui-bg)] text-[var(--ui-text)]">
       <Sidebar width={sidebarWidth} />
@@ -286,6 +300,17 @@ function App() {
                     </option>
                   ))}
                 </select>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await useRepoStore.getState().pull()
+                  }}
+                  disabled={!activeRepoPath || !selectedAccountId}
+                  title="Pull changes"
+                  className="rounded-md border border-[var(--ui-border)] px-3 py-1 text-xs font-semibold text-slate-200 hover:bg-[var(--ui-hover)] disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Pull
+                </button>
                 <button
                   type="button"
                   onClick={handlePush}

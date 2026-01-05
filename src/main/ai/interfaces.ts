@@ -1,4 +1,3 @@
-
 export type CommitMessage = {
   title: string
   body?: string
@@ -12,5 +11,10 @@ export type AiContext = {
 }
 
 export interface AiProvider {
-  generate(context: AiContext, apiKey: string, model: string, timeoutMs: number): Promise<CommitMessage | null>
+  generate(
+    context: AiContext,
+    apiKey: string,
+    model: string,
+    timeoutMs: number
+  ): Promise<CommitMessage | null>
 }

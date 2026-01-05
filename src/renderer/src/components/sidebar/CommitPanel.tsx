@@ -136,6 +136,23 @@ export function CommitPanel() {
           )}
           Stage All
         </motion.button>
+
+        <div className="flex items-center gap-2 px-1">
+          <input
+            type="checkbox"
+            id="auto-push"
+            checked={useRepoStore((s) => s.autoPush)}
+            onChange={(e) => useRepoStore.getState().updateSettings({ autoPush: e.target.checked })}
+            className="h-3 w-3 rounded border-[var(--ui-border)] bg-[var(--ui-panel)] text-[var(--ui-accent)] focus:ring-[var(--ui-accent)]"
+          />
+          <label
+            htmlFor="auto-push"
+            className="select-none text-[10px] text-[var(--ui-text-muted)] hover:text-white cursor-pointer"
+          >
+            Push immediately after commit
+          </label>
+        </div>
+
         <motion.button
           type="button"
           onClick={commit}

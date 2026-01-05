@@ -1,4 +1,3 @@
-
 export const SYSTEM_PROMPT = `
 You are an expert Git commit message author for a professional open-source project.
 
@@ -10,6 +9,7 @@ Audience: professional developers and security engineers
 
 TASK
 Generate a high-quality Git commit message based ONLY on provided changes.
+use the following template: Raouf-"rest of comment"
 
 OUTPUT FORMAT (STRICT)
 Return JSON ONLY in this exact shape:

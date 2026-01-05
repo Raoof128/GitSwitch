@@ -21,25 +21,79 @@ const DEFAULT_DIFF_LINES = 400
 
 // User-friendly error message translations
 const ERROR_TRANSLATIONS: Array<{ pattern: RegExp; message: string }> = [
-  { pattern: /Permission denied \(publickey\)/i, message: 'SSH key not authorized. Please ensure your SSH key is added to your GitHub/GitLab account.' },
-  { pattern: /Host key verification failed/i, message: 'Host key verification failed. Try enabling "Trust new hosts" in Settings → Advanced, or manually add the host to known_hosts.' },
-  { pattern: /Could not resolve hostname/i, message: 'Could not connect to remote server. Check your internet connection and the remote URL.' },
-  { pattern: /Connection refused/i, message: 'Connection refused. The remote server is not responding.' },
-  { pattern: /repository not found/i, message: 'Repository not found. Check that the remote URL is correct and you have access.' },
-  { pattern: /fatal: not a git repository/i, message: 'This folder is not a Git repository. Run "git init" to create one.' },
+  {
+    pattern: /Permission denied \(publickey\)/i,
+    message:
+      'SSH key not authorized. Please ensure your SSH key is added to your GitHub/GitLab account.'
+  },
+  {
+    pattern: /Host key verification failed/i,
+    message:
+      'Host key verification failed. Try enabling "Trust new hosts" in Settings → Advanced, or manually add the host to known_hosts.'
+  },
+  {
+    pattern: /Could not resolve hostname/i,
+    message:
+      'Could not connect to remote server. Check your internet connection and the remote URL.'
+  },
+  {
+    pattern: /Connection refused/i,
+    message: 'Connection refused. The remote server is not responding.'
+  },
+  {
+    pattern: /repository not found/i,
+    message: 'Repository not found. Check that the remote URL is correct and you have access.'
+  },
+  {
+    pattern: /fatal: not a git repository/i,
+    message: 'This folder is not a Git repository. Run "git init" to create one.'
+  },
   { pattern: /nothing to commit/i, message: 'Nothing to commit. Stage some changes first.' },
-  { pattern: /no changes added to commit/i, message: 'No changes staged. Use "Stage All" or stage files manually.' },
-  { pattern: /failed to push some refs/i, message: 'Push failed. Your branch may be behind the remote. Try pulling first.' },
-  { pattern: /Updates were rejected/i, message: 'Push rejected. The remote has changes you don\'t have locally. Pull first, then push.' },
-  { pattern: /Could not read from remote/i, message: 'Could not read from remote. Check your SSH key and network connection.' },
-  { pattern: /Authentication failed/i, message: 'Authentication failed. Check your credentials or SSH key.' },
-  { pattern: /remote origin already exists/i, message: 'Remote "origin" already exists. Use "Update Origin" to change it.' },
-  { pattern: /does not appear to be a git repository/i, message: 'Remote URL is not a valid Git repository.' },
+  {
+    pattern: /no changes added to commit/i,
+    message: 'No changes staged. Use "Stage All" or stage files manually.'
+  },
+  {
+    pattern: /failed to push some refs/i,
+    message: 'Push failed. Your branch may be behind the remote. Try pulling first.'
+  },
+  {
+    pattern: /Updates were rejected/i,
+    message: "Push rejected. The remote has changes you don't have locally. Pull first, then push."
+  },
+  {
+    pattern: /Could not read from remote/i,
+    message: 'Could not read from remote. Check your SSH key and network connection.'
+  },
+  {
+    pattern: /Authentication failed/i,
+    message: 'Authentication failed. Check your credentials or SSH key.'
+  },
+  {
+    pattern: /remote origin already exists/i,
+    message: 'Remote "origin" already exists. Use "Update Origin" to change it.'
+  },
+  {
+    pattern: /does not appear to be a git repository/i,
+    message: 'Remote URL is not a valid Git repository.'
+  },
   { pattern: /pathspec .* did not match/i, message: 'File not found or not tracked by Git.' },
-  { pattern: /CONFLICT/i, message: 'Merge conflict detected. Resolve conflicts manually before committing.' },
-  { pattern: /detached HEAD/i, message: 'You are in detached HEAD state. Create or checkout a branch before committing.' },
-  { pattern: /cannot lock ref/i, message: 'Git lock error. Another Git process may be running, or there\'s a stale lock file.' },
-  { pattern: /index\.lock/i, message: 'Git is locked. If no other Git operation is running, delete .git/index.lock manually.' }
+  {
+    pattern: /CONFLICT/i,
+    message: 'Merge conflict detected. Resolve conflicts manually before committing.'
+  },
+  {
+    pattern: /detached HEAD/i,
+    message: 'You are in detached HEAD state. Create or checkout a branch before committing.'
+  },
+  {
+    pattern: /cannot lock ref/i,
+    message: "Git lock error. Another Git process may be running, or there's a stale lock file."
+  },
+  {
+    pattern: /index\.lock/i,
+    message: 'Git is locked. If no other Git operation is running, delete .git/index.lock manually.'
+  }
 ]
 
 const getGitErrorMessage = (error: unknown, fallback = 'Git operation failed.'): string => {
@@ -217,7 +271,7 @@ export async function addToGitignore(repoPath: string, filePath: string): Promis
 
     // Read current content
     const currentContent = await fs.readFile(gitignorePath, 'utf-8')
-    
+
     // Check if already ignored (simplistic check to avoid duplicate lines)
     if (currentContent.split('\n').includes(filePath)) {
       return
@@ -386,6 +440,61 @@ export async function pushWithIdentity(
     })
 
     return result
+  } finally {
+    await cleanupTempKey(tempKeyPath)
+  }
+}
+
+export async function pullWithIdentity(
+  repoPath: string,
+  keyId: string,
+  strictHostKeyChecking: boolean
+): Promise<string> {
+  let privateKey = await loadKey(keyId)
+  const tempKeyPath = await writeTempKeyFile(privateKey)
+  // Zero out private key from memory immediately
+  privateKey = ''
+
+  const strictValue = strictHostKeyChecking ? 'yes' : 'no'
+  const sshCommand = `ssh -i "${tempKeyPath}" -o IdentitiesOnly=yes -o StrictHostKeyChecking=${strictValue}`
+
+  try {
+    const git = simpleGit({ baseDir: repoPath })
+    // Configure git to use the SSH command for this operation
+    const env = { ...process.env, GIT_SSH_COMMAND: sshCommand }
+    
+    // We can use simpleGit directly here as it supports env vars in options or we can spawn if needed for streaming
+    // But pull usually isn't as long-running/streaming as push can be for large repos, 
+    // though simpleGit is fine. Let's use simpleGit's pull with env.
+    const result = await git.env(env).pull()
+    return result.summary.changes + result.summary.insertions + result.summary.deletions > 0 
+      ? 'Updated' 
+      : 'Already up to date'
+  } catch (error) {
+     throw new Error(getGitErrorMessage(error, 'Pull failed.'))
+  } finally {
+    await cleanupTempKey(tempKeyPath)
+  }
+}
+
+export async function fetchWithIdentity(
+  repoPath: string,
+  keyId: string,
+  strictHostKeyChecking: boolean
+): Promise<void> {
+  let privateKey = await loadKey(keyId)
+  const tempKeyPath = await writeTempKeyFile(privateKey)
+  privateKey = ''
+
+  const strictValue = strictHostKeyChecking ? 'yes' : 'no'
+  const sshCommand = `ssh -i "${tempKeyPath}" -o IdentitiesOnly=yes -o StrictHostKeyChecking=${strictValue}`
+
+  try {
+    const git = simpleGit({ baseDir: repoPath })
+    const env = { ...process.env, GIT_SSH_COMMAND: sshCommand }
+    await git.env(env).fetch(['--all'])
+  } catch (error) {
+     throw new Error(getGitErrorMessage(error, 'Fetch failed.'))
   } finally {
     await cleanupTempKey(tempKeyPath)
   }

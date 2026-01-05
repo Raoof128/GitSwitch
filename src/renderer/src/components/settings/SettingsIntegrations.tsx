@@ -294,6 +294,6 @@ export function SettingsIntegrations() {
           </div>
         </div>
       </div>
-    </section >
+    </section>
   )
 }

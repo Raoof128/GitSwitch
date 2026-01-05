@@ -34,6 +34,10 @@ const api = {
     ipcRenderer.invoke('git:ignore', repoPath, filePath),
   gitPush: (repoPath: string, accountId: string): Promise<PushResult> =>
     ipcRenderer.invoke('git:push', repoPath, accountId),
+  gitPull: (repoPath: string, accountId: string): Promise<string> =>
+    ipcRenderer.invoke('git:pull', repoPath, accountId),
+  gitFetch: (repoPath: string, accountId: string): Promise<{ ok: boolean }> =>
+    ipcRenderer.invoke('git:fetch', repoPath, accountId),
   createPullRequest: (repoPath: string, options: PullRequestOptions): Promise<PullRequestResult> =>
     ipcRenderer.invoke('git:createPullRequest', repoPath, options),
   getSettings: (): Promise<{

@@ -35,9 +35,9 @@ type ElectronStoreType<T> = {
 // Handle ESM/CJS interop for electron-store
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const ElectronStoreModule = require('electron-store')
-const ElectronStore = (
-  ElectronStoreModule.default || ElectronStoreModule
-) as new <T>(options: unknown) => ElectronStoreType<T>
+const ElectronStore = (ElectronStoreModule.default || ElectronStoreModule) as new <T>(
+  options: unknown
+) => ElectronStoreType<T>
 
 const DEFAULT_SETTINGS: StoreSchema['settings'] = {
   aiCloudModel: 'gpt-4o-mini',

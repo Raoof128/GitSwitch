@@ -1,4 +1,3 @@
-
 import type { AiContext, AiProvider, CommitMessage } from '../interfaces'
 import { buildUserPrompt, CYBERSECURITY_INSTRUCTION, SYSTEM_PROMPT } from '../prompts'
 import { parseAiResponse } from '../helpers'
@@ -29,9 +28,7 @@ export class AnthropicProvider implements AiProvider {
           max_tokens: 1024,
           temperature: 0.2,
           system: SYSTEM_PROMPT,
-          messages: [
-            { role: 'user', content: userContent }
-          ]
+          messages: [{ role: 'user', content: userContent }]
         }),
         signal: controller.signal
       })

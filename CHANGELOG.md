@@ -4,6 +4,16 @@
 
 - Raouf: (entries appended below)
 - Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: Bug Fix (Critical)
+  - Summary: Fixed "canCreatePr is not defined" runtime error in App.tsx by ensuring the variable is defined in the component scope.
+  - Files: src/renderer/src/App.tsx
+  - Verification: Manual verification of code structure.
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: UX (Improvement)
+  - Summary: Removed annoying "Create Pull Request?" prompt after every push. Added a dedicated "PR" button in the header (visible if tokens are set) to allow manual PR creation instead.
+  - Files: src/renderer/src/App.tsx
+  - Verification: Manual check of UI.
+- Raouf: 2026-01-05 (Australia/Sydney)
   - Scope: AI Configuration (Fix)
   - Summary: Disabled strict `responseSchema` for Gemini provider. Research confirmed Gemini 1.5 Flash often fails to populate required fields when schema is active. Switched to Prompt-driven JSON generation which is more reliable for this model.
   - Files: src/main/ai/providers/gemini.ts

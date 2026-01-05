@@ -62,21 +62,10 @@ function App() {
   }, [setDiffMode])
 
   const handlePush = useCallback(async (): Promise<void> => {
-    const pushed = await push()
-    if (!pushed) {
-      return
-    }
+    await push()
+  }, [push])
 
-    const canCreatePr = hasGitHubToken || hasGitLabToken
-    if (!canCreatePr) {
-      return
-    }
-
-    const shouldCreate = window.confirm('Push successful. Create Pull Request?')
-    if (shouldCreate) {
-      await openPrModal()
-    }
-  }, [hasGitHubToken, hasGitLabToken, openPrModal, push])
+  const canCreatePr = hasGitHubToken || hasGitLabToken
 
   const toggleSettings = useCallback(() => {
     setSettingsOpen(!settingsOpen)
@@ -320,6 +309,16 @@ function App() {
                 >
                   Push
                 </button>
+                {canCreatePr && (
+                  <button
+                    type="button"
+                    onClick={openPrModal}
+                    title="Create Pull Request"
+                    className="rounded-md border border-[var(--ui-border)] px-3 py-1 text-xs font-semibold text-slate-200 hover:bg-[var(--ui-hover)]"
+                  >
+                    PR
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={toggleSettings}

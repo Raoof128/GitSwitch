@@ -1,34 +1,74 @@
-# gitswitch
+# Gitswitch
 
-An Electron application with React and TypeScript
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Electron](https://img.shields.io/badge/Electron-33.0-blue)
+![React](https://img.shields.io/badge/React-19-blue)
 
-## Recommended IDE Setup
+**Gitswitch** is a modern, AI-powered Git client designed for developers who manage multiple accounts and repositories. Built with Electron and React, it offers a seamless experience or switching identities, managing diffs, and generating semantic commit messages using Google Gemini AI.
 
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+## 🚀 Features
 
-## Project Setup
+*   **Multi-Account Management**: Easily switch between GitHub/GitLab accounts (Personal, Work, etc.).
+*   **AI Commit Generation**: Automatically generate semantic commit titles and detailed descriptions using Gemini 1.5 Flash.
+*   **Smart Diff Viewer**: View staged and unstaged changes with syntax highlighting.
+*   **Drag & Drop**: Add repositories by simply dragging folders.
+*   **Privacy First**: API keys are stored securely in your OS keychain.
+*   **Dark Mode**: Sleek, modern URL-inspired interface.
 
-### Install
+## 🛠️ Tech Stack
+
+*   **Core**: [Electron](https://www.electronjs.org/), [TypeScript](https://www.typescriptlang.org/)
+*   **Frontend**: [React 19](https://react.dev/), [Vite](https://vitejs.dev/), [TailwindCSS](https://tailwindcss.com/)
+*   **State Management**: [Zustand](https://github.com/pmndrs/zustand)
+*   **AI**: [Google Generative AI SDK](https://github.com/google/google-genai)
+*   **Git**: [Simple-Git](https://github.com/steveukx/git-js)
+
+## 📦 Installation
+
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/raoof/gitswitch.git
+    cd gitswitch
+    ```
+
+2.  **Install dependencies**:
+    ```bash
+    npm install
+    ```
+
+3.  **Start the development app**:
+    ```bash
+    npm run dev
+    ```
+
+## 🏗️ Building
+
+To create a production build for your OS:
 
 ```bash
-$ npm install
+# macOS
+npm run build:mac
+
+# Windows
+npm run build:win
+
+# Linux
+npm run build:linux
 ```
 
-### Development
+## 🤖 AI Configuration
 
-```bash
-$ npm run dev
-```
+1.  Get a generic API Key from [Google AI Studio](https://aistudio.google.com/).
+2.  Open **Settings** in Gitswitch.
+3.  Select **Cloud (Gemini)** provider.
+4.  Enter your API Key.
+5.  (Optional) Customize the "Persona" to adjust the tone of commit messages.
 
-### Build
+## 🤝 Contributing
 
-```bash
-# For windows
-$ npm run build:win
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to submit Pull Requests and report issues.
 
-# For macOS
-$ npm run build:mac
+## 📄 License
 
-# For Linux
-$ npm run build:linux
-```
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

@@ -4,6 +4,26 @@
 
 - Raouf: (entries appended below)
 - Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: AI Configuration (Fix)
+  - Summary: Increased default AI generation timeout from 8s to 30s to prevent premature timeouts on slower connections.
+  - Files: src/main/secure/key-manager.ts, src/main/ai/commit-generate.ts
+  - Verification: Manual check of default values.
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: Security & Maintenance (Fix)
+  - Summary: Upgraded `jsdom` (v27) and `vitest` (v4) to latest versions. Added `overrides` for `esbuild ^0.27.2` to resolve high-severity audit vulnerabilities.
+  - Files: package.json
+  - Verification: Manual verification of `npm install` (by user).
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: Configuration (Fix)
+  - Summary: Upgraded `@testing-library/react` and `vitest` dependencies to versions compatible with React 19 to fix `npm install` resolution errors.
+  - Files: package.json
+  - Verification: Manual verification of `npm install` (by user).
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: Project Audit (Major Upgrade)
+  - Summary: Conducted comprehensive production-readiness audit. Added MISSING release assets (LICENSE, CONTRIBUTING, SECURITY, CODE_OF_CONDUCT). Upgraded README.md. Implemented CI/CD workflows and Vitest testing infrastructure.
+  - Files: README.md, LICENSE, CONTRIBUTING.md, SECURITY.md, CODE_OF_CONDUCT.md, .github/*, package.json, vitest.config.ts
+  - Verification: Validation of file creation.
+- Raouf: 2026-01-05 (Australia/Sydney)
   - Scope: Bug Fix (Critical)
   - Summary: Fixed "canCreatePr is not defined" runtime error in App.tsx by ensuring the variable is defined in the component scope.
   - Files: src/renderer/src/App.tsx

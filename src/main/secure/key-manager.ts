@@ -46,7 +46,7 @@ const DEFAULT_SETTINGS: StoreSchema['settings'] = {
   aiProvider: 'offline',
   aiPersona: 'standard',
   aiRedactionEnabled: true,
-  aiTimeoutSec: 8,
+  aiTimeoutSec: 30,
   defaultAccountId: undefined,
   defaultBaseBranch: 'main',
   diffLimitKb: 80,

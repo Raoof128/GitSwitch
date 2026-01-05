@@ -21,7 +21,7 @@ import { redactSecrets } from './helpers'
 
 const DEFAULT_DIFF_BYTES = 80 * 1024
 const DEFAULT_DIFF_LINES = 400
-const DEFAULT_TIMEOUT_MS = 20000
+const DEFAULT_TIMEOUT_MS = 30000
 
 // Rate limiting configuration
 const RATE_LIMIT_WINDOW = 60000 // 1 minute

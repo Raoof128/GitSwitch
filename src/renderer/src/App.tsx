@@ -34,7 +34,9 @@ function App() {
     generateCommitMessage,
     openPrModal,
     clearCommitResetTimer,
-    setSettingsOpen
+    setSettingsOpen,
+    refreshSettings,
+    refreshAccounts
   } = useRepoStore()
   const [diffMode, setDiffMode] = useState<DiffMode>('unstaged')
   const reduceMotion = useReducedMotionSafe(reducedMotion)
@@ -136,10 +138,12 @@ function App() {
   }, [sidebarWidth])
 
   useEffect(() => {
+    refreshAccounts()
+    refreshSettings()
     return () => {
       clearCommitResetTimer()
     }
-  }, [clearCommitResetTimer])
+  }, [clearCommitResetTimer, refreshAccounts, refreshSettings])
 
   useEffect(() => {
     const handler = (event: KeyboardEvent): void => {
@@ -316,11 +320,10 @@ function App() {
                       type="button"
                       onClick={handleDiffModeUnstaged}
                       title="Show unstaged changes (Ctrl/⌘+1)"
-                      className={`rounded-md border px-2 py-1 text-[10px] ${
-                        diffMode === 'unstaged'
-                          ? 'border-[var(--ui-border-soft)] text-white'
-                          : 'border-[var(--ui-border)] text-[var(--ui-text-muted)]'
-                      }`}
+                      className={`rounded-md border px-2 py-1 text-[10px] ${diffMode === 'unstaged'
+                        ? 'border-[var(--ui-border-soft)] text-white'
+                        : 'border-[var(--ui-border)] text-[var(--ui-text-muted)]'
+                        }`}
                     >
                       Unstaged
                     </button>
@@ -328,11 +331,10 @@ function App() {
                       type="button"
                       onClick={handleDiffModeStaged}
                       title="Show staged changes (Ctrl/⌘+2)"
-                      className={`rounded-md border px-2 py-1 text-[10px] ${
-                        diffMode === 'staged'
-                          ? 'border-[var(--ui-border-soft)] text-white'
-                          : 'border-[var(--ui-border)] text-[var(--ui-text-muted)]'
-                      }`}
+                      className={`rounded-md border px-2 py-1 text-[10px] ${diffMode === 'staged'
+                        ? 'border-[var(--ui-border-soft)] text-white'
+                        : 'border-[var(--ui-border)] text-[var(--ui-text-muted)]'
+                        }`}
                     >
                       Staged
                     </button>

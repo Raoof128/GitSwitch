@@ -190,7 +190,9 @@ export async function loadKey(accountId: string): Promise<string> {
 }
 
 export function getSettings(): StoreSchema['settings'] {
-  return store.get('settings')
+  const stored = store.get('settings') || {}
+  // Deep merge or at least shallow merge with defaults to ensure all fields exist
+  return { ...DEFAULT_SETTINGS, ...stored }
 }
 
 export async function getSettingsPublic(): Promise<{

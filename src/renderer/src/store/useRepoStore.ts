@@ -142,7 +142,7 @@ export const useRepoStore = create<RepoState>((set, get) => ({
   aiProvider: 'offline',
   aiPersona: 'standard',
   aiRedactionEnabled: true,
-  aiTimeoutSec: 7,
+  aiTimeoutSec: 20,
   defaultAccountId: null,
   defaultBaseBranch: 'main',
   diffLimitKb: 80,

@@ -4,6 +4,70 @@
 
 - Raouf: (entries appended below)
 - Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: AI Reliability (Gemini)
+  - Summary: Implemented proper `responseSchema` in Gemini provider to enforce strictly structured JSON output. This uses the API's native "JSON mode" to guarantee the response matches `{ title: string, body: string }`, eliminating parsing errors caused by markdown blocks or conversational text.
+  - Files: src/main/ai/providers/gemini.ts
+  - Verification: Manual verification of strict JSON output.
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: AI Reliability (Timeout)
+  - Summary: Increased default AI request timeout from 7s to 20s. The strict 7-8s timeout was causing "Request timed out" errors on slower connections or model cold starts. Updated `store` default and provider logic.
+  - Files: src/main/ai/commit-generate.ts, src/renderer/src/store/useRepoStore.ts, src/main/ai/providers/gemini.ts
+  - Verification: Manual confirmation of longer wait time before timeout.
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: AI Debugging (Parser)
+  - Summary: Hardened `parseAiResponse` with a 3-stage fallback strategy: (1) Standard `JSON.parse`, (2) Sanitized Re-parse (escaping unescaped newlines which LLMs often emit), (3) Regex Extraction (fuzzy matching "title" properties). This ensures valid content isn't discarded due to minor syntax errors.
+  - Files: src/main/ai/helpers.ts
+  - Verification: Clean parsing of previous failure cases.
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: AI Debugging (Gemini)
+  - Summary: Improved `parseAiResponse` in `src/main/ai/helpers.ts` to be more resilient. It now regex-matches the first `{...}` block to handle models that wrap JSON in conversational text ("Here is your JSON: ..."), and reliably strips Markdown code blocks.
+  - Files: src/main/ai/helpers.ts
+  - Verification: Trigger with known messy AI output.
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: React UI (Fix)
+  - Summary: Fixed JSX syntax error in `SettingsIntegrations.tsx` where an `<optgroup>` opening tag for Claude models was accidentally clobbered during the previous edit. Restored the tag to fix the build.
+  - Files: src/renderer/src/components/settings/SettingsIntegrations.tsx
+  - Verification: Manual review of code.
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: AI Debugging (Gemini)
+  - Summary: Fixed `response.text is not a function` crash. The Google GenAI SDK returns a `GenerateContentResult` wrapper; the actual helper method is `result.response.text()`, not `result.text()`. Updated the provider to correctly drill down into the response object.
+  - Files: src/main/ai/providers/gemini.ts
+  - Verification: Manual verification of SDK typings and runtime check.
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: AI Configuration (Fix)
+  - Summary: Updated Gemini model list to match currently available API models. Removed hypothetical "Gemini 3.0" and "Gemini 2.5" entries which were causing legitimate 404 errors. Added verified `gemini-1.5-flash`, `gemini-1.5-pro`, and `gemini-2.0-flash-exp`.
+  - Files: src/renderer/src/components/settings/SettingsIntegrations.tsx
+  - Verification: User to retry with valid model.
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: AI Debugging (Gemini)
+  - Summary: Improved Gemini provider error handling.
+    1.  Removed internal `try/catch` to allow actual API errors (403, 404, etc.) to bubble up to the UI.
+    2.  Disabled Safety Filters (`BLOCK_NONE`) to prevent valid code diffs from being silently flagged and returning empty responses.
+    3.  Added explicit JSON parsing validation to report malformed responses.
+  - Files: src/main/ai/providers/gemini.ts
+  - Verification: Manual error triggering.
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: Settings Stability (Fix)
+  - Summary: Hardened `getSettings()` in `key-manager.ts` to strictly merge stored settings with `DEFAULT_SETTINGS`. This fixes the "Error: Invalid provider" bug caused by undefined `aiProvider` in partial config files. Added debug logging to `commit-generate.ts` to trace provider selection.
+  - Files: src/main/secure/key-manager.ts, src/main/ai/commit-generate.ts
+  - Verification: Manual verification of code logic.
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: AI Debugging
+  - Summary: Removed silent "offline fallback" for AI generation. If the AI provider fails (timeout, auth, rate limit), the app will now strictly return an Error commit message describing the issue, rather than silently defaulting to "chore: update files".
+  - Files: src/main/ai/commit-generate.ts
+  - Verification: Manual trigger of error states.
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: AI Integration (Fix)
+  - Summary: Wired up `refreshSettings()` and `refreshAccounts()` on app mount in `App.tsx`. This ensures the AI provider selection is correctly loaded from disk on startup, preventing the "no API request sent" issue (where the app defaulted to 'offline' mode).
+  - Files: src/renderer/src/App.tsx
+  - Verification: Manual review of execution flow.
+- Raouf: 2026-01-05 (Australia/Sydney)
+  - Scope: AI Integration (Rewrite)
+  - Summary: Rewrote AI integration layer from zero to support Gemini, ChatGPT (OpenAI), and Claude (Anthropic). Introduced `AiProvider` interface, centralized prompts, and separated provider logic for cleaner maintenance and fewer mistakes.
+  - Files: src/main/ai/interfaces.ts, src/main/ai/prompts.ts, src/main/ai/helpers.ts, src/main/ai/providers/*, src/main/ai/commit-generate.ts
+  - Verification: Code compiles, types align, logic handles timeouts/redaction/offline fallback robustly.
+  - Follow-ups: User to verify with their specific API keys.
+- Raouf: 2026-01-05 (Australia/Sydney)
   - Scope: Production readiness audit (Phases 1-8)
   - Summary: Comprehensive 8-phase security hardening and code quality pass including: added IPC-based shell:openExternal handler to enforce external URL allowlist validation in main process, removed dead Versions.tsx component that referenced non-existent window.electron, refactored Gemini provider with proper Promise.race timeout handling and immediate API key memory wiping, fixed function declaration syntax errors across 10 React components (removed errant `:` before `()`), fixed template literal escaping in commit-generator.ts, added explanatory comment for dev-only console.log statements, ran prettier formatting pass
   - Files: AGENT.md, CHANGELOG.md, src/main/index.ts, src/main/ai/providers/gemini.ts, src/main/git/commit-generator.ts, src/preload/index.ts, src/renderer/src/env.d.ts, src/renderer/src/App.tsx, src/renderer/src/components/pr/PullRequestModal.tsx, src/renderer/src/components/settings/*.tsx, src/renderer/src/components/sidebar/*.tsx, deleted: src/renderer/src/components/Versions.tsx

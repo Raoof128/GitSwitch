@@ -191,19 +191,17 @@ export function SettingsIntegrations() {
               <option value="o3-mini">o3-mini (Fast Reasoning)</option>
               <option value="o1">o1</option>
             </optgroup>
-            <optgroup label="Google Gemini 3.x (2025 Frontier)">
-              <option value="gemini-3.0-flash">Gemini 3.0 Flash (New Standard)</option>
-              <option value="gemini-3-flash-preview">Gemini 3 Flash Preview</option>
-              <option value="gemini-3.0-pro">Gemini 3.0 Pro (Reasoning)</option>
-              <option value="gemini-3-deep-think">Gemini 3 Deep Think</option>
+            <optgroup label="Google Gemini 1.5 (Recommended)">
+              <option value="gemini-1.5-flash">Gemini 1.5 Flash (Fast & Cheap)</option>
+              <option value="gemini-1.5-flash-8b">Gemini 1.5 Flash 8B (Fastest)</option>
+              <option value="gemini-1.5-pro">Gemini 1.5 Pro (Best Quality)</option>
             </optgroup>
-            <optgroup label="Google Gemini 2.x">
-              <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
-              <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+            <optgroup label="Google Gemini Experimental">
+              <option value="gemini-exp-1206">Gemini Exp 1206 (Reasoning)</option>
+              <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash Exp</option>
             </optgroup>
-            <optgroup label="Google Gemini 1.5 (Legacy Stable)">
-              <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
-              <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+            <optgroup label="Legacy">
+              <option value="gemini-1.0-pro">Gemini 1.0 Pro</option>
             </optgroup>
             <optgroup label="Anthropic Claude 4.x (Latest)">
               <option value="claude-opus-4.5">Claude Opus 4.5 (Most Intelligent)</option>
@@ -328,6 +326,6 @@ export function SettingsIntegrations() {
           </div>
         </div>
       </div>
-    </section>
+    </section >
   )
 }

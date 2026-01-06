@@ -4,6 +4,14 @@
 
 - Raouf: (entries appended below)
 - Raouf: 2026-01-06 (Australia/Sydney)
+  - Scope: UX (Auto-Push + Sync)
+  - Summary: Fixed auto-push account fallback and accelerated background fetch so changes are picked up within a few seconds.
+    1.  Auto-push now falls back to the default account when no selection is active, and settings updates can adopt the default account automatically.
+    2.  Reduced the background fetch interval to 5 seconds for near-instant status updates.
+  - Files: src/renderer/src/store/useRepoStore.ts, src/renderer/src/App.tsx
+  - Verification: Not run (not requested).
+  - Follow-ups: Commit with auto-push enabled and confirm the push triggers without manually selecting an account.
+- Raouf: 2026-01-06 (Australia/Sydney)
   - Scope: Reliability & Security (Settings + Git)
   - Summary: Fixed settings persistence for auto-push, corrected unstaged diff behavior, enforced diff size limits, and hardened git operations against timeouts and option injection.
     1.  Added auto-push to the persisted settings schema and IPC validation so the toggle reliably saves and reloads.

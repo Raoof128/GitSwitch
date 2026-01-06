@@ -196,7 +196,7 @@ function App(): JSX.Element {
 
     const intervalId = setInterval(() => {
       useRepoStore.getState().fetch()
-    }, 40000) // 40 seconds interval
+    }, 5000) // 5 seconds interval
 
     return () => clearInterval(intervalId)
   }, [activeRepoPath, selectedAccountId])

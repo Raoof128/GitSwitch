@@ -419,7 +419,7 @@ export const useRepoStore = create<RepoState>((set, get) => ({
   },
   push: async () => {
     const repoPath = get().activeRepoPath
-    const accountId = get().selectedAccountId
+    const accountId = get().selectedAccountId ?? get().defaultAccountId
     if (!repoPath || !accountId) {
       return false
     }
@@ -513,6 +513,17 @@ export const useRepoStore = create<RepoState>((set, get) => ({
       return
     }
     const settings = await window.api.updateSettings(input)
+    const accounts = get().accounts
+    const defaultAccountId = settings.defaultAccountId ?? null
+    const selectedAccountId = get().selectedAccountId
+    const selectedExists = selectedAccountId
+      ? accounts.some((account) => account.id === selectedAccountId)
+      : false
+    const canUseDefault = defaultAccountId
+      ? accounts.some((account) => account.id === defaultAccountId)
+      : false
+    const nextSelectedAccountId =
+      !selectedExists && canUseDefault ? defaultAccountId : selectedAccountId
     set({
       aiCloudModel: settings.aiCloudModel,
       aiLocalModel: settings.aiLocalModel,
@@ -521,7 +532,7 @@ export const useRepoStore = create<RepoState>((set, get) => ({
       aiRedactionEnabled: settings.aiRedactionEnabled,
       aiTimeoutSec: settings.aiTimeoutSec,
       autoPush: settings.autoPush,
-      defaultAccountId: settings.defaultAccountId ?? null,
+      defaultAccountId,
       defaultBaseBranch: settings.defaultBaseBranch,
       diffLimitKb: settings.diffLimitKb,
       diffLimitLines: settings.diffLimitLines,
@@ -531,7 +542,8 @@ export const useRepoStore = create<RepoState>((set, get) => ({
       likeApp: settings.likeApp,
       reducedMotion: settings.reducedMotion,
       strictHostKeyChecking: settings.strictHostKeyChecking,
-      theme: settings.theme
+      theme: settings.theme,
+      selectedAccountId: nextSelectedAccountId
     })
   },
   saveAiKey: async (key: string) => {

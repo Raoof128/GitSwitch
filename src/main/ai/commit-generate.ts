@@ -95,10 +95,10 @@ const hasUnknownPaths = (message: CommitMessage, allowedFiles: Set<string>): boo
       segments.length === 2 && segments.every((segment) => /^[A-Za-z]{1,2}$/.test(segment))
     const isShortAllCaps =
       segments.length === 2 && segments.every((segment) => /^[A-Z]{1,3}$/.test(segment))
-    const isNumericRatio = segments.length === 2 && segments.every((segment) => /^\d+$/.test(segment))
+    const isNumericRatio =
+      segments.length === 2 && segments.every((segment) => /^\d+$/.test(segment))
     const isVersionPair =
-      segments.length === 2 &&
-      segments.every((segment) => /^v?\d+(?:\.\d+)*$/i.test(segment))
+      segments.length === 2 && segments.every((segment) => /^v?\d+(?:\.\d+)*$/i.test(segment))
     if (isShortAlphaPair || isShortAllCaps || isNumericRatio || isVersionPair) return false
     return !allowed.has(path)
   })

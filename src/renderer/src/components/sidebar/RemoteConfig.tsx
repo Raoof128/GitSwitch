@@ -50,13 +50,15 @@ export function RemoteConfig(): JSX.Element | null {
 
       {hasOrigin ? (
         <div className="mb-2 text-[11px]">
-          <span className="text-emerald-300">✓</span>{' '}
+          <span className="text-[var(--ui-status-added)]">✓</span>{' '}
           <span className="break-all text-[var(--ui-text-muted)]">
             {originRemote?.url || 'Set'}
           </span>
         </div>
       ) : (
-        <div className="mb-2 text-[11px] text-amber-400">⚠️ No remote origin configured</div>
+        <div className="mb-2 text-[11px] text-[var(--ui-status-modified)]">
+          ⚠️ No remote origin configured
+        </div>
       )}
 
       <div className="space-y-2">
@@ -71,13 +73,13 @@ export function RemoteConfig(): JSX.Element | null {
         />
 
         {error && (
-          <div className="rounded bg-rose-500/10 border border-rose-500/20 px-2 py-1 text-[10px] text-rose-400">
+          <div className="rounded border border-[var(--ui-status-deleted-border)] bg-[var(--ui-status-deleted-bg)] px-2 py-1 text-[10px] text-[var(--ui-status-deleted)]">
             {error}
           </div>
         )}
 
         {success && (
-          <div className="rounded bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 text-[10px] text-emerald-300">
+          <div className="rounded border border-[var(--ui-status-added-border)] bg-[var(--ui-status-added-bg)] px-2 py-1 text-[10px] text-[var(--ui-status-added)]">
             ✓ Remote origin saved
           </div>
         )}
@@ -87,7 +89,7 @@ export function RemoteConfig(): JSX.Element | null {
           onClick={handleSave}
           disabled={saving || !remoteUrl.trim()}
           whileTap={scaleTap(reduceMotion)}
-          className="flex w-full items-center justify-center gap-1.5 rounded-md border-2 border-violet-500/40 bg-violet-500/10 py-1.5 text-xs font-medium text-violet-300 transition-colors hover:bg-violet-500/20 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-violet-400 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-1.5 rounded-md border-2 border-[var(--ui-accent-border)] bg-[var(--ui-accent-bg)] py-1.5 text-xs font-medium text-[var(--ui-accent)] transition-colors hover:bg-[var(--ui-accent-bg-strong)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {saving ? (
             <svg

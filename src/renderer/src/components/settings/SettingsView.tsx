@@ -67,8 +67,8 @@ export function SettingsView(): JSX.Element {
               onClick={() => setTab(item.id as SettingsTab)}
               className={`w-full rounded-md px-2 py-1 text-left ${
                 tab === item.id
-                  ? 'bg-[var(--ui-hover)] text-white'
-                  : 'text-[var(--ui-text-muted)] hover:bg-[var(--ui-hover)] hover:text-white'
+                  ? 'bg-[var(--ui-hover)] text-[var(--ui-text)]'
+                  : 'text-[var(--ui-text-muted)] hover:bg-[var(--ui-hover)] hover:text-[var(--ui-text)]'
               }`}
             >
               {item.label}

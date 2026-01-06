@@ -4,6 +4,36 @@
 
 - Raouf: (entries appended below)
 - Raouf: 2026-01-06 (Australia/Sydney)
+  - Scope: UI/UX (Settings Icon Motion)
+  - Summary: Added a more expressive settings control with a rotating glass ring and pulsing accent orb.
+    1.  Applied motion-safe spin and pulse to the settings glyph while keeping reduced-motion support.
+  - Files: src/renderer/src/App.tsx
+  - Verification: Not run (not requested).
+  - Follow-ups: Optional: adjust spin/pulse durations if the motion feels too loud.
+- Raouf: 2026-01-06 (Australia/Sydney)
+  - Scope: UI/UX (Settings Control)
+  - Summary: Upgraded the settings control to a layered glass icon with an accent orb for a more distinctive presence.
+    1.  Added a subtle halo and accent dot around the gear glyph while preserving the existing button layout.
+  - Files: src/renderer/src/App.tsx
+  - Verification: Not run (not requested).
+  - Follow-ups: Optional: tweak icon size or glow intensity if you want it quieter or louder.
+- Raouf: 2026-01-06 (Australia/Sydney)
+  - Scope: UI/UX (Settings Icon)
+  - Summary: Replaced the settings emoji with a consistent inline SVG icon for a cleaner, theme-aligned control.
+    1.  Added an accessible gear icon to the settings button while retaining existing hover and glass styling.
+  - Files: src/renderer/src/App.tsx
+  - Verification: Not run (not requested).
+  - Follow-ups: Visual check in the header to confirm the icon weight feels right.
+- Raouf: 2026-01-06 (Australia/Sydney)
+  - Scope: UI Theme (Color Consistency)
+  - Summary: Normalized status and accent colors to theme tokens across the renderer, and aligned accent buttons and alerts with consistent tokenized backgrounds.
+    1.  Added accent and status background/border tokens to the theme and applied them to alerts, badges, and action buttons.
+    2.  Replaced hardcoded success/warn/error utilities in badges, warnings, and banners with theme variables.
+    3.  Ran Prettier on the AI guard block to keep lint clean (no logic change).
+  - Files: src/renderer/src/assets/main.css, src/renderer/src/App.tsx, src/renderer/src/components/diff/DiffView.tsx, src/renderer/src/components/pr/PullRequestModal.tsx, src/renderer/src/components/settings/SettingsIntegrations.tsx, src/renderer/src/components/settings/SettingsView.tsx, src/renderer/src/components/sidebar/CommitPanel.tsx, src/renderer/src/components/sidebar/FileList.tsx, src/renderer/src/components/sidebar/RemoteConfig.tsx, src/renderer/src/components/sidebar/RepoList.tsx, src/main/ai/commit-generate.ts
+  - Verification: `npm run lint` (warns about existing prettier issue in src/main/git/git-service.ts).
+  - Follow-ups: Optional: run `npx prettier --write src/main/git/git-service.ts` to clear the remaining lint warning.
+- Raouf: 2026-01-06 (Australia/Sydney)
   - Scope: AI Safety (Hallucination Filter)
   - Summary: Reduced false positives for short alphabetic pairs (e.g., UI/UX) in the file-reference validation.
     1.  Ignored two-part alpha pairs with 1–2 letter segments to avoid misclassifying shorthand as paths.

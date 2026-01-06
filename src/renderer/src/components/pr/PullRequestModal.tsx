@@ -174,10 +174,10 @@ export function PullRequestModal(): JSX.Element | null {
         </div>
 
         {prResult.status === 'error' && (
-          <div className="mt-3 text-xs text-rose-300">{prResult.message}</div>
+          <div className="mt-3 text-xs text-[var(--ui-status-deleted)]">{prResult.message}</div>
         )}
         {prResult.status === 'success' && prResult.url && (
-          <div className="mt-3 flex items-center justify-between text-xs text-emerald-300">
+          <div className="mt-3 flex items-center justify-between text-xs text-[var(--ui-status-added)]">
             <span>PR created</span>
             <button
               type="button"

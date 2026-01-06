@@ -62,7 +62,7 @@ export function CommitPanel(): JSX.Element {
             whileTap={scaleTap(reduceMotion)}
             disabled={isGenerateDisabled}
             title="Generate message (Shift+Ctrl/⌘+G)"
-            className="rounded-md border border-[var(--glass-border)] px-2 py-1 text-[10px] text-slate-300 hover:border-[var(--ui-border-soft)] hover:bg-[var(--ui-hover)] hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-md border border-[var(--glass-border)] px-2 py-1 text-[10px] text-slate-300 hover:border-[var(--ui-border-soft)] hover:bg-[var(--ui-hover)] hover:text-[var(--ui-text)] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {generateStatus === 'loading' ? 'Generating…' : 'Generate ✨'}
           </motion.button>
@@ -85,12 +85,12 @@ export function CommitPanel(): JSX.Element {
           )}
         </div>
         {titleLength > 72 && (
-          <div className="rounded bg-amber-500/10 border border-amber-500/20 px-2 py-1 text-[11px] text-amber-400">
+          <div className="rounded border border-[var(--ui-status-modified-border)] bg-[var(--ui-status-modified-bg)] px-2 py-1 text-[11px] text-[var(--ui-status-modified)]">
             ⚠️ Title exceeds 72 characters (may be truncated)
           </div>
         )}
         {commitError && (
-          <div className="rounded bg-rose-500/10 border border-rose-500/20 px-2 py-1 text-[11px] text-rose-400">
+          <div className="rounded border border-[var(--ui-status-deleted-border)] bg-[var(--ui-status-deleted-bg)] px-2 py-1 text-[11px] text-[var(--ui-status-deleted)]">
             ❌ {commitError}
           </div>
         )}
@@ -99,11 +99,11 @@ export function CommitPanel(): JSX.Element {
           onClick={stageAll}
           disabled={isStageDisabled}
           whileTap={scaleTap(reduceMotion)}
-          className="flex w-full items-center justify-center gap-1.5 rounded-md border-2 border-cyan-500/40 bg-cyan-500/10 py-1.5 text-xs font-medium text-cyan-300 transition-colors hover:bg-cyan-500/20 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-1.5 rounded-md border-2 border-[var(--ui-accent-border)] bg-[var(--ui-accent-bg)] py-1.5 text-xs font-medium text-[var(--ui-accent)] transition-colors hover:bg-[var(--ui-accent-bg-strong)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isStaging ? (
             <svg
-              className="h-3.5 w-3.5 animate-spin text-cyan-300"
+              className="h-3.5 w-3.5 animate-spin text-[var(--ui-accent)]"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -147,7 +147,7 @@ export function CommitPanel(): JSX.Element {
           />
           <label
             htmlFor="auto-push"
-            className="select-none text-[10px] text-[var(--ui-text-muted)] hover:text-white cursor-pointer"
+            className="cursor-pointer select-none text-[10px] text-[var(--ui-text-muted)] hover:text-[var(--ui-text)]"
           >
             Push immediately after commit
           </label>
@@ -174,7 +174,7 @@ export function CommitPanel(): JSX.Element {
                 exit={{ opacity: 0 }}
               >
                 <motion.span
-                  className="h-3 w-3 rounded-full border border-slate-400 border-t-transparent"
+                  className="h-3 w-3 rounded-full border border-[var(--ui-border-soft)] border-t-transparent"
                   animate={reduceMotion ? {} : { rotate: 360 }}
                   transition={
                     reduceMotion
@@ -187,7 +187,7 @@ export function CommitPanel(): JSX.Element {
             {commitStatus === 'success' && (
               <motion.span
                 key="success"
-                className="absolute inset-0 flex items-center justify-center text-emerald-300"
+                className="absolute inset-0 flex items-center justify-center text-[var(--ui-status-added)]"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}

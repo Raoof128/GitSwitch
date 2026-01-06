@@ -21,6 +21,9 @@
 
   --ui-accent: #88c0d0;
   /* Frost accent */
+  --ui-accent-bg: rgba(136, 192, 208, 0.12);
+  --ui-accent-bg-strong: rgba(136, 192, 208, 0.2);
+  --ui-accent-border: rgba(136, 192, 208, 0.45);
   --ui-text: #eceff4;
   /* Snow text */
   --ui-text-muted: #d8dee9;
@@ -35,6 +38,12 @@
   /* Error */
   --ui-status-untracked: #81a1c1;
   /* Accent alternate */
+  --ui-status-added-bg: rgba(163, 190, 140, 0.12);
+  --ui-status-added-border: rgba(163, 190, 140, 0.35);
+  --ui-status-modified-bg: rgba(235, 203, 139, 0.12);
+  --ui-status-modified-border: rgba(235, 203, 139, 0.35);
+  --ui-status-deleted-bg: rgba(191, 97, 106, 0.12);
+  --ui-status-deleted-border: rgba(191, 97, 106, 0.35);
 
   /* Code syntax */
   --code-keyword: #81a1c1;
@@ -209,9 +218,21 @@ body::before {
   color: var(--ui-text-muted) !important;
 }
 
-.text-emerald-400,
-.text-amber-400,
-.text-rose-400,
+.text-emerald-300,
+.text-emerald-400 {
+  color: var(--ui-status-added) !important;
+}
+
+.text-amber-300,
+.text-amber-400 {
+  color: var(--ui-status-modified) !important;
+}
+
+.text-rose-300,
+.text-rose-400 {
+  color: var(--ui-status-deleted) !important;
+}
+
 .text-sky-400 {
   color: var(--ui-text) !important;
 }

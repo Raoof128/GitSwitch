@@ -214,7 +214,9 @@ function App(): JSX.Element {
         {settingsOpen ? (
           <div className="flex flex-1 flex-col overflow-hidden">
             <header className="glass-panel flex items-center justify-between border-b border-[var(--glass-border)] px-4 py-3">
-              <div className="text-base font-semibold tracking-wide text-white">Settings</div>
+              <div className="text-base font-semibold tracking-wide text-[var(--ui-text)]">
+                Settings
+              </div>
               <button
                 type="button"
                 onClick={toggleSettings}
@@ -229,7 +231,7 @@ function App(): JSX.Element {
           <>
             <header className="glass-panel flex items-center justify-between border-b border-[var(--glass-border)] px-4 py-3">
               <div>
-                <div className="text-base font-semibold tracking-wide text-white">
+                <div className="text-base font-semibold tracking-wide text-[var(--ui-text)]">
                   {activeRepoPath ? activeRepoPath.split(/[\\/]/).pop() : 'No repo selected'}
                 </div>
                 <div className="text-xs text-[var(--ui-text-muted)]">
@@ -264,7 +266,7 @@ function App(): JSX.Element {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.12 }}
-                      className="rounded-full border border-rose-500/30 bg-rose-500/10 px-2 py-0.5 text-[10px] text-rose-400"
+                      className="rounded-full border border-[var(--ui-status-deleted-border)] bg-[var(--ui-status-deleted-bg)] px-2 py-0.5 text-[10px] text-[var(--ui-status-deleted)]"
                       title={commitError}
                     >
                       ⚠️ Error
@@ -279,7 +281,7 @@ function App(): JSX.Element {
                     setSelectedAccountId(value ? value : null)
                   }}
                   disabled={accounts.length === 0}
-                  className="h-7 rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel)]/70 px-2 text-[10px] font-semibold text-white hover:bg-[var(--ui-hover)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="h-7 rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel)]/70 px-2 text-[10px] font-semibold text-[var(--ui-text)] hover:bg-[var(--ui-hover)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)] disabled:cursor-not-allowed disabled:opacity-50"
                   title="Quick swap account"
                 >
                   <option value="">No account</option>
@@ -323,9 +325,36 @@ function App(): JSX.Element {
                   type="button"
                   onClick={toggleSettings}
                   title="Open Settings"
-                  className="rounded-md border border-[var(--glass-border)] px-2 py-1 text-xs font-semibold text-slate-200 hover:bg-[var(--ui-hover)]"
+                  aria-label="Open Settings"
+                  className="group rounded-md border border-[var(--glass-border)] px-2 py-1 text-xs font-semibold text-slate-200 hover:bg-[var(--ui-hover)]"
                 >
-                  ⚙️
+                  <span className="relative inline-flex h-5 w-5 items-center justify-center">
+                    <span
+                      aria-hidden="true"
+                      className="absolute inset-0 rounded-full border border-[var(--glass-border)] bg-[var(--ui-panel)]/40 opacity-60 transition-opacity group-hover:opacity-100"
+                    />
+                    <span
+                      aria-hidden="true"
+                      className="absolute inset-0 rounded-full border border-[var(--ui-accent-border)]/70 opacity-70 shadow-[0_0_8px_rgba(136,192,208,0.35)] motion-safe:animate-spin motion-safe:[animation-duration:8s] motion-reduce:animate-none"
+                    />
+                    <svg
+                      className="relative h-3.5 w-3.5 text-[var(--ui-text)] drop-shadow-[0_0_6px_rgba(136,192,208,0.35)]"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <circle cx="12" cy="12" r="3.5" />
+                      <path d="M19.4 15a1.8 1.8 0 0 0 .36 2l.05.06a2 2 0 1 1-2.83 2.83l-.06-.05a1.8 1.8 0 0 0-2-.36 1.8 1.8 0 0 0-1.1 1.64V21a2 2 0 1 1-4 0v-.08a1.8 1.8 0 0 0-1.1-1.64 1.8 1.8 0 0 0-2 .36l-.06.05a2 2 0 1 1-2.83-2.83l.05-.06a1.8 1.8 0 0 0 .36-2 1.8 1.8 0 0 0-1.64-1.1H3a2 2 0 1 1 0-4h.08a1.8 1.8 0 0 0 1.64-1.1 1.8 1.8 0 0 0-.36-2l-.05-.06a2 2 0 1 1 2.83-2.83l.06.05a1.8 1.8 0 0 0 2 .36H9.2a1.8 1.8 0 0 0 1.1-1.64V3a2 2 0 1 1 4 0v.08a1.8 1.8 0 0 0 1.1 1.64h.06a1.8 1.8 0 0 0 2-.36l.06-.05a2 2 0 1 1 2.83 2.83l-.05.06a1.8 1.8 0 0 0-.36 2v.06a1.8 1.8 0 0 0 1.64 1.1H21a2 2 0 1 1 0 4h-.08a1.8 1.8 0 0 0-1.64 1.1Z" />
+                    </svg>
+                    <span
+                      aria-hidden="true"
+                      className="absolute -right-0.5 -top-0.5 h-1.5 w-1.5 rounded-full bg-[var(--ui-accent)] shadow-[0_0_8px_rgba(136,192,208,0.7)] motion-safe:animate-pulse motion-safe:[animation-duration:2.4s] motion-reduce:animate-none"
+                    />
+                  </span>
                 </button>
               </div>
             </header>
@@ -346,7 +375,7 @@ function App(): JSX.Element {
                       title="Show unstaged changes (Ctrl/⌘+1)"
                       className={`rounded-md border px-2 py-1 text-[10px] ${
                         diffMode === 'unstaged'
-                          ? 'border-[var(--ui-border-soft)] text-white'
+                          ? 'border-[var(--ui-border-soft)] text-[var(--ui-text)]'
                           : 'border-[var(--glass-border)] text-[var(--ui-text-muted)]'
                       }`}
                     >
@@ -358,7 +387,7 @@ function App(): JSX.Element {
                       title="Show staged changes (Ctrl/⌘+2)"
                       className={`rounded-md border px-2 py-1 text-[10px] ${
                         diffMode === 'staged'
-                          ? 'border-[var(--ui-border-soft)] text-white'
+                          ? 'border-[var(--ui-border-soft)] text-[var(--ui-text)]'
                           : 'border-[var(--glass-border)] text-[var(--ui-text-muted)]'
                       }`}
                     >

@@ -200,7 +200,9 @@ export function SettingsIntegrations(): JSX.Element {
             >
               Remove key
             </button>
-            <span className={hasAiKey ? 'text-emerald-300' : 'text-[var(--ui-text-muted)]'}>
+            <span
+              className={hasAiKey ? 'text-[var(--ui-status-added)]' : 'text-[var(--ui-text-muted)]'}
+            >
               {hasAiKey ? 'Connected' : 'Not connected'}
             </span>
           </div>
@@ -249,7 +251,11 @@ export function SettingsIntegrations(): JSX.Element {
               </button>
             </div>
             <div className="flex justify-end">
-              <span className={hasGitHubToken ? 'text-emerald-300' : 'text-[var(--ui-text-muted)]'}>
+              <span
+                className={
+                  hasGitHubToken ? 'text-[var(--ui-status-added)]' : 'text-[var(--ui-text-muted)]'
+                }
+              >
                 {hasGitHubToken ? '✓ Connected' : 'Not connected'}
               </span>
             </div>
@@ -287,7 +293,11 @@ export function SettingsIntegrations(): JSX.Element {
               </button>
             </div>
             <div className="flex justify-end">
-              <span className={hasGitLabToken ? 'text-emerald-300' : 'text-[var(--ui-text-muted)]'}>
+              <span
+                className={
+                  hasGitLabToken ? 'text-[var(--ui-status-added)]' : 'text-[var(--ui-text-muted)]'
+                }
+              >
                 {hasGitLabToken ? '✓ Connected' : 'Not connected'}
               </span>
             </div>

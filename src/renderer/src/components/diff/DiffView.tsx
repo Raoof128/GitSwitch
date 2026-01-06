@@ -37,7 +37,7 @@ export function DiffView({ diffText }: DiffViewProps): JSX.Element {
         className="diff-view space-y-6"
       >
         {isTruncated && (
-          <div className="rounded-md border border-yellow-500/50 bg-yellow-500/10 p-3 text-xs text-yellow-200">
+          <div className="rounded-md border border-[var(--ui-status-modified-border)] bg-[var(--ui-status-modified-bg)] p-3 text-xs text-[var(--ui-status-modified)]">
             ⚠️ Showing first {MAX_DISPLAY_FILES} of {allFiles.length} changed files for performance.
           </div>
         )}

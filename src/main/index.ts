@@ -360,6 +360,7 @@ async function registerIpcHandlers(): Promise<void> {
           'aiProvider',
           'aiRedactionEnabled',
           'aiTimeoutSec',
+          'autoPush',
           'defaultAccountId',
           'defaultBaseBranch',
           'diffLimitKb',
@@ -397,6 +398,9 @@ async function registerIpcHandlers(): Promise<void> {
       }
       if ('aiTimeoutSec' in input) {
         safeInput.aiTimeoutSec = assertNumber(input.aiTimeoutSec, 'aiTimeoutSec')
+      }
+      if ('autoPush' in input) {
+        safeInput.autoPush = assertBoolean(input.autoPush, 'autoPush')
       }
       if ('defaultAccountId' in input) {
         const value = input.defaultAccountId

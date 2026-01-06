@@ -14,6 +14,7 @@ type StoreSchema = {
     aiPersona: 'standard' | 'cybersecurity'
     aiRedactionEnabled: boolean
     aiTimeoutSec: number
+    autoPush: boolean
     defaultAccountId?: string
     defaultBaseBranch: 'main' | 'master'
     diffLimitKb: number
@@ -47,6 +48,7 @@ const DEFAULT_SETTINGS: StoreSchema['settings'] = {
   aiPersona: 'standard',
   aiRedactionEnabled: true,
   aiTimeoutSec: 30,
+  autoPush: false,
   defaultAccountId: undefined,
   defaultBaseBranch: 'main',
   diffLimitKb: 80,
@@ -203,6 +205,7 @@ export async function getSettingsPublic(): Promise<{
   aiPersona: 'standard' | 'cybersecurity'
   aiRedactionEnabled: boolean
   aiTimeoutSec: number
+  autoPush: boolean
   defaultAccountId?: string
   defaultBaseBranch: 'main' | 'master'
   diffLimitKb: number
@@ -225,6 +228,7 @@ export async function getSettingsPublic(): Promise<{
     aiPersona: settings.aiPersona || 'standard',
     aiRedactionEnabled: settings.aiRedactionEnabled,
     aiTimeoutSec: settings.aiTimeoutSec,
+    autoPush: settings.autoPush,
     defaultAccountId: settings.defaultAccountId,
     defaultBaseBranch: settings.defaultBaseBranch,
     diffLimitKb: settings.diffLimitKb,

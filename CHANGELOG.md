@@ -3,6 +3,23 @@
 ## Unreleased
 
 - Raouf: (entries appended below)
+- Raouf: 2026-01-06 (Australia/Sydney)
+  - Scope: Reliability & Security (Settings + Git)
+  - Summary: Fixed settings persistence for auto-push, corrected unstaged diff behavior, enforced diff size limits, and hardened git operations against timeouts and option injection.
+    1.  Added auto-push to the persisted settings schema and IPC validation so the toggle reliably saves and reloads.
+    2.  Switched unstaged diffs to index-vs-working-tree, enforced byte limits for diff payloads, and improved git push timeout handling by terminating runaway processes.
+    3.  Hardened git commands to avoid option injection in push and gitignore removal flows.
+  - Files: src/main/secure/key-manager.ts, src/main/index.ts, src/preload/index.ts, src/main/git/git-service.ts
+  - Verification: Not run (not requested).
+  - Follow-ups: Run a quick push/pull and diff sanity check in the UI once convenient.
+- Raouf: 2026-01-06 (Australia/Sydney)
+  - Scope: UI Theme (Quick Nord)
+  - Summary: Swapped the renderer's palette to the requested Quick Nord colors and aligned interactive states with the Frost accent.
+    1.  Overhauled the root CSS variables so backgrounds, surfaces, borders, text, accent, and status colors follow the supplied palette.
+    2.  Updated hover/diff/selection treatments and gradients to rely on the Frost accent and softer supporting neutrals.
+  - Files: src/renderer/src/assets/main.css
+  - Verification: Not run (visual-only change).
+  - Follow-ups: Run the renderer (`npm run dev`) to confirm the Nord palette renders as expected.
 - Raouf: 2026-01-05 (Australia/Sydney)
   - Scope: Bug Fix (AI)
   - Summary: Improved AI hallucination detection to eliminate false positives.

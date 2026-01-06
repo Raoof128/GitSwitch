@@ -7,48 +7,47 @@
   font-size: clamp(13px, 0.8vw + 8px, 16px);
   color-scheme: dark;
 
-  /* Arasaka Tower Palette */
-  --ui-bg: #0b0e14;
-  /* Void Black */
-  --ui-panel: #121212;
-  /* Panel Grey */
-  --ui-panel-muted: #1a1a1a;
-  /* Input Fields */
-  --ui-border: #333333;
-  /* Subtle separation */
-  --ui-border-soft: #262626;
-  --ui-hover: #1f1f1f;
+  /* Quick Nord Palette */
+  --ui-bg: #2e3440;
+  /* Background */
+  --ui-panel: #3b4252;
+  /* Surface */
+  --ui-panel-muted: #303646;
+  /* Secondary surface */
+  --ui-border: #434c5e;
+  /* Structural outline */
+  --ui-border-soft: #4c566a;
+  --ui-hover: #4c566a;
 
-  --ui-accent: #c5003c;
-  /* Arasaka Red (Primary Action) */
-  --ui-text: #e5e5e5;
-  /* Off-white */
-  --ui-text-muted: #999999;
-  /* Secondary Grey */
+  --ui-accent: #88c0d0;
+  /* Frost accent */
+  --ui-text: #eceff4;
+  /* Snow text */
+  --ui-text-muted: #d8dee9;
+  /* Softer snow */
 
-  /* Functional Status */
-  --ui-status-added: #00e676;
-  /* Neon Matrix Green */
-  --ui-status-modified: #ff9100;
-  /* Safety Orange */
-  --ui-status-deleted: #ff1744;
-  /* Bright Failure Red */
-  --ui-status-untracked: #2979ff;
-  /* Terminal Blue */
+  /* Functional status */
+  --ui-status-added: #a3be8c;
+  /* Success/Git added */
+  --ui-status-modified: #ebcb8b;
+  /* Warning */
+  --ui-status-deleted: #bf616a;
+  /* Error */
+  --ui-status-untracked: #81a1c1;
+  /* Accent alternate */
 
-  /* Code Syntax (Netrunner) */
-  --code-keyword: #ff0055;
-  --code-function: #00ff9f;
-  --code-string: #fcee0a;
+  /* Code syntax */
+  --code-keyword: #81a1c1;
+  --code-function: #88c0d0;
+  --code-string: #a3be8c;
 
-  /* Additional Cyberpunk Accents */
-  --brand-cyan: #00f0ff;
-  /* Focus/Links */
+  /* Additional Frost accents */
+  --brand-cyan: #81a1c1;
 
-  --ui-diff-insert: rgba(0, 230, 118, 0.1);
-  --ui-diff-delete: rgba(255, 23, 68, 0.1);
-  --ui-diff-gutter-insert: rgba(0, 230, 118, 0.2);
-  --ui-diff-gutter-delete: rgba(255, 23, 68, 0.2);
+  --ui-diff-insert: rgba(163, 190, 140, 0.15);
+  --ui-diff-delete: rgba(191, 97, 106, 0.15);
+  --ui-diff-gutter-insert: rgba(163, 190, 140, 0.35);
+  --ui-diff-gutter-delete: rgba(191, 97, 106, 0.35);
 }
 
 body {
@@ -81,7 +80,8 @@ body::before {
   left: 0;
   bottom: 0;
   right: 0;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  background: linear-gradient(rgba(38, 43, 54, 0) 50%, rgba(21, 25, 32, 0.25) 50%),
+    linear-gradient(90deg, rgba(136, 192, 208, 0.06), rgba(129, 161, 193, 0.04), rgba(136, 192, 208, 0.06));
   z-index: 9999;
   background-size: 100% 2px, 3px 100%;
   pointer-events: none;
@@ -116,9 +116,8 @@ body::before {
 }
 
 ::selection {
-  background: rgba(197, 0, 60, 0.2);
-  /* #c5003c33 */
-  color: #e5e5e5;
+  background: rgba(136, 192, 208, 0.25);
+  color: #eceff4;
 }
 
 .text-slate-100,
@@ -244,7 +243,7 @@ button:hover:not(:disabled) {
 }
 
 .hover-card:hover {
-  background-color: rgba(197, 0, 60, 0.1);
+  background-color: rgba(136, 192, 208, 0.15);
   box-shadow: 0 0 0 1px var(--ui-border-soft);
 }
 
@@ -360,7 +359,7 @@ button:hover:not(:disabled) {
 }
 
 .diff-view .diff-line:hover {
-  background: rgba(197, 0, 60, 0.08);
+  background: rgba(136, 192, 208, 0.12);
 }
 
 .diff-view .diff-code-insert {

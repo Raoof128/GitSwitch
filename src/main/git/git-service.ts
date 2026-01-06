@@ -214,7 +214,6 @@ export async function setRemoteOrigin(repoPath: string, url: string): Promise<vo
 async function checkDiffSize(
   git: ReturnType<typeof simpleGit>,
   args: string[],
-  maxBytes: number,
   maxLines: number
 ): Promise<{ ok: boolean; reason?: string }> {
   try {
@@ -251,19 +250,25 @@ export async function getDiff(repoPath: string, mode: DiffMode = 'unstaged'): Pr
   const maxBytes = settings.diffLimitKb > 0 ? settings.diffLimitKb * 1024 : DEFAULT_DIFF_BYTES
   const maxLines = settings.diffLimitLines > 0 ? settings.diffLimitLines : DEFAULT_DIFF_LINES
 
-  const diffArgs = mode === 'staged' ? ['--cached'] : ['HEAD']
+  const diffArgs = mode === 'staged' ? ['--cached'] : []
 
   // Safety check before loading full diff into memory
-  const sizeCheck = await checkDiffSize(git, diffArgs, maxBytes, maxLines)
+  const sizeCheck = await checkDiffSize(git, diffArgs, maxLines)
   if (!sizeCheck.ok) {
     return `[DIFF TOO LARGE] ${sizeCheck.reason}\n\nConsider adjusting limits in Settings > Advanced.`
   }
 
   try {
     const rawDiff = await git.diff(diffArgs)
+    const rawBytes = Buffer.byteLength(rawDiff, 'utf8')
+    if (rawBytes > maxBytes) {
+      const actualKb = Math.ceil(rawBytes / 1024)
+      const limitKb = Math.ceil(maxBytes / 1024)
+      return `[DIFF TOO LARGE] Diff is too large (${actualKb} KB > ${limitKb} KB limit).\n\nConsider adjusting limits in Settings > Advanced.`
+    }
     // Final guard for IPC and Renderer stability
     const MAX_IPC_SIZE = 512 * 1024 // 512KB hard limit for IPC
-    if (rawDiff.length > MAX_IPC_SIZE) {
+    if (rawBytes > MAX_IPC_SIZE) {
       return (
         rawDiff.slice(0, MAX_IPC_SIZE) +
         '\n\n[TRUNCATED DUE TO IPC LIMITS - Use git diff via terminal for full view]'
@@ -317,7 +322,7 @@ export async function addToGitignore(repoPath: string, filePath: string): Promis
     // Untrack the file if it was previously tracked
     // using --cached to remove from index but keep file on disk
     try {
-      await git.rm([filePath, '--cached'])
+      await git.rm(['--cached', '--', filePath])
     } catch {
       // Ignore if file wasn't tracked
     }
@@ -408,12 +413,14 @@ export async function pushWithIdentity(
     const result = await new Promise<PushResult>((resolve, reject) => {
       const controller = new AbortController()
       const timer = setTimeout(() => controller.abort(), 30000) // 30-second timeout
+      let settled = false
+      let killTimer: ReturnType<typeof setTimeout> | null = null
 
       let stdout = ''
       let stderr = ''
 
       // Use -u to set upstream tracking, and specify origin + branch
-      const child = spawn('git', ['push', '-u', 'origin', currentBranch], {
+      const child = spawn('git', ['push', '-u', '--', 'origin', currentBranch], {
         cwd: repoPath,
         env: {
           ...process.env,
@@ -440,16 +447,34 @@ export async function pushWithIdentity(
         }
       })
 
-      child.on('error', (error) => {
+      const clearKillTimer = (): void => {
+        if (killTimer) {
+          clearTimeout(killTimer)
+          killTimer = null
+        }
+      }
+
+      const finalize = (handler: () => void): void => {
+        if (settled) {
+          return
+        }
+        settled = true
         clearTimeout(timer)
-        reject(error)
+        handler()
+      }
+
+      child.on('error', (error) => {
+        clearKillTimer()
+        finalize(() => reject(error))
       })
 
       child.on('close', (code) => {
-        clearTimeout(timer)
-        if (code === 0) {
-          resolve({ stdout, stderr })
-        } else {
+        clearKillTimer()
+        finalize(() => {
+          if (code === 0) {
+            resolve({ stdout, stderr })
+            return
+          }
           // Extract the meaningful part of stderr for the error message
           const stderrLines = stderr.trim().split('\n')
           const meaningfulError = stderrLines
@@ -463,12 +488,19 @@ export async function pushWithIdentity(
           )
           Object.assign(error, { stdout, stderr })
           reject(error)
-        }
+        })
       })
 
       controller.signal.addEventListener('abort', () => {
-        clearTimeout(timer)
-        reject(new Error('Git push timeout'))
+        if (!settled && child.exitCode === null && !child.killed) {
+          child.kill('SIGTERM')
+          killTimer = setTimeout(() => {
+            if (child.exitCode === null && !child.killed) {
+              child.kill('SIGKILL')
+            }
+          }, 2000)
+        }
+        finalize(() => reject(new Error('Git push timeout')))
       })
     })
 

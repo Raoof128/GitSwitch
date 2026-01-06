@@ -47,6 +47,7 @@ const api = {
     aiProvider: 'offline' | 'local' | 'cloud'
     aiRedactionEnabled: boolean
     aiTimeoutSec: number
+    autoPush: boolean
     defaultAccountId?: string | null
     defaultBaseBranch: 'main' | 'master'
     diffLimitKb: number
@@ -67,6 +68,7 @@ const api = {
       aiProvider: 'offline' | 'local' | 'cloud'
       aiRedactionEnabled: boolean
       aiTimeoutSec: number
+      autoPush: boolean
       defaultAccountId?: string | null
       defaultBaseBranch: 'main' | 'master'
       diffLimitKb: number

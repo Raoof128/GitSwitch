@@ -4,6 +4,41 @@
 
 - Raouf: (entries appended below)
 - Raouf: 2026-01-06 (Australia/Sydney)
+  - Scope: UI/UX (Loader Width)
+  - Summary: Widened the spider loader footprint for better spacing in the title area.
+    1.  Increased the title loader and container width to 24em.
+  - Files: src/renderer/src/assets/main.css
+  - Verification: Not run (not requested).
+  - Follow-ups: Let me know if you want a specific pixel width instead.
+- Raouf: 2026-01-06 (Australia/Sydney)
+  - Scope: UI/UX (Loader Scale)
+  - Summary: Increased the spider loader size by 10% for better visibility next to the title.
+    1.  Bumped the title loader scale token from 1.8px to 1.98px.
+  - Files: src/renderer/src/assets/main.css
+  - Verification: Not run (not requested).
+  - Follow-ups: If you want another size tweak, share the target percentage.
+- Raouf: 2026-01-06 (Australia/Sydney)
+  - Scope: UI/UX (Loader Swap)
+  - Summary: Replaced the hamster loader with the spider swing animation and mapped its palette to the Nord theme tokens.
+    1.  Updated the header loader markup and ported the animation CSS into the shared stylesheet.
+  - Files: src/renderer/src/App.tsx, src/renderer/src/assets/main.css
+  - Verification: Not run (not requested).
+  - Follow-ups: If you want the loader larger or slower, tell me the preferred size/speed.
+- Raouf: 2026-01-06 (Australia/Sydney)
+  - Scope: UI/UX (Sync Loader Placement)
+  - Summary: Moved the hamster loader beside the app title and scaled it up for better visibility.
+    1.  Relocated the loader to the left header cluster and introduced a larger title variant.
+  - Files: src/renderer/src/App.tsx, src/renderer/src/assets/main.css
+  - Verification: Not run (not requested).
+  - Follow-ups: Adjust the size/offset if you want it tighter to the title.
+- Raouf: 2026-01-06 (Australia/Sydney)
+  - Scope: UI/UX (Sync Loader Visibility)
+  - Summary: Made the hamster loader always visible in the top bar with a slightly larger header variant.
+    1.  Removed the conditional sync gating and added a header-sized variant to ensure the animation is visible.
+  - Files: src/renderer/src/App.tsx, src/renderer/src/assets/main.css
+  - Verification: Not run (not requested).
+  - Follow-ups: If you want it smaller or aligned differently, tell me the preferred size/position.
+- Raouf: 2026-01-06 (Australia/Sydney)
   - Scope: UI/UX (Sync Loader)
   - Summary: Added a top-bar hamster loader that animates during push/pull and respects reduced-motion settings.
     1.  Wired sync state into the store and surfaced it in the header next to the account control.

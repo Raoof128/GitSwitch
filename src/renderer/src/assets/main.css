@@ -486,364 +486,269 @@ button:hover:not(:disabled) {
   color: var(--ui-text);
 }
 
-.hamster-loader {
-  --dur: 1s;
+.spider-loader {
+  --loader-scale: 1.6px;
+  --loader-red: var(--ui-status-deleted);
+  --loader-blue: var(--ui-accent);
+  --loader-dark: var(--ui-border);
+  --loader-shadow: var(--ui-border-soft);
+  --loader-light: var(--ui-text);
   position: relative;
-  width: 12em;
-  height: 12em;
-  font-size: 2px;
+  width: 21.87em;
+  height: 31.25em;
+  font-size: var(--loader-scale);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
 }
 
-.hamster-loader .wheel-and-hamster,
-.hamster-loader .wheel,
-.hamster-loader .hamster,
-.hamster-loader .hamster div,
-.hamster-loader .spoke {
+.spider-loader--title {
+  --loader-scale: 1.98px;
+  width: 24em;
+  margin-top: -2px;
+}
+
+.spider-loader--title .container {
+  width: 24em;
+}
+
+.spider-loader .container {
+  position: relative;
+  width: 21.87em;
+  height: 31.25em;
+}
+
+.spider-loader .center {
+  position: absolute;
+  transform: translateX(-50%);
+  left: 50%;
+}
+
+.spider-loader .rope {
+  height: 13.62em;
+  width: 0.15em;
+  background-color: var(--loader-light);
+  top: 0;
+  animation: swing 2s ease-in-out infinite;
+}
+
+@keyframes swing {
+  50% {
+    top: -4em;
+  }
+}
+
+.spider-loader .legs {
+  height: 1.12em;
+  width: 7.5em;
+  background-color: transparent;
+  box-shadow:
+    0 0 0 0.12em var(--loader-dark),
+    0 0 0 1.06em var(--loader-blue),
+    0 0 0 1.18em var(--loader-dark);
+  top: 12.5em;
+  border-radius: 3.12em;
+}
+
+.spider-loader .boot-l,
+.spider-loader .boot-r {
+  height: 1.25em;
+  width: 2.5em;
+  background-color: var(--loader-red);
+  position: absolute;
+  border: 0.12em solid var(--loader-dark);
+  bottom: 1.12em;
+}
+
+.spider-loader .boot-l {
+  left: 1em;
+}
+
+.spider-loader .boot-r {
+  transform: rotateY(180deg);
+  left: 3.81em;
+}
+
+.spider-loader .boot-l:before,
+.spider-loader .boot-r:before {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-bottom: 1.12em solid var(--loader-dark);
+  border-left: 1.18em solid transparent;
+  bottom: 1.31em;
+  left: 1.46em;
+}
+
+.spider-loader .boot-l:after,
+.spider-loader .boot-r:after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-bottom: 1.12em solid var(--loader-red);
+  border-left: 1em solid transparent;
+  right: 0;
+  top: -0.93em;
+}
+
+.spider-loader .costume {
+  height: 6.25em;
+  width: 5.62em;
+  background: linear-gradient(
+    to right,
+    var(--loader-blue) 20%,
+    var(--loader-red) 20%,
+    var(--loader-red) 80%,
+    var(--loader-blue) 80%
+  );
+  border: 0.12em solid var(--loader-dark);
+  top: 14.68em;
+}
+
+.spider-loader .spider {
+  height: 1.87em;
+  width: 0.93em;
+  background-color: var(--loader-dark);
+  border-radius: 45%;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top: calc(50% + 0.93em);
+  left: 50%;
+}
+
+.spider-loader .s1,
+.spider-loader .s3 {
+  height: 7.5em;
+  width: 2.5em;
+  border-radius: 0 0 1.37em 1.37em;
+  border-bottom: 0.12em solid var(--loader-dark);
   position: absolute;
 }
 
-.hamster-loader .wheel-and-hamster {
-  inset: 0;
+.spider-loader .s2,
+.spider-loader .s4 {
+  height: 7.5em;
+  width: 3.12em;
+  border-radius: 0 0 1.56em 1.56em;
+  border-bottom: 0.12em solid var(--loader-dark);
+  position: absolute;
 }
 
-.hamster-loader .wheel,
-.hamster-loader .spoke {
-  border-radius: 50%;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+.spider-loader .s1,
+.spider-loader .s2,
+.spider-loader .s3,
+.spider-loader .s4 {
+  left: 50%;
 }
 
-.hamster-loader .wheel {
-  background: radial-gradient(
-    100% 100% at center,
-    rgba(255, 255, 255, 0) 47.8%,
-    var(--ui-border-soft) 48%
+.spider-loader .s1 {
+  bottom: 1.43em;
+}
+
+.spider-loader .s2 {
+  bottom: 0.93em;
+}
+
+.spider-loader .s3,
+.spider-loader .s4 {
+  transform: translateX(-50%) rotateX(180deg);
+}
+
+.spider-loader .s3 {
+  top: 1.43em;
+}
+
+.spider-loader .s4 {
+  top: 0.93em;
+}
+
+.spider-loader .belt {
+  height: 0.43em;
+  width: 5.87em;
+  background-color: var(--loader-red);
+  border: 0.12em solid var(--loader-dark);
+  top: -0.12em;
+}
+
+.spider-loader .hand-r,
+.spider-loader .hand-l {
+  height: 8.12em;
+  background: linear-gradient(
+    var(--loader-red) 4.6em,
+    var(--loader-dark) 4.6em,
+    var(--loader-dark) 4.75em,
+    var(--loader-blue) 4.75em,
+    var(--loader-blue) 8.12em
   );
-  z-index: 2;
+  width: 1.12em;
+  border: 0.12em solid var(--loader-dark);
+  border-radius: 1.25em;
+  position: absolute;
+  transform-origin: bottom;
+  bottom: -0.12em;
 }
 
-.hamster-loader .hamster {
-  animation: hamster var(--dur) ease-in-out infinite;
-  top: 50%;
-  left: calc(50% - 3.5em);
-  width: 7em;
-  height: 3.75em;
-  transform: rotate(4deg) translate(-0.8em, 1.85em);
-  transform-origin: 50% 0;
-  z-index: 1;
+.spider-loader .hand-r {
+  right: -0.75em;
+  transform: rotate(-22deg);
 }
 
-.hamster-loader .hamster__head {
-  animation: hamsterHead var(--dur) ease-in-out infinite;
-  background: var(--ui-accent);
-  border-radius: 70% 30% 0 100% / 40% 25% 25% 60%;
-  box-shadow:
-    0 -0.25em 0 rgba(236, 239, 244, 0.7) inset,
-    0.75em -1.55em 0 rgba(136, 192, 208, 0.35) inset;
-  top: 0;
-  left: -2em;
-  width: 2.75em;
-  height: 2.5em;
-  transform-origin: 100% 50%;
+.spider-loader .hand-l {
+  left: -0.75em;
+  transform: rotate(22deg);
 }
 
-.hamster-loader .hamster__ear {
-  animation: hamsterEar var(--dur) ease-in-out infinite;
-  background: var(--ui-text-muted);
-  border-radius: 50%;
-  box-shadow: -0.25em 0 var(--ui-accent) inset;
-  top: -0.25em;
-  right: -0.25em;
-  width: 0.75em;
-  height: 0.75em;
-  transform-origin: 50% 75%;
+.spider-loader .neck {
+  height: 0.37em;
+  width: 1.25em;
+  background-color: var(--loader-red);
+  bottom: -0.62em;
+  border: 0.12em solid var(--loader-dark);
 }
 
-.hamster-loader .hamster__eye {
-  animation: hamsterEye var(--dur) linear infinite;
-  background-color: var(--ui-bg);
-  border-radius: 50%;
-  top: 0.375em;
-  left: 1.25em;
-  width: 0.5em;
-  height: 0.5em;
+.spider-loader .mask {
+  height: 4.65em;
+  width: 4.06em;
+  background-color: var(--loader-red);
+  border-radius: 50% 50% 50% 50% / 54% 54% 46% 46%;
+  border: 0.12em solid var(--loader-dark);
+  top: 6.56em;
 }
 
-.hamster-loader .hamster__nose {
-  background: rgba(236, 239, 244, 0.8);
-  border-radius: 35% 65% 85% 15% / 70% 50% 50% 30%;
-  top: 0.75em;
-  left: 0;
-  width: 0.2em;
-  height: 0.25em;
+.spider-loader .eye-l,
+.spider-loader .eye-r {
+  height: 0.68em;
+  width: 1.37em;
+  background-color: var(--loader-light);
+  border-radius: 1.37em 1.37em 0 0;
+  border: 0.12em solid var(--loader-dark);
+  position: absolute;
+  top: 2.1em;
 }
 
-.hamster-loader .hamster__body {
-  animation: hamsterBody var(--dur) ease-in-out infinite;
-  background: var(--ui-text);
-  border-radius: 50% 30% 50% 30% / 15% 60% 40% 40%;
-  box-shadow:
-    0.1em 0.75em 0 rgba(136, 192, 208, 0.55) inset,
-    0.15em -0.5em 0 rgba(236, 239, 244, 0.6) inset;
-  top: 0.25em;
-  left: 2em;
-  width: 4.5em;
-  height: 3em;
-  transform-origin: 17% 50%;
-  transform-style: preserve-3d;
+.spider-loader .eye-l {
+  left: 0.3em;
 }
 
-.hamster-loader .hamster__limb--fr,
-.hamster-loader .hamster__limb--fl {
-  clip-path: polygon(0 0, 100% 0, 70% 80%, 60% 100%, 0% 100%, 40% 80%);
-  top: 2em;
-  left: 0.5em;
-  width: 1em;
-  height: 1.5em;
-  transform-origin: 50% 0;
+.spider-loader .eye-r {
+  right: 0.3em;
 }
 
-.hamster-loader .hamster__limb--fr {
-  animation: hamsterFRLimb var(--dur) linear infinite;
-  background: linear-gradient(rgba(136, 192, 208, 0.6) 80%, rgba(236, 239, 244, 0.7) 80%);
-  transform: rotate(15deg) translateZ(-1px);
+.spider-loader .cover {
+  height: 3.12em;
+  width: 0.15em;
+  background-color: var(--loader-light);
+  bottom: 8.12em;
 }
 
-.hamster-loader .hamster__limb--fl {
-  animation: hamsterFLLimb var(--dur) linear infinite;
-  background: linear-gradient(rgba(236, 239, 244, 0.7) 80%, rgba(216, 222, 233, 0.9) 80%);
-  transform: rotate(15deg);
-}
-
-.hamster-loader .hamster__limb--br,
-.hamster-loader .hamster__limb--bl {
-  border-radius: 0.75em 0.75em 0 0;
-  clip-path: polygon(0 0, 100% 0, 100% 30%, 70% 90%, 70% 100%, 30% 100%, 40% 90%, 0% 30%);
-  top: 1em;
-  left: 2.8em;
-  width: 1.5em;
-  height: 2.5em;
-  transform-origin: 50% 30%;
-}
-
-.hamster-loader .hamster__limb--br {
-  animation: hamsterBRLimb var(--dur) linear infinite;
-  background: linear-gradient(rgba(136, 192, 208, 0.55) 90%, rgba(236, 239, 244, 0.7) 90%);
-  transform: rotate(-25deg) translateZ(-1px);
-}
-
-.hamster-loader .hamster__limb--bl {
-  animation: hamsterBLLimb var(--dur) linear infinite;
-  background: linear-gradient(rgba(236, 239, 244, 0.7) 90%, rgba(216, 222, 233, 0.9) 90%);
-  transform: rotate(-25deg);
-}
-
-.hamster-loader .hamster__tail {
-  animation: hamsterTail var(--dur) linear infinite;
-  background: rgba(236, 239, 244, 0.7);
-  border-radius: 0.25em 50% 50% 0.25em;
-  box-shadow: 0 -0.2em 0 rgba(216, 222, 233, 0.8) inset;
-  top: 1.5em;
-  right: -0.5em;
-  width: 1em;
-  height: 0.5em;
-  transform: rotate(30deg) translateZ(-1px);
-  transform-origin: 0.25em 0.25em;
-}
-
-.hamster-loader .spoke {
-  animation: spoke var(--dur) linear infinite;
-  background:
-    radial-gradient(
-      100% 100% at center,
-      var(--ui-border-soft) 4.8%,
-      rgba(255, 255, 255, 0) 5%
-    ),
-    linear-gradient(
-        rgba(255, 255, 255, 0) 46.9%,
-        var(--ui-border) 47% 52.9%,
-        rgba(255, 255, 255, 0) 53%
-      )
-      50% 50% / 99% 99% no-repeat;
-}
-
-.hamster-loader[data-paused='true'] * {
+.spider-loader[data-paused='true'] * {
   animation: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hamster-loader * {
+  .spider-loader * {
     animation: none !important;
-  }
-}
-
-@keyframes hamster {
-  from,
-  to {
-    transform: rotate(4deg) translate(-0.8em, 1.85em);
-  }
-
-  50% {
-    transform: rotate(0) translate(-0.8em, 1.85em);
-  }
-}
-
-@keyframes hamsterHead {
-  from,
-  25%,
-  50%,
-  75%,
-  to {
-    transform: rotate(0);
-  }
-
-  12.5%,
-  37.5%,
-  62.5%,
-  87.5% {
-    transform: rotate(8deg);
-  }
-}
-
-@keyframes hamsterEye {
-  from,
-  90%,
-  to {
-    transform: scaleY(1);
-  }
-
-  95% {
-    transform: scaleY(0);
-  }
-}
-
-@keyframes hamsterEar {
-  from,
-  25%,
-  50%,
-  75%,
-  to {
-    transform: rotate(0);
-  }
-
-  12.5%,
-  37.5%,
-  62.5%,
-  87.5% {
-    transform: rotate(12deg);
-  }
-}
-
-@keyframes hamsterBody {
-  from,
-  25%,
-  50%,
-  75%,
-  to {
-    transform: rotate(0);
-  }
-
-  12.5%,
-  37.5%,
-  62.5%,
-  87.5% {
-    transform: rotate(-2deg);
-  }
-}
-
-@keyframes hamsterFRLimb {
-  from,
-  25%,
-  50%,
-  75%,
-  to {
-    transform: rotate(50deg) translateZ(-1px);
-  }
-
-  12.5%,
-  37.5%,
-  62.5%,
-  87.5% {
-    transform: rotate(-30deg) translateZ(-1px);
-  }
-}
-
-@keyframes hamsterFLLimb {
-  from,
-  25%,
-  50%,
-  75%,
-  to {
-    transform: rotate(-30deg);
-  }
-
-  12.5%,
-  37.5%,
-  62.5%,
-  87.5% {
-    transform: rotate(50deg);
-  }
-}
-
-@keyframes hamsterBRLimb {
-  from,
-  25%,
-  50%,
-  75%,
-  to {
-    transform: rotate(-60deg) translateZ(-1px);
-  }
-
-  12.5%,
-  37.5%,
-  62.5%,
-  87.5% {
-    transform: rotate(20deg) translateZ(-1px);
-  }
-}
-
-@keyframes hamsterBLLimb {
-  from,
-  25%,
-  50%,
-  75%,
-  to {
-    transform: rotate(20deg);
-  }
-
-  12.5%,
-  37.5%,
-  62.5%,
-  87.5% {
-    transform: rotate(-60deg);
-  }
-}
-
-@keyframes hamsterTail {
-  from,
-  25%,
-  50%,
-  75%,
-  to {
-    transform: rotate(30deg) translateZ(-1px);
-  }
-
-  12.5%,
-  37.5%,
-  62.5%,
-  87.5% {
-    transform: rotate(10deg) translateZ(-1px);
-  }
-}
-
-@keyframes spoke {
-  from {
-    transform: rotate(0);
-  }
-
-  to {
-    transform: rotate(-1turn);
   }
 }

@@ -4,6 +4,21 @@
 
 - Raouf: (entries appended below)
 - Raouf: 2026-01-06 (Australia/Sydney)
+  - Scope: UI/UX (Sync Loader)
+  - Summary: Added a top-bar hamster loader that animates during push/pull and respects reduced-motion settings.
+    1.  Wired sync state into the store and surfaced it in the header next to the account control.
+    2.  Ported the hamster wheel animation into the shared stylesheet with Nord-aligned colors.
+  - Files: src/renderer/src/App.tsx, src/renderer/src/assets/main.css, src/renderer/src/store/useRepoStore.ts
+  - Verification: Not run (not requested).
+  - Follow-ups: Trigger push/pull and confirm the loader appears and stops cleanly.
+- Raouf: 2026-01-06 (Australia/Sydney)
+  - Scope: UX (Status Flicker)
+  - Summary: Prevented header ahead/behind flicker by preserving the last known status during transient git status failures.
+    1.  Tracked the repo path associated with the latest status and kept it intact on refresh errors.
+  - Files: src/renderer/src/store/useRepoStore.ts
+  - Verification: Not run (not requested).
+  - Follow-ups: Push/pull again to confirm the header status no longer blinks.
+- Raouf: 2026-01-06 (Australia/Sydney)
   - Scope: UI/UX (Settings Icon Motion)
   - Summary: Added a more expressive settings control with a rotating glass ring and pulsing accent orb.
     1.  Applied motion-safe spin and pulse to the settings glyph while keeping reduced-motion support.

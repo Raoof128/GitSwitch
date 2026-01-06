@@ -36,7 +36,9 @@ function App(): JSX.Element {
     clearCommitResetTimer,
     setSettingsOpen,
     refreshSettings,
-    refreshAccounts
+    refreshAccounts,
+    syncAction,
+    syncStatus
   } = useRepoStore()
   const [diffMode, setDiffMode] = useState<DiffMode>('unstaged')
   const reduceMotion = useReducedMotionSafe(reducedMotion)
@@ -66,6 +68,8 @@ function App(): JSX.Element {
   }, [push])
 
   const canCreatePr = hasGitHubToken || hasGitLabToken
+  const syncLabel =
+    syncAction === 'push' ? 'Pushing' : syncAction === 'pull' ? 'Pulling' : 'Syncing'
 
   const toggleSettings = useCallback(() => {
     setSettingsOpen(!settingsOpen)
@@ -271,6 +275,47 @@ function App(): JSX.Element {
                     >
                       ⚠️ Error
                     </motion.span>
+                  )}
+                </AnimatePresence>
+                <AnimatePresence>
+                  {syncStatus === 'loading' && (
+                    <motion.div
+                      key="syncing"
+                      initial={{ opacity: 0, scale: reduceMotion ? 1 : 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: reduceMotion ? 0 : 0.18 }}
+                      className="flex items-center"
+                      title={syncLabel}
+                    >
+                      <div
+                        className="hamster-loader"
+                        data-paused={reduceMotion ? 'true' : 'false'}
+                      >
+                        <div
+                          aria-label={`${syncLabel} changes`}
+                          role="img"
+                          className="wheel-and-hamster"
+                        >
+                          <div className="wheel" />
+                          <div className="hamster">
+                            <div className="hamster__body">
+                              <div className="hamster__head">
+                                <div className="hamster__ear" />
+                                <div className="hamster__eye" />
+                                <div className="hamster__nose" />
+                              </div>
+                              <div className="hamster__limb hamster__limb--fr" />
+                              <div className="hamster__limb hamster__limb--fl" />
+                              <div className="hamster__limb hamster__limb--br" />
+                              <div className="hamster__limb hamster__limb--bl" />
+                              <div className="hamster__tail" />
+                            </div>
+                          </div>
+                          <div className="spoke" />
+                        </div>
+                      </div>
+                    </motion.div>
                   )}
                 </AnimatePresence>
                 <select

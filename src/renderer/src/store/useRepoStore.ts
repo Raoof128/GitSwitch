@@ -81,6 +81,9 @@ type RepoState = {
     files: string[]
   }
   status: GitStatus | null
+  statusRepoPath: string | null
+  syncAction: 'push' | 'pull' | null
+  syncStatus: 'idle' | 'loading'
   strictHostKeyChecking: boolean
   submitPullRequest: () => Promise<void>
   theme: 'dark'
@@ -128,6 +131,9 @@ export const useRepoStore = create<RepoState>((set, get) => ({
   repos: [],
   activeRepoPath: null,
   status: null,
+  statusRepoPath: null,
+  syncAction: null,
+  syncStatus: 'idle',
   diffText: '',
   stagedDiffText: '',
   stagedSummary: {
@@ -198,6 +204,7 @@ export const useRepoStore = create<RepoState>((set, get) => ({
             ...state,
             activeRepoPath: selected,
             status,
+            statusRepoPath: selected,
             stagedSummary: {
               count: status.staged.length,
               files: status.staged.slice(0, 5)
@@ -209,6 +216,7 @@ export const useRepoStore = create<RepoState>((set, get) => ({
           repos: [...state.repos, { path: selected, name: getRepoName(selected) }],
           activeRepoPath: selected,
           status,
+          statusRepoPath: selected,
           stagedSummary: {
             count: status.staged.length,
             files: status.staged.slice(0, 5)
@@ -224,7 +232,7 @@ export const useRepoStore = create<RepoState>((set, get) => ({
     }
   },
   setActiveRepo: async (path) => {
-    set({ activeRepoPath: path, publishStatus: null, remotes: [] })
+    set({ activeRepoPath: path, publishStatus: null, remotes: [], statusRepoPath: null })
     await get().refreshStatus()
     await get().loadDiff('unstaged')
     await get().refreshRemotes()
@@ -235,6 +243,7 @@ export const useRepoStore = create<RepoState>((set, get) => ({
       set({
         publishStatus: null,
         status: null,
+        statusRepoPath: null,
         stagedSummary: { count: 0, files: [] }
       })
       return
@@ -253,6 +262,7 @@ export const useRepoStore = create<RepoState>((set, get) => ({
       const nextLastUpdatedAt = hasMeaningfulChange ? Date.now() : get().lastUpdatedAt
       set({
         status,
+        statusRepoPath: repoPath,
         stagedSummary: {
           count: status.staged.length,
           files: status.staged.slice(0, 5)
@@ -260,8 +270,14 @@ export const useRepoStore = create<RepoState>((set, get) => ({
         lastUpdatedAt: nextLastUpdatedAt
       })
     } catch {
+      const previousStatus = get().status
+      const previousRepoPath = get().statusRepoPath
+      if (previousStatus && previousRepoPath === repoPath) {
+        return
+      }
       set({
         status: null,
+        statusRepoPath: null,
         stagedSummary: { count: 0, files: [] }
       })
     }
@@ -434,6 +450,7 @@ export const useRepoStore = create<RepoState>((set, get) => ({
     }
 
     try {
+      set({ syncStatus: 'loading', syncAction: 'push' })
       await window.api.gitPush(repoPath, accountId)
       return true
     } catch (error) {
@@ -448,6 +465,8 @@ export const useRepoStore = create<RepoState>((set, get) => ({
       // Clear error after delay
       setTimeout(() => set({ commitError: null, commitStatus: 'idle' }), 8000)
       return false
+    } finally {
+      set({ syncStatus: 'idle', syncAction: null })
     }
   },
   pull: async () => {
@@ -458,6 +477,7 @@ export const useRepoStore = create<RepoState>((set, get) => ({
     }
 
     try {
+      set({ syncStatus: 'loading', syncAction: 'pull' })
       set({ commitStatus: 'loading' })
       await window.api.gitPull(repoPath, accountId)
 
@@ -475,6 +495,8 @@ export const useRepoStore = create<RepoState>((set, get) => ({
       })
       setTimeout(() => set({ commitError: null, commitStatus: 'idle' }), 8000)
       return false
+    } finally {
+      set({ syncStatus: 'idle', syncAction: null })
     }
   },
   fetch: async () => {
@@ -734,6 +756,7 @@ export const useRepoStore = create<RepoState>((set, get) => ({
     }
     set({
       status,
+      statusRepoPath: repoPath,
       stagedSummary: {
         count: status.staged.length,
         files: status.staged.slice(0, 5)

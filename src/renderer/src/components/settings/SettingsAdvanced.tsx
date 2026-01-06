@@ -80,7 +80,7 @@ export function SettingsAdvanced(): JSX.Element {
             onChange={(event) => setTimeoutValue(Number(event.target.value))}
             type="number"
             min={3}
-            max={15}
+            max={60}
             className="w-full rounded-md border border-[var(--ui-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs"
           />
         </div>

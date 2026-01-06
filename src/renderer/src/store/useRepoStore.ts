@@ -242,13 +242,22 @@ export const useRepoStore = create<RepoState>((set, get) => ({
 
     try {
       const status = await window.api.getGitStatus(repoPath)
+      const previous = get().status
+      const hasMeaningfulChange =
+        !previous ||
+        previous.current !== status.current ||
+        previous.ahead !== status.ahead ||
+        previous.behind !== status.behind ||
+        previous.files.length !== status.files.length ||
+        previous.staged.length !== status.staged.length
+      const nextLastUpdatedAt = hasMeaningfulChange ? Date.now() : get().lastUpdatedAt
       set({
         status,
         stagedSummary: {
           count: status.staged.length,
           files: status.staged.slice(0, 5)
         },
-        lastUpdatedAt: Date.now()
+        lastUpdatedAt: nextLastUpdatedAt
       })
     } catch {
       set({

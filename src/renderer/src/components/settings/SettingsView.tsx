@@ -1,4 +1,5 @@
-import { useMemo, useState, useEffect, useRef, JSX } from 'react'
+import { useMemo, useState, useRef, JSX } from 'react'
+import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { SettingsAccounts } from './SettingsAccounts'
 import { SettingsAdvanced } from './SettingsAdvanced'
 import { SettingsGeneral } from './SettingsGeneral'
@@ -10,27 +11,22 @@ export function SettingsView(): JSX.Element {
   const [tab, setTab] = useState<SettingsTab>('general')
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent): void => {
-      const tabs: SettingsTab[] = ['general', 'integrations', 'accounts', 'advanced']
-      const currentIndex = tabs.indexOf(tab)
+  const handleKeyDown = (event: ReactKeyboardEvent<HTMLElement>): void => {
+    const tabs: SettingsTab[] = ['general', 'integrations', 'accounts', 'advanced']
+    const currentIndex = tabs.indexOf(tab)
 
-      if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
-        event.preventDefault()
-        const nextIndex = (currentIndex + 1) % tabs.length
-        setTab(tabs[nextIndex])
-        tabRefs.current[nextIndex]?.focus()
-      } else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
-        event.preventDefault()
-        const prevIndex = (currentIndex - 1 + tabs.length) % tabs.length
-        setTab(tabs[prevIndex])
-        tabRefs.current[prevIndex]?.focus()
-      }
+    if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
+      event.preventDefault()
+      const nextIndex = (currentIndex + 1) % tabs.length
+      setTab(tabs[nextIndex])
+      tabRefs.current[nextIndex]?.focus()
+    } else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
+      event.preventDefault()
+      const prevIndex = (currentIndex - 1 + tabs.length) % tabs.length
+      setTab(tabs[prevIndex])
+      tabRefs.current[prevIndex]?.focus()
     }
-
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [tab])
+  }
 
   const content = useMemo(() => {
     switch (tab) {
@@ -52,7 +48,7 @@ export function SettingsView(): JSX.Element {
         <div className="mb-2 text-xs uppercase tracking-[0.2em] text-[var(--ui-text-muted)]">
           Settings
         </div>
-        <nav className="space-y-1 text-xs">
+        <nav className="space-y-1 text-xs" onKeyDown={handleKeyDown}>
           {[
             { id: 'general', label: 'General' },
             { id: 'integrations', label: 'Integrations' },

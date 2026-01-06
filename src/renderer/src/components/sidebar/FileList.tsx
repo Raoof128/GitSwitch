@@ -61,8 +61,9 @@ export function FileList(): JSX.Element {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={(e) => handleIgnore(file.path, e)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:bg-[var(--ui-hover)] rounded"
+                    className="rounded p-0.5 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)] hover:bg-[var(--ui-hover)]"
                     title="Add to .gitignore"
+                    aria-label="Add file to .gitignore"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

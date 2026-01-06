@@ -56,7 +56,7 @@ export function RepoList(): JSX.Element {
               animate="visible"
               exit="exit"
               className={cx(
-                'hover-card relative flex w-full flex-col rounded-md px-2 py-2 text-left text-sm transition',
+                'hover-card relative flex w-full flex-col rounded-md px-2 py-2 text-left text-sm transition focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)]',
                 isActive ? 'text-white' : 'text-slate-300'
               )}
             >

@@ -4,6 +4,29 @@
 
 - Raouf: (entries appended below)
 - Raouf: 2026-01-06 (Australia/Sydney)
+  - Scope: UI/UX (Audit Fixes)
+  - Summary: Fixed UI regressions in settings/account rows, scoped tab keyboard navigation, improved keyboard access for file actions, aligned timeout limits, and added focused UI tests.
+    1.  Repaired broken Tailwind classes in Accounts rows and added focus-visible affordances in repo and file lists.
+    2.  Scoped settings tab arrow navigation to the settings sidebar and aligned AI timeout limits with defaults.
+    3.  Added SettingsView tests to cover tab switching via click and arrow keys.
+  - Files: src/renderer/src/components/settings/SettingsAccounts.tsx, src/renderer/src/components/settings/SettingsView.tsx, src/renderer/src/components/sidebar/FileList.tsx, src/renderer/src/components/settings/SettingsAdvanced.tsx, src/renderer/src/components/sidebar/RepoList.tsx, src/renderer/src/App.test.tsx
+  - Verification: Not run (not requested).
+  - Follow-ups: Run `npm test` to validate UI tests in your environment.
+- Raouf: 2026-01-06 (Australia/Sydney)
+  - Scope: UX (Sync Stability)
+  - Summary: Reduced UI flicker at 1s fetch intervals by only updating the "Updated" timestamp when status meaningfully changes.
+    1.  Added a lightweight status comparison to avoid re-triggering the header animation on identical polling results.
+  - Files: src/renderer/src/store/useRepoStore.ts
+  - Verification: Not run (not requested).
+  - Follow-ups: Monitor the header badge behavior during rapid fetches and adjust thresholds if needed.
+- Raouf: 2026-01-06 (Australia/Sydney)
+  - Scope: UX (Sync Interval)
+  - Summary: Reduced the background fetch interval to 1 second to make remote status updates near-instant.
+    1.  Updated the reconciliation loop timer to 1s for faster change pickup.
+  - Files: src/renderer/src/App.tsx
+  - Verification: Not run (not requested).
+  - Follow-ups: Monitor CPU/network impact on large repos and adjust if needed.
+- Raouf: 2026-01-06 (Australia/Sydney)
   - Scope: UX (Auto-Push + Sync)
   - Summary: Fixed auto-push account fallback and accelerated background fetch so changes are picked up within a few seconds.
     1.  Auto-push now falls back to the default account when no selection is active, and settings updates can adopt the default account automatically.

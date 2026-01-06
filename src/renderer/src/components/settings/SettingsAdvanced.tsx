@@ -50,7 +50,7 @@ export function SettingsAdvanced(): JSX.Element {
   return (
     <section className="space-y-4">
       <div className="text-sm font-semibold">Advanced</div>
-      <div className="rounded-md border-2 border-[var(--ui-border)] bg-[var(--ui-panel)]/60 p-4 text-xs">
+      <div className="glass-card rounded-md p-4 text-xs">
         <div className="mb-3">
           <label className="mb-1 block text-[var(--ui-text-muted)]">Diff size limit (lines)</label>
           <input
@@ -59,7 +59,7 @@ export function SettingsAdvanced(): JSX.Element {
             type="number"
             min={50}
             max={2000}
-            className="w-full rounded-md border border-[var(--ui-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs"
+            className="w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs"
           />
         </div>
         <div className="mb-3">
@@ -70,7 +70,7 @@ export function SettingsAdvanced(): JSX.Element {
             type="number"
             min={10}
             max={512}
-            className="w-full rounded-md border border-[var(--ui-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs"
+            className="w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs"
           />
         </div>
         <div className="mb-3">
@@ -81,7 +81,7 @@ export function SettingsAdvanced(): JSX.Element {
             type="number"
             min={3}
             max={60}
-            className="w-full rounded-md border border-[var(--ui-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs"
+            className="w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs"
           />
         </div>
         <div className="mb-3 flex items-center justify-between">
@@ -106,7 +106,7 @@ export function SettingsAdvanced(): JSX.Element {
           <button
             type="button"
             onClick={handleSave}
-            className="rounded-md border border-[var(--ui-border)] px-3 py-1 text-xs font-semibold hover:bg-[var(--ui-hover)]"
+            className="rounded-md border border-[var(--glass-border)] px-3 py-1 text-xs font-semibold hover:bg-[var(--ui-hover)]"
           >
             Save Advanced
           </button>

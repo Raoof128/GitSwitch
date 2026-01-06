@@ -18,10 +18,10 @@ export function Sidebar({ width = 256 }: SidebarProps): JSX.Element {
 
   return (
     <aside
-      className="flex h-full flex-col border-r-2 border-[var(--ui-border)] bg-[var(--ui-panel)]/80"
+      className="glass-panel flex h-full flex-col border-r border-[var(--glass-border)]"
       style={{ width: `${width}px` }}
     >
-      <div className="border-b-2 border-[var(--ui-border)] px-4 py-3">
+      <div className="border-b border-[var(--glass-border)] px-4 py-3">
         <div className="text-xs uppercase tracking-[0.2em] text-[var(--ui-text-muted)]">
           GitSwitch
         </div>

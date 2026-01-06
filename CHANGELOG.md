@@ -4,6 +4,15 @@
 
 - Raouf: (entries appended below)
 - Raouf: 2026-01-06 (Australia/Sydney)
+  - Scope: UI/UX (Liquid Glass Polish)
+  - Summary: Applied Liquid Glass styling to core toolbars and controls, aligned borders to glass tokens, and softened scanlines for clarity.
+    1.  Updated header, toolbar, and selector borders to use glass tokens for a consistent Liquid Glass surface language.
+    2.  Retuned diff containers and active repo highlights to align with the new glass surface treatment.
+    3.  Softened scanline overlays and default form borders to improve legibility with translucent layers.
+  - Files: src/renderer/src/assets/main.css, src/renderer/src/App.tsx, src/renderer/src/components/diff/DiffView.tsx, src/renderer/src/components/settings/SettingsAccounts.tsx, src/renderer/src/components/sidebar/RepoList.tsx
+  - Verification: Not run (visual change only).
+  - Follow-ups: Launch the renderer to validate the glass clarity and contrast on real data.
+- Raouf: 2026-01-06 (Australia/Sydney)
   - Scope: UI/UX (Audit Fixes)
   - Summary: Fixed UI regressions in settings/account rows, scoped tab keyboard navigation, improved keyboard access for file actions, aligned timeout limits, and added focused UI tests.
     1.  Repaired broken Tailwind classes in Accounts rows and added focus-visible affordances in repo and file lists.

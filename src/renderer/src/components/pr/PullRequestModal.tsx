@@ -125,7 +125,7 @@ export function PullRequestModal(): JSX.Element | null {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
       <div
         ref={modalRef}
-        className="w-full max-w-lg rounded-lg border-2 border-[var(--ui-border)] bg-[var(--ui-panel)] p-4 shadow-xl"
+        className="glass-elevated w-full max-w-lg rounded-lg p-4"
         role="dialog"
         aria-modal="true"
         aria-labelledby="pr-modal-title"
@@ -139,27 +139,27 @@ export function PullRequestModal(): JSX.Element | null {
             value={prForm.title}
             onChange={handleTitleChange}
             placeholder="Title"
-            className="w-full rounded-md border-2 border-[var(--ui-border)] bg-[var(--ui-panel-muted)] px-2 py-2 text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)]"
+            className="w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel-muted)] px-2 py-2 text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)]"
           />
           <textarea
             value={prForm.body}
             onChange={handleBodyChange}
             placeholder="Description"
             rows={4}
-            className="w-full resize-none rounded-md border-2 border-[var(--ui-border)] bg-[var(--ui-panel-muted)] px-2 py-2 text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)]"
+            className="w-full resize-none rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel-muted)] px-2 py-2 text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)]"
           />
           <div className="grid grid-cols-2 gap-2">
             <input
               value={prForm.baseBranch}
               onChange={handleBaseChange}
               placeholder="Base branch"
-              className="w-full rounded-md border-2 border-[var(--ui-border)] bg-[var(--ui-panel-muted)] px-2 py-2 text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)]"
+              className="w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel-muted)] px-2 py-2 text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)]"
             />
             <input
               value={prForm.headBranch}
               onChange={handleHeadChange}
               placeholder="Head branch"
-              className="w-full rounded-md border-2 border-[var(--ui-border)] bg-[var(--ui-panel-muted)] px-2 py-2 text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)]"
+              className="w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel-muted)] px-2 py-2 text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)]"
             />
           </div>
           <label className="flex items-center gap-2 text-xs text-slate-300">
@@ -182,7 +182,7 @@ export function PullRequestModal(): JSX.Element | null {
             <button
               type="button"
               onClick={handleOpenPr}
-              className="rounded-md border border-[var(--ui-border)] px-2 py-1 text-xs hover:bg-[var(--ui-hover)]"
+              className="rounded-md border border-[var(--glass-border)] px-2 py-1 text-xs hover:bg-[var(--ui-hover)]"
             >
               Open PR
             </button>
@@ -193,7 +193,7 @@ export function PullRequestModal(): JSX.Element | null {
           <button
             type="button"
             onClick={handleClose}
-            className="rounded-md border border-[var(--ui-border)] px-3 py-1 text-xs hover:bg-[var(--ui-hover)]"
+            className="rounded-md border border-[var(--glass-border)] px-3 py-1 text-xs hover:bg-[var(--ui-hover)]"
           >
             Cancel
           </button>
@@ -201,7 +201,7 @@ export function PullRequestModal(): JSX.Element | null {
             type="button"
             disabled={isDisabled || prResult.status === 'loading'}
             onClick={handleSubmit}
-            className="rounded-md border border-[var(--ui-border)] px-3 py-1 text-xs font-semibold disabled:opacity-40 hover:bg-[var(--ui-hover)]"
+            className="rounded-md border border-[var(--glass-border)] px-3 py-1 text-xs font-semibold disabled:opacity-40 hover:bg-[var(--ui-hover)]"
           >
             {prResult.status === 'loading' ? 'Creating…' : 'Create PR'}
           </button>

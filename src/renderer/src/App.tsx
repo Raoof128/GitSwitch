@@ -213,12 +213,12 @@ function App(): JSX.Element {
       <div className="flex flex-1 flex-col">
         {settingsOpen ? (
           <div className="flex flex-1 flex-col overflow-hidden">
-            <header className="flex items-center justify-between border-b-2 border-[var(--ui-border)] bg-[var(--ui-panel)]/60 px-4 py-3">
+            <header className="glass-panel flex items-center justify-between border-b border-[var(--glass-border)] px-4 py-3">
               <div className="text-base font-semibold tracking-wide text-white">Settings</div>
               <button
                 type="button"
                 onClick={toggleSettings}
-                className="rounded-md border border-[var(--ui-border)] px-3 py-1 text-xs font-semibold text-slate-200 hover:bg-[var(--ui-hover)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)]"
+                className="rounded-md border border-[var(--glass-border)] px-3 py-1 text-xs font-semibold text-slate-200 hover:bg-[var(--ui-hover)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)]"
               >
                 Back
               </button>
@@ -227,7 +227,7 @@ function App(): JSX.Element {
           </div>
         ) : (
           <>
-            <header className="flex items-center justify-between border-b-2 border-[var(--ui-border)] bg-[var(--ui-panel)]/60 px-4 py-3">
+            <header className="glass-panel flex items-center justify-between border-b border-[var(--glass-border)] px-4 py-3">
               <div>
                 <div className="text-base font-semibold tracking-wide text-white">
                   {activeRepoPath ? activeRepoPath.split(/[\\/]/).pop() : 'No repo selected'}
@@ -250,7 +250,7 @@ function App(): JSX.Element {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.16 }}
-                      className="rounded-full border border-[var(--ui-border)] px-2 py-0.5 text-[10px] text-[var(--ui-text-muted)]"
+                      className="rounded-full border border-[var(--glass-border)] bg-[var(--glass-bg-muted)] px-2 py-0.5 text-[10px] text-[var(--ui-text-muted)]"
                     >
                       Updated
                     </motion.span>
@@ -279,7 +279,7 @@ function App(): JSX.Element {
                     setSelectedAccountId(value ? value : null)
                   }}
                   disabled={accounts.length === 0}
-                  className="h-7 rounded-md border border-[var(--ui-border)] bg-[var(--ui-panel)]/70 px-2 text-[10px] font-semibold text-white hover:bg-[var(--ui-hover)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="h-7 rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel)]/70 px-2 text-[10px] font-semibold text-white hover:bg-[var(--ui-hover)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)] disabled:cursor-not-allowed disabled:opacity-50"
                   title="Quick swap account"
                 >
                   <option value="">No account</option>
@@ -296,7 +296,7 @@ function App(): JSX.Element {
                   }}
                   disabled={!activeRepoPath || !selectedAccountId}
                   title="Pull changes"
-                  className="rounded-md border border-[var(--ui-border)] px-3 py-1 text-xs font-semibold text-slate-200 hover:bg-[var(--ui-hover)] disabled:cursor-not-allowed disabled:opacity-40"
+                  className="rounded-md border border-[var(--glass-border)] px-3 py-1 text-xs font-semibold text-slate-200 hover:bg-[var(--ui-hover)] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Pull
                 </button>
@@ -305,7 +305,7 @@ function App(): JSX.Element {
                   onClick={handlePush}
                   disabled={!activeRepoPath || !selectedAccountId}
                   title="Push changes"
-                  className="rounded-md border border-[var(--ui-border)] px-3 py-1 text-xs font-semibold text-slate-200 hover:bg-[var(--ui-hover)] disabled:cursor-not-allowed disabled:opacity-40"
+                  className="rounded-md border border-[var(--glass-border)] px-3 py-1 text-xs font-semibold text-slate-200 hover:bg-[var(--ui-hover)] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Push
                 </button>
@@ -314,7 +314,7 @@ function App(): JSX.Element {
                     type="button"
                     onClick={() => openPrModal()}
                     title="Create Pull Request"
-                    className="rounded-md border border-[var(--ui-border)] px-3 py-1 text-xs font-semibold text-slate-200 hover:bg-[var(--ui-hover)]"
+                    className="rounded-md border border-[var(--glass-border)] px-3 py-1 text-xs font-semibold text-slate-200 hover:bg-[var(--ui-hover)]"
                   >
                     PR
                   </button>
@@ -323,7 +323,7 @@ function App(): JSX.Element {
                   type="button"
                   onClick={toggleSettings}
                   title="Open Settings"
-                  className="rounded-md border border-[var(--ui-border)] px-2 py-1 text-xs font-semibold text-slate-200 hover:bg-[var(--ui-hover)]"
+                  className="rounded-md border border-[var(--glass-border)] px-2 py-1 text-xs font-semibold text-slate-200 hover:bg-[var(--ui-hover)]"
                 >
                   ⚙️
                 </button>
@@ -332,10 +332,10 @@ function App(): JSX.Element {
 
             <div className="flex flex-1 overflow-hidden">
               <section
-                className="shrink-0 border-r-2 border-[var(--ui-border)] bg-[var(--ui-panel-muted)]"
+                className="shrink-0 border-r border-[var(--glass-border)] bg-[var(--ui-panel-muted)]"
                 style={{ width: `${fileListWidth}px` }}
               >
-                <div className="flex items-center justify-between border-b-2 border-[var(--ui-border)] px-3 py-2">
+                <div className="glass-panel glass-panel-muted flex items-center justify-between border-b border-[var(--glass-border)] px-3 py-2">
                   <div className="text-xs uppercase tracking-[0.2em] text-[var(--ui-text-muted)]">
                     Files
                   </div>
@@ -347,7 +347,7 @@ function App(): JSX.Element {
                       className={`rounded-md border px-2 py-1 text-[10px] ${
                         diffMode === 'unstaged'
                           ? 'border-[var(--ui-border-soft)] text-white'
-                          : 'border-[var(--ui-border)] text-[var(--ui-text-muted)]'
+                          : 'border-[var(--glass-border)] text-[var(--ui-text-muted)]'
                       }`}
                     >
                       Unstaged
@@ -359,7 +359,7 @@ function App(): JSX.Element {
                       className={`rounded-md border px-2 py-1 text-[10px] ${
                         diffMode === 'staged'
                           ? 'border-[var(--ui-border-soft)] text-white'
-                          : 'border-[var(--ui-border)] text-[var(--ui-text-muted)]'
+                          : 'border-[var(--glass-border)] text-[var(--ui-text-muted)]'
                       }`}
                     >
                       Staged

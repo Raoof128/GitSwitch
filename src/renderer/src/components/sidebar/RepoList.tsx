@@ -33,7 +33,7 @@ export function RepoList(): JSX.Element {
           onClick={addRepo}
           whileTap={scaleTap(reduceMotion)}
           title="Add repository (Ctrl/⌘+O)"
-          className="rounded-md border border-[var(--ui-border)] px-2 py-1 text-xs text-slate-300 hover:border-[var(--ui-border-soft)] hover:bg-[var(--ui-hover)] hover:text-white"
+          className="rounded-md border border-[var(--glass-border)] px-2 py-1 text-xs text-slate-300 hover:border-[var(--ui-border-soft)] hover:bg-[var(--ui-hover)] hover:text-white"
         >
           + Add
         </motion.button>
@@ -63,7 +63,7 @@ export function RepoList(): JSX.Element {
               {isActive && (
                 <motion.span
                   layoutId="active-repo"
-                  className="absolute inset-0 -z-10 rounded-md bg-[var(--ui-border)]"
+                  className="absolute inset-0 -z-10 rounded-md bg-[var(--glass-bg-strong)]"
                   transition={{ duration: 0.18 }}
                 />
               )}

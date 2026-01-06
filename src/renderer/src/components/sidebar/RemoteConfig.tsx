@@ -41,7 +41,7 @@ export function RemoteConfig(): JSX.Element | null {
   }
 
   return (
-    <div className="mt-4 rounded-md border-2 border-[var(--ui-border)] bg-[var(--ui-panel)]/60 p-3">
+    <div className="glass-card mt-4 rounded-md p-3">
       <div className="mb-2">
         <div className="text-xs uppercase tracking-[0.2em] text-[var(--ui-text-muted)]">
           Remote Origin
@@ -67,7 +67,7 @@ export function RemoteConfig(): JSX.Element | null {
             setError(null)
           }}
           placeholder={hasOrigin ? 'Update remote URL...' : 'git@github.com:user/repo.git'}
-          className="w-full rounded-md border-2 border-[var(--ui-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs text-slate-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)]"
+          className="w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs text-slate-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)]"
         />
 
         {error && (

@@ -24,7 +24,7 @@ export function DiffView({ diffText }: DiffViewProps): JSX.Element {
   const allFiles = parseDiff(diffText)
   const MAX_DISPLAY_FILES = 50
   const files = allFiles.slice(0, MAX_DISPLAY_FILES)
-  const isTruncated = allFiles.length > MAX_DISPLAY_FILES;
+  const isTruncated = allFiles.length > MAX_DISPLAY_FILES
 
   return (
     <AnimatePresence mode="wait">
@@ -44,9 +44,9 @@ export function DiffView({ diffText }: DiffViewProps): JSX.Element {
         {files.map((file) => (
           <div
             key={`${file.oldPath}-${file.newPath}`}
-            className="diff-view-container rounded-lg border-2 border-[var(--ui-border)]"
+            className="diff-view-container rounded-lg border border-[var(--glass-border)]"
           >
-            <div className="border-b-2 border-[var(--ui-border)] bg-[var(--ui-panel)]/70 px-4 py-2 text-xs text-slate-300">
+            <div className="border-b border-[var(--glass-border)] bg-[var(--ui-panel)]/70 px-4 py-2 text-xs text-slate-300">
               {file.newPath || file.oldPath}
             </div>
             <Diff viewType="split" diffType={file.type} hunks={file.hunks}>

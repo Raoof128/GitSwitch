@@ -93,7 +93,7 @@ export function SettingsIntegrations(): JSX.Element {
     <section className="space-y-6">
       <div className="text-sm font-semibold">Integrations</div>
 
-      <div className="rounded-md border-2 border-[var(--ui-border)] bg-[var(--ui-panel)]/60 p-4 text-xs">
+      <div className="glass-card rounded-md p-4 text-xs">
         <div className="mb-3 text-[11px] uppercase tracking-[0.2em] text-[var(--ui-text-muted)]">
           AI Commit Generator
         </div>
@@ -103,7 +103,7 @@ export function SettingsIntegrations(): JSX.Element {
             <select
               value={provider}
               onChange={(event) => setProvider(event.target.value as typeof provider)}
-              className="w-full rounded-md border-2 border-[var(--ui-border)] bg-[var(--ui-panel-muted)] px-2 py-1 text-xs"
+              className="w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel-muted)] px-2 py-1 text-xs"
             >
               <option value="offline">Offline</option>
               <option value="local">Local LLM</option>
@@ -118,7 +118,7 @@ export function SettingsIntegrations(): JSX.Element {
             <select
               value={persona}
               onChange={(event) => setPersona(event.target.value as typeof persona)}
-              className="w-full rounded-md border-2 border-[var(--ui-border)] bg-[var(--ui-panel-muted)] px-2 py-1 text-xs"
+              className="w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel-muted)] px-2 py-1 text-xs"
             >
               <option value="standard">Standard Developer</option>
               <option value="cybersecurity">Cybersecurity Expert</option>
@@ -129,7 +129,7 @@ export function SettingsIntegrations(): JSX.Element {
           </div>
         </div>
 
-        <div className="mb-3 rounded-md border border-[var(--ui-border)] bg-[var(--ui-panel-muted)] p-3">
+        <div className="glass-panel glass-panel-muted mb-3 rounded-md border border-[var(--glass-border)] p-3">
           <div className="mb-2 text-[11px] uppercase tracking-[0.2em] text-[var(--ui-text-muted)]">
             Local LLM
           </div>
@@ -138,14 +138,14 @@ export function SettingsIntegrations(): JSX.Element {
             value={localUrl}
             onChange={(event) => setLocalUrl(event.target.value)}
             placeholder="http://localhost:11434/api/generate"
-            className="mb-2 w-full rounded-md border border-[var(--ui-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs"
+            className="mb-2 w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs"
           />
           <label className="mb-1 block text-[var(--ui-text-muted)]">Model</label>
           <input
             value={localModel}
             onChange={(event) => setLocalModel(event.target.value)}
             placeholder="qwen2.5-coder:7b"
-            className="mb-2 w-full rounded-md border border-[var(--ui-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs"
+            className="mb-2 w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs"
           />
           <div className="flex items-center gap-2">
             <div className="text-[10px] text-[var(--ui-text-muted)]">
@@ -154,7 +154,7 @@ export function SettingsIntegrations(): JSX.Element {
           </div>
         </div>
 
-        <div className="mb-3 rounded-md border border-[var(--ui-border)] bg-[var(--ui-panel-muted)] p-3">
+        <div className="glass-panel glass-panel-muted mb-3 rounded-md border border-[var(--glass-border)] p-3">
           <div className="mb-2 text-[11px] uppercase tracking-[0.2em] text-[var(--ui-text-muted)]">
             Cloud LLM
           </div>
@@ -164,13 +164,13 @@ export function SettingsIntegrations(): JSX.Element {
             onChange={(event) => setCloudKey(event.target.value)}
             placeholder={hasAiKey ? 'API key stored' : 'API key'}
             type="password"
-            className="mb-2 w-full rounded-md border border-[var(--ui-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs"
+            className="mb-2 w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs"
           />
           <label className="mb-1 block text-[var(--ui-text-muted)]">Model</label>
           <select
             value={cloudModel}
             onChange={(event) => setCloudModel(event.target.value)}
-            className="mb-2 w-full rounded-md border border-[var(--ui-border)] bg-[var(--ui-panel-muted)] px-2 py-1 text-xs"
+            className="mb-2 w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel-muted)] px-2 py-1 text-xs"
           >
             <optgroup label="Google Gemini 1.5 (Recommended)">
               <option value="gemini-1.5-flash">Gemini 1.5 Flash (Fast & Cheap)</option>
@@ -189,14 +189,14 @@ export function SettingsIntegrations(): JSX.Element {
             <button
               type="button"
               onClick={handleSaveCloudKey}
-              className="rounded-md border border-[var(--ui-border)] px-2 py-1 text-xs hover:bg-[var(--ui-hover)]"
+              className="rounded-md border border-[var(--glass-border)] px-2 py-1 text-xs hover:bg-[var(--ui-hover)]"
             >
               Save key
             </button>
             <button
               type="button"
               onClick={clearAiKey}
-              className="rounded-md border border-[var(--ui-border)] px-2 py-1 text-xs hover:bg-[var(--ui-hover)]"
+              className="rounded-md border border-[var(--glass-border)] px-2 py-1 text-xs hover:bg-[var(--ui-hover)]"
             >
               Remove key
             </button>
@@ -209,14 +209,14 @@ export function SettingsIntegrations(): JSX.Element {
         <button
           type="button"
           onClick={handleSaveAi}
-          className="rounded-md border border-[var(--ui-border)] px-3 py-1 text-xs font-semibold hover:bg-[var(--ui-hover)]"
+          className="rounded-md border border-[var(--glass-border)] px-3 py-1 text-xs font-semibold hover:bg-[var(--ui-hover)]"
         >
           Securely Save Configuration
         </button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-md border-2 border-[var(--ui-border)] bg-[var(--ui-panel)]/60 p-4 text-xs">
+        <div className="glass-card rounded-md p-4 text-xs">
           <div className="mb-2 text-[11px] uppercase tracking-[0.2em] text-[var(--ui-text-muted)]">
             GitHub
           </div>
@@ -226,7 +226,7 @@ export function SettingsIntegrations(): JSX.Element {
             onChange={(event) => setGithubToken(event.target.value)}
             placeholder={hasGitHubToken ? 'Token stored' : 'Token'}
             type="password"
-            className="mb-2 w-full rounded-md border border-[var(--ui-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs"
+            className="mb-2 w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs"
           />
           <div className="mb-3 text-[10px] text-[var(--ui-text-muted)]">
             Required scopes: repo, pull_requests
@@ -236,14 +236,14 @@ export function SettingsIntegrations(): JSX.Element {
               <button
                 type="button"
                 onClick={handleSaveGitHub}
-                className="flex-1 rounded-md border border-[var(--ui-border)] px-2 py-1 text-xs hover:bg-[var(--ui-hover)]"
+                className="flex-1 rounded-md border border-[var(--glass-border)] px-2 py-1 text-xs hover:bg-[var(--ui-hover)]"
               >
                 Save token
               </button>
               <button
                 type="button"
                 onClick={clearGitHubToken}
-                className="flex-1 rounded-md border border-[var(--ui-border)] px-2 py-1 text-xs hover:bg-[var(--ui-hover)]"
+                className="flex-1 rounded-md border border-[var(--glass-border)] px-2 py-1 text-xs hover:bg-[var(--ui-hover)]"
               >
                 Remove
               </button>
@@ -256,7 +256,7 @@ export function SettingsIntegrations(): JSX.Element {
           </div>
         </div>
 
-        <div className="rounded-md border-2 border-[var(--ui-border)] bg-[var(--ui-panel)]/60 p-4 text-xs">
+        <div className="glass-card rounded-md p-4 text-xs">
           <div className="mb-2 text-[11px] uppercase tracking-[0.2em] text-[var(--ui-text-muted)]">
             GitLab
           </div>
@@ -266,7 +266,7 @@ export function SettingsIntegrations(): JSX.Element {
             onChange={(event) => setGitlabToken(event.target.value)}
             placeholder={hasGitLabToken ? 'Token stored' : 'Token'}
             type="password"
-            className="mb-2 w-full rounded-md border border-[var(--ui-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs"
+            className="mb-2 w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs"
           />
           <div className="mb-3 text-[10px] text-[var(--ui-text-muted)]">Required scopes: api</div>
           <div className="flex flex-col gap-2">
@@ -274,14 +274,14 @@ export function SettingsIntegrations(): JSX.Element {
               <button
                 type="button"
                 onClick={handleSaveGitLab}
-                className="flex-1 rounded-md border border-[var(--ui-border)] px-2 py-1 text-xs hover:bg-[var(--ui-hover)]"
+                className="flex-1 rounded-md border border-[var(--glass-border)] px-2 py-1 text-xs hover:bg-[var(--ui-hover)]"
               >
                 Save token
               </button>
               <button
                 type="button"
                 onClick={clearGitLabToken}
-                className="flex-1 rounded-md border border-[var(--ui-border)] px-2 py-1 text-xs hover:bg-[var(--ui-hover)]"
+                className="flex-1 rounded-md border border-[var(--glass-border)] px-2 py-1 text-xs hover:bg-[var(--ui-hover)]"
               >
                 Remove
               </button>

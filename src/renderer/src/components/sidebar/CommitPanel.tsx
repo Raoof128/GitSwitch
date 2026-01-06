@@ -37,7 +37,7 @@ export function CommitPanel(): JSX.Element {
   const isStaging = stageStatus === 'loading'
 
   return (
-    <div className="mt-6 rounded-md border-2 border-[var(--ui-border)] bg-[var(--ui-panel)]/60 p-3">
+    <div className="glass-card mt-6 rounded-md p-3">
       <div className="mb-2">
         <div className="text-xs uppercase tracking-[0.2em] text-[var(--ui-text-muted)]">Commit</div>
       </div>
@@ -54,7 +54,7 @@ export function CommitPanel(): JSX.Element {
                 commit()
               }
             }}
-            className="w-full flex-1 rounded-md border-2 border-[var(--ui-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs text-slate-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)] disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full flex-1 rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs text-slate-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)] disabled:cursor-not-allowed disabled:opacity-50"
           />
           <motion.button
             type="button"
@@ -62,7 +62,7 @@ export function CommitPanel(): JSX.Element {
             whileTap={scaleTap(reduceMotion)}
             disabled={isGenerateDisabled}
             title="Generate message (Shift+Ctrl/⌘+G)"
-            className="rounded-md border border-[var(--ui-border)] px-2 py-1 text-[10px] text-slate-300 hover:border-[var(--ui-border-soft)] hover:bg-[var(--ui-hover)] hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-md border border-[var(--glass-border)] px-2 py-1 text-[10px] text-slate-300 hover:border-[var(--ui-border-soft)] hover:bg-[var(--ui-hover)] hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
           >
             {generateStatus === 'loading' ? 'Generating…' : 'Generate ✨'}
           </motion.button>
@@ -73,7 +73,7 @@ export function CommitPanel(): JSX.Element {
           placeholder="Description (optional)"
           rows={3}
           disabled={isGenerating}
-          className="w-full resize-none rounded-md border-2 border-[var(--ui-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs text-slate-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)] disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full resize-none rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs text-slate-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)] disabled:cursor-not-allowed disabled:opacity-50"
         />
         <div className="text-[11px] text-[var(--ui-text-muted)]">
           Staged files: {stagedSummary.count}
@@ -143,7 +143,7 @@ export function CommitPanel(): JSX.Element {
             id="auto-push"
             checked={useRepoStore((s) => s.autoPush)}
             onChange={(e) => useRepoStore.getState().updateSettings({ autoPush: e.target.checked })}
-            className="h-3 w-3 rounded border-[var(--ui-border)] bg-[var(--ui-panel)] text-[var(--ui-accent)] focus:ring-[var(--ui-accent)]"
+            className="h-3 w-3 rounded border-[var(--glass-border)] bg-[var(--ui-panel)] text-[var(--ui-accent)] focus:ring-[var(--ui-accent)]"
           />
           <label
             htmlFor="auto-push"
@@ -159,7 +159,7 @@ export function CommitPanel(): JSX.Element {
           disabled={isDisabled}
           whileTap={scaleTap(reduceMotion)}
           title="Commit (Ctrl/⌘+Enter)"
-          className="relative w-full rounded-md border-2 border-[var(--ui-border)] px-2 py-1 text-xs font-semibold text-slate-200 hover:bg-[var(--ui-hover)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)] disabled:cursor-not-allowed disabled:opacity-50"
+          className="relative w-full rounded-md border border-[var(--glass-border)] px-2 py-1 text-xs font-semibold text-slate-200 hover:bg-[var(--ui-hover)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)] disabled:cursor-not-allowed disabled:opacity-50"
         >
           <span className={commitStatus === 'loading' ? 'opacity-0' : 'opacity-100'}>
             {branchLabel}

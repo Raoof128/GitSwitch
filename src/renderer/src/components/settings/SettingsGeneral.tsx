@@ -30,13 +30,13 @@ export function SettingsGeneral(): JSX.Element {
   return (
     <section className="space-y-4">
       <div className="text-sm font-semibold">General</div>
-      <div className="rounded-md border-2 border-[var(--ui-border)] bg-[var(--ui-panel)]/60 p-4 text-xs">
+      <div className="glass-card rounded-md p-4 text-xs">
         <div className="mb-3">
           <label className="mb-1 block text-[var(--ui-text-muted)]">Theme</label>
           <select
             value={theme}
             disabled
-            className="w-full rounded-md border-2 border-[var(--ui-border)] bg-[var(--ui-panel-muted)] px-2 py-1 text-xs opacity-60"
+            className="w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel-muted)] px-2 py-1 text-xs opacity-60"
           >
             <option value="dark">Dark (default)</option>
           </select>
@@ -55,7 +55,7 @@ export function SettingsGeneral(): JSX.Element {
           <select
             value={baseBranch}
             onChange={(event) => setBaseBranch(event.target.value as 'main' | 'master')}
-            className="w-full rounded-md border-2 border-[var(--ui-border)] bg-[var(--ui-panel-muted)] px-2 py-1 text-xs"
+            className="w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel-muted)] px-2 py-1 text-xs"
           >
             <option value="main">main</option>
             <option value="master">master</option>
@@ -73,7 +73,7 @@ export function SettingsGeneral(): JSX.Element {
         <button
           type="button"
           onClick={handleSave}
-          className="rounded-md border border-[var(--ui-border)] px-3 py-1 text-xs font-semibold hover:bg-[var(--ui-hover)]"
+          className="rounded-md border border-[var(--glass-border)] px-3 py-1 text-xs font-semibold hover:bg-[var(--ui-hover)]"
         >
           Save General
         </button>

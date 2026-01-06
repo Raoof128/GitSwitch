@@ -44,7 +44,7 @@ export function SettingsView(): JSX.Element {
 
   return (
     <div className="flex flex-1 overflow-hidden">
-      <aside className="w-48 border-r-2 border-[var(--ui-border)] bg-[var(--ui-panel-muted)] px-3 py-4">
+      <aside className="glass-panel glass-panel-muted w-48 border-r border-[var(--glass-border)] px-3 py-4">
         <div className="mb-2 text-xs uppercase tracking-[0.2em] text-[var(--ui-text-muted)]">
           Settings
         </div>

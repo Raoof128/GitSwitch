@@ -4,6 +4,27 @@
 
 - Raouf: (entries appended below)
 - Raouf: 2026-01-06 (Australia/Sydney)
+  - Scope: AI Safety (Hallucination Filter)
+  - Summary: Reduced false positives for short alphabetic pairs (e.g., UI/UX) in the file-reference validation.
+    1.  Ignored two-part alpha pairs with 1–2 letter segments to avoid misclassifying shorthand as paths.
+  - Files: src/main/ai/commit-generate.ts
+  - Verification: Not run (not requested).
+  - Follow-ups: Retry AI generation with UI/UX or CI/CD phrasing to confirm the warning is gone.
+- Raouf: 2026-01-06 (Australia/Sydney)
+  - Scope: AI Safety (False Positive Guard)
+  - Summary: Reduced false positives in AI file-reference validation for common UI/UX and version abbreviations.
+    1.  Ignored short uppercase pairs (e.g., UI/UX), numeric ratios, and version pairs when checking unknown paths.
+  - Files: src/main/ai/commit-generate.ts
+  - Verification: Not run (not requested).
+  - Follow-ups: Generate a commit message mentioning UI/UX to confirm no false block occurs.
+- Raouf: 2026-01-06 (Australia/Sydney)
+  - Scope: UI/UX (Header Stability)
+  - Summary: Stabilized the ahead/behind header label during push/pull by reserving space and using tabular numerals.
+    1.  Added a fixed minimum width and tabular numeric alignment to prevent layout shifts as counts change.
+  - Files: src/renderer/src/App.tsx
+  - Verification: `npm run lint` (warns about existing prettier issue in src/main/git/git-service.ts).
+  - Follow-ups: If you want the warning cleared, I can format `src/main/git/git-service.ts`.
+- Raouf: 2026-01-06 (Australia/Sydney)
   - Scope: UI/UX (Liquid Glass Polish)
   - Summary: Applied Liquid Glass styling to core toolbars and controls, aligned borders to glass tokens, and softened scanlines for clarity.
     1.  Updated header, toolbar, and selector borders to use glass tokens for a consistent Liquid Glass surface language.

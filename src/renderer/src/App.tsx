@@ -239,7 +239,7 @@ function App(): JSX.Element {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <div className="text-xs text-[var(--ui-text-muted)]">
+                <div className="min-w-[18ch] text-right text-xs tabular-nums text-[var(--ui-text-muted)] whitespace-nowrap">
                   {status ? `Ahead ${status.ahead} / Behind ${status.behind}` : ''}
                 </div>
                 <AnimatePresence>

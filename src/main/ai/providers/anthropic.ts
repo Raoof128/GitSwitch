@@ -43,7 +43,8 @@ export class AnthropicProvider implements AiProvider {
       const text = data.content?.[0]?.text || ''
       return parseAiResponse(text)
     } catch (error) {
-      console.error('Anthropic generation failed:', error)
+      const message = error instanceof Error ? error.message : String(error)
+      console.error(`Anthropic generation failed: ${message}`, error)
       return null
     } finally {
       clearTimeout(timer)

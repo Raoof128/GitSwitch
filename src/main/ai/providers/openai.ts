@@ -46,7 +46,8 @@ export class OpenAIProvider implements AiProvider {
       }
       return parseAiResponse(data.choices?.[0]?.message?.content || '')
     } catch (error) {
-      console.error('OpenAI generation failed:', error)
+      const message = error instanceof Error ? error.message : String(error)
+      console.error(`OpenAI generation failed: ${message}`, error)
       return null
     } finally {
       clearTimeout(timer)

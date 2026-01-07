@@ -188,15 +188,19 @@ function App(): JSX.Element {
   }, [addRepo, commit, generateCommitMessage, refreshStatus, setSettingsOpen, settingsOpen])
 
   // Background Fetch / Dynamic Reconciliation Loop
+  // Reduced polling frequency from 1s to 30s to avoid excessive network/CPU usage
+  // Real-time updates are handled by the file watcher in the main process
   useEffect(() => {
     if (!activeRepoPath || !selectedAccountId) return
 
     // Initial fetch on mount/change
     useRepoStore.getState().fetch()
 
+    const FETCH_INTERVAL_MS = 30_000 // 30 seconds
+
     const intervalId = setInterval(() => {
       useRepoStore.getState().fetch()
-    }, 1000) // 1 second interval
+    }, FETCH_INTERVAL_MS)
 
     return () => clearInterval(intervalId)
   }, [activeRepoPath, selectedAccountId])

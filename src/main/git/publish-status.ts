@@ -4,67 +4,22 @@
 
 import { simpleGit } from 'simple-git'
 import type { PublishStatus } from '../../index'
+import {
+  fetchWithTimeout,
+  detectGitProvider,
+  parseGitHubRepo,
+  parseGitLabProjectPath
+} from './git-utils'
 
 // -------------------------------------------------------------------------- //
-//                                    TYPES                                   //
+//                                  CONSTANTS                                 //
 // -------------------------------------------------------------------------- //
-
-type Provider = 'github' | 'gitlab' | 'unknown'
-
-type GitHubRepo = {
-  owner: string
-  repo: string
-}
 
 const FETCH_TIMEOUT_MS = 6000
-
-const fetchWithTimeout = async (
-  url: string,
-  options: RequestInit,
-  timeoutMs: number
-): Promise<Response> => {
-  const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), timeoutMs)
-  try {
-    return await fetch(url, { ...options, signal: controller.signal })
-  } finally {
-    clearTimeout(timer)
-  }
-}
 
 // -------------------------------------------------------------------------- //
 //                                   HELPERS                                  //
 // -------------------------------------------------------------------------- //
-
-const detectGitProvider = (remoteUrl: string): Provider => {
-  if (remoteUrl.includes('github.com')) return 'github'
-  if (remoteUrl.includes('gitlab.com')) return 'gitlab'
-  return 'unknown'
-}
-
-const parseGitHubRepo = (remote: string): GitHubRepo | null => {
-  const sshMatch = remote.match(/git@github\.com:(.+?)\/(.+?)(\.git)?$/)
-  if (sshMatch) {
-    return { owner: sshMatch[1], repo: sshMatch[2] }
-  }
-  const httpsMatch = remote.match(/https?:\/\/github\.com\/(.+?)\/(.+?)(\.git)?$/)
-  if (httpsMatch) {
-    return { owner: httpsMatch[1], repo: httpsMatch[2] }
-  }
-  return null
-}
-
-const parseGitLabProjectPath = (remote: string): string | null => {
-  const sshMatch = remote.match(/git@gitlab\.com:(.+?)(\.git)?$/)
-  if (sshMatch) {
-    return sshMatch[1]
-  }
-  const httpsMatch = remote.match(/https?:\/\/gitlab\.com\/(.+?)(\.git)?$/)
-  if (httpsMatch) {
-    return httpsMatch[1]
-  }
-  return null
-}
 
 const getOriginUrl = async (repoPath: string): Promise<string | null> => {
   const git = simpleGit({ baseDir: repoPath })

@@ -1,7 +1,24 @@
-import { GoogleGenAI, HarmCategory, HarmBlockThreshold } from '@google/genai'
+import { GoogleGenAI, HarmCategory, HarmBlockThreshold, type SafetySetting } from '@google/genai'
 import type { AiContext, AiProvider, CommitMessage } from '../interfaces'
 import { buildUserPrompt, CYBERSECURITY_INSTRUCTION, SYSTEM_PROMPT } from '../prompts'
 import { parseAiResponse } from '../helpers'
+
+/** Response structure for Gemini SDK candidates */
+interface GeminiCandidate {
+  content?: {
+    parts?: Array<{ text?: string }>
+  }
+}
+
+/** Possible response structures from Gemini SDK */
+interface GeminiResponse {
+  text?: () => string
+  response?: {
+    text: () => string
+    candidates?: GeminiCandidate[]
+  }
+  candidates?: GeminiCandidate[]
+}
 
 export class GeminiProvider implements AiProvider {
   async generate(
@@ -25,6 +42,26 @@ export class GeminiProvider implements AiProvider {
       )
     })
 
+    // Safety settings to disable content filtering for code diffs
+    const safetySettings: SafetySetting[] = [
+      {
+        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+        threshold: HarmBlockThreshold.BLOCK_NONE
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        threshold: HarmBlockThreshold.BLOCK_NONE
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        threshold: HarmBlockThreshold.BLOCK_NONE
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold: HarmBlockThreshold.BLOCK_NONE
+      }
+    ]
+
     // No try-catch here - let the orchestrator handle the error so it's visible to the user
     // Configure to accept all content (Git diffs can be flagged falsely as unsafe)
     const responsePromise = ai.models.generateContent({
@@ -41,35 +78,7 @@ export class GeminiProvider implements AiProvider {
         responseMimeType: 'application/json',
         // responseSchema can cause issues with Gemini Flash returning null/empty fields
         // We rely on the prompt to enforce JSON structure and our robust parser to handle it.
-        /*
-        responseSchema: {
-          type: 'OBJECT',
-          properties: {
-            title: { type: 'STRING' },
-            description: { type: 'STRING' }
-          },
-          required: ['title', 'description']
-        },
-        */
-        // @ts-ignore - SDK types might be strict, but we want to disable safety checks for code
-        safetySettings: [
-          {
-            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-            threshold: HarmBlockThreshold.BLOCK_NONE
-          },
-          {
-            category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-            threshold: HarmBlockThreshold.BLOCK_NONE
-          },
-          {
-            category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-            threshold: HarmBlockThreshold.BLOCK_NONE
-          },
-          {
-            category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-            threshold: HarmBlockThreshold.BLOCK_NONE
-          }
-        ]
+        safetySettings
       }
     })
 
@@ -87,25 +96,16 @@ export class GeminiProvider implements AiProvider {
     try {
       // The @google/genai SDK returns a result that can have different structures
       // depending on the model and configuration. We handle the most common ones.
-      const res = result as {
-        text?: () => string
-        response?: { text: () => string }
-      }
+      const res = result as GeminiResponse
       if (typeof res.text === 'function') {
         text = res.text()
       } else if (res.response && typeof res.response.text === 'function') {
         text = res.response.text()
       } else {
         // Fallback: try to read candidates directly if methods fail
-        // @ts-ignore: Fallback for different SDK response structures
-        const candidate = result.response?.candidates?.[0] || result.candidates?.[0]
-        if (
-          candidate &&
-          candidate.content &&
-          candidate.content.parts &&
-          candidate.content.parts[0]
-        ) {
-          text = candidate.content.parts[0].text || ''
+        const candidate = res.response?.candidates?.[0] ?? res.candidates?.[0]
+        if (candidate?.content?.parts?.[0]) {
+          text = candidate.content.parts[0].text ?? ''
         }
       }
     } catch (e) {

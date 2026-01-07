@@ -1,5 +1,12 @@
 import type { CommitMessage } from './interfaces'
 
+/**
+ * Parses AI response text to extract a commit message.
+ * Handles various formats including raw JSON, markdown code blocks, and partial JSON.
+ *
+ * @param text - The raw AI response text to parse
+ * @returns The parsed commit message, or null if parsing fails or text is empty
+ */
 export function parseAiResponse(text: string): CommitMessage | null {
   if (!text) return null
   let jsonText = text.trim()

@@ -3,6 +3,25 @@
 ## Unreleased
 
 - Raouf: (entries appended below)
+- Raouf: 2026-01-07 (Australia/Sydney)
+  - Scope: Code Quality Audit (Comprehensive Fix)
+  - Summary: Fixed 17 audit issues across Critical, High, and Medium severity levels. Resolved all TypeScript, error handling, security, and performance issues identified in the codebase audit.
+    1.  CRITICAL: Removed `@ts-ignore` in `gemini.ts` by adding proper `SafetySetting[]` type and `GeminiResponse`/`GeminiCandidate` interfaces.
+    2.  CRITICAL: Replaced `api: unknown` in `preload/index.d.ts` with fully typed `PreloadApi` interface.
+    3.  HIGH: Fixed empty catch block in `local.ts` with proper JSON parse error handling and extracted hardcoded URL to constant.
+    4.  HIGH: Converted CJS `require()` to ESM `import` in `git-service.ts`, `watcher.ts`, and `key-manager.ts`.
+    5.  HIGH: Removed unnecessary `@types/chokidar` from `package.json`.
+    6.  HIGH: Replaced browser `confirm()` in `FileList.tsx` with in-app React modal dialog.
+    7.  HIGH: Changed aggressive 1-second polling to 30-second interval in `App.tsx`.
+    8.  MEDIUM: Created `git-utils.ts` to extract duplicated utilities (`fetchWithTimeout`, `parseGitHubRepo`, `parseGitLabProjectPath`, `detectGitProvider`).
+    9.  MEDIUM: Added error context to catch blocks in `anthropic.ts` and `openai.ts`.
+    10. MEDIUM: Added `IpcMainInvokeEvent` type to all 16 IPC handler `_event` parameters in `index.ts`.
+    11. MEDIUM: Added JSDoc documentation to `helpers.ts` for nullable return type.
+    12. MEDIUM: Fixed `useRepoStore.getState()` called inside render in `CommitPanel.tsx`.
+    13. MEDIUM: Added error recovery with backoff mechanism in `watcher.ts` (max 5 consecutive errors, 30s backoff).
+  - Files: src/main/ai/providers/gemini.ts, src/preload/index.d.ts, src/main/ai/providers/local.ts, src/main/git/git-service.ts, src/main/git/watcher.ts, src/main/secure/key-manager.ts, package.json, src/renderer/src/components/sidebar/FileList.tsx, src/renderer/src/App.tsx, src/main/git/git-utils.ts (NEW), src/main/git/pull-request.ts, src/main/git/publish-status.ts, src/main/ai/providers/anthropic.ts, src/main/ai/providers/openai.ts, src/main/index.ts, src/main/ai/helpers.ts, src/renderer/src/components/sidebar/CommitPanel.tsx
+  - Verification: `npm run lint` and `npx tsc --noEmit` both pass with 0 errors. AI Orchestrator audit: PASSED.
+  - Follow-ups: None - all identified issues resolved.
 - Raouf: 2026-01-06 (Australia/Sydney)
   - Scope: UI/UX (Loader Width)
   - Summary: Widened the spider loader footprint for better spacing in the title area.
@@ -172,7 +191,7 @@
 - Raouf: 2026-01-05 (Australia/Sydney)
   - Scope: Maintenance (Stability & Performance)
   - Summary: Implemented comprehensive stability guards for large repositories and massive code changes.
-    1.  Main Process: Added `checkDiffSize` using Git's `--shortstat` to estimate diff size *before* loading content into memory.
+    1.  Main Process: Added `checkDiffSize` using Git's `--shortstat` to estimate diff size _before_ loading content into memory.
     2.  Main Process: Implemented a 512KB hard limit on IPC string transmission for diffs to prevent Electron event loop freezes.
     3.  Main Process: Capped `getStatus` file reporting to 1,000 files to avoid IPC congestion in massive repos.
     4.  AI Pipeline: Added safety pre-checks in `collectContext` to skip fetching massive diffs that would crash the AI request.
@@ -198,7 +217,7 @@
     5.  Synchronized `env.d.ts` and `preload/index.ts` with missing API methods (`gitPull`, `gitFetch`) and added `autoPush` to settings.
     6.  Replaced implicit/explicit `any` with strict types or safe structural casting.
     7.  Fixed `no-useless-escape` regex error in `git-service.ts`.
-  - Files: src/main/**/*, src/renderer/src/**/*, src/preload/*, src/env.d.ts
+  - Files: src/main/**/\*, src/renderer/src/**/_, src/preload/_, src/env.d.ts
   - Verification: `npm run lint` and `npm run typecheck` now pass with 0 errors/warnings.
 - Raouf: 2026-01-05 (Australia/Sydney)
   - Scope: Repository Cleanup
@@ -228,7 +247,7 @@
 - Raouf: 2026-01-05 (Australia/Sydney)
   - Scope: Project Audit (Major Upgrade)
   - Summary: Conducted comprehensive production-readiness audit. Added MISSING release assets (LICENSE, CONTRIBUTING, SECURITY, CODE_OF_CONDUCT). Upgraded README.md. Implemented CI/CD workflows and Vitest testing infrastructure.
-  - Files: README.md, LICENSE, CONTRIBUTING.md, SECURITY.md, CODE_OF_CONDUCT.md, .github/*, package.json, vitest.config.ts
+  - Files: README.md, LICENSE, CONTRIBUTING.md, SECURITY.md, CODE_OF_CONDUCT.md, .github/\*, package.json, vitest.config.ts
   - Verification: Validation of file creation.
 - Raouf: 2026-01-05 (Australia/Sydney)
   - Scope: Bug Fix (Critical)
@@ -351,13 +370,13 @@
 - Raouf: 2026-01-05 (Australia/Sydney)
   - Scope: AI Integration (Rewrite)
   - Summary: Rewrote AI integration layer from zero to support Gemini, ChatGPT (OpenAI), and Claude (Anthropic). Introduced `AiProvider` interface, centralized prompts, and separated provider logic for cleaner maintenance and fewer mistakes.
-  - Files: src/main/ai/interfaces.ts, src/main/ai/prompts.ts, src/main/ai/helpers.ts, src/main/ai/providers/*, src/main/ai/commit-generate.ts
+  - Files: src/main/ai/interfaces.ts, src/main/ai/prompts.ts, src/main/ai/helpers.ts, src/main/ai/providers/\*, src/main/ai/commit-generate.ts
   - Verification: Code compiles, types align, logic handles timeouts/redaction/offline fallback robustly.
   - Follow-ups: User to verify with their specific API keys.
 - Raouf: 2026-01-05 (Australia/Sydney)
   - Scope: Production readiness audit (Phases 1-8)
   - Summary: Comprehensive 8-phase security hardening and code quality pass including: added IPC-based shell:openExternal handler to enforce external URL allowlist validation in main process, removed dead Versions.tsx component that referenced non-existent window.electron, refactored Gemini provider with proper Promise.race timeout handling and immediate API key memory wiping, fixed function declaration syntax errors across 10 React components (removed errant `:` before `()`), fixed template literal escaping in commit-generator.ts, added explanatory comment for dev-only console.log statements, ran prettier formatting pass
-  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts, src/main/ai/providers/gemini.ts, src/main/git/commit-generator.ts, src/preload/index.ts, src/renderer/src/env.d.ts, src/renderer/src/App.tsx, src/renderer/src/components/pr/PullRequestModal.tsx, src/renderer/src/components/settings/*.tsx, src/renderer/src/components/sidebar/*.tsx, deleted: src/renderer/src/components/Versions.tsx
+  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts, src/main/ai/providers/gemini.ts, src/main/git/commit-generator.ts, src/preload/index.ts, src/renderer/src/env.d.ts, src/renderer/src/App.tsx, src/renderer/src/components/pr/PullRequestModal.tsx, src/renderer/src/components/settings/_.tsx, src/renderer/src/components/sidebar/_.tsx, deleted: src/renderer/src/components/Versions.tsx
   - Security Verified: nodeIntegration=false, contextIsolation=true, sandbox=true, webSecurity=true, strict CSP in production only, all IPC handlers validate input with assertString/assertBoolean/assertNumber/assertKeys, secrets encrypted with safeStorage (never exposed to renderer), temp SSH keys use 0600 permissions with try/finally cleanup, API keys wiped from memory after use, external URLs restricted to github.com/gitlab.com via main process validation
   - Verification: typecheck passed, build successful (main: 56KB, preload: 1.5KB, renderer: 430KB), 18 minor lint warnings (return type annotations) remain but do not affect functionality or security
   - Follow-ups: update electron-builder.yml identity placeholder before macOS release

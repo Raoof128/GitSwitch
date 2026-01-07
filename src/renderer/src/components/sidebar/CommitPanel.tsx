@@ -19,7 +19,9 @@ export function CommitPanel(): JSX.Element {
     setCommitTitle,
     setCommitBody,
     generateCommitMessage,
-    commit
+    commit,
+    autoPush,
+    updateSettings
   } = useRepoStore()
 
   const trimmedTitle = useMemo(() => commitTitle.trim(), [commitTitle])
@@ -141,8 +143,8 @@ export function CommitPanel(): JSX.Element {
           <input
             type="checkbox"
             id="auto-push"
-            checked={useRepoStore((s) => s.autoPush)}
-            onChange={(e) => useRepoStore.getState().updateSettings({ autoPush: e.target.checked })}
+            checked={autoPush}
+            onChange={(e) => updateSettings({ autoPush: e.target.checked })}
             className="h-3 w-3 rounded border-[var(--glass-border)] bg-[var(--ui-panel)] text-[var(--ui-accent)] focus:ring-[var(--ui-accent)]"
           />
           <label

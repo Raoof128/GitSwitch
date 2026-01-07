@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, dialog, session } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog, session, IpcMainInvokeEvent } from 'electron'
 import { promises as fs, existsSync } from 'fs'
 import { join, resolve } from 'path'
 import { homedir } from 'os'
@@ -231,93 +231,117 @@ async function registerIpcHandlers(): Promise<void> {
     return result.filePaths[0]
   })
 
-  ipcMain.handle('git:status', async (_event, repoPath: string) => {
+  ipcMain.handle('git:status', async (_event: IpcMainInvokeEvent, repoPath: string) => {
     const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
     ensureWatcher(normalized)
     return getStatus(normalized)
   })
 
-  ipcMain.handle('git:diff', async (_event, repoPath: string, mode: DiffMode) => {
-    const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
-    if (mode !== 'staged' && mode !== 'unstaged') {
-      throw new Error('Invalid diff mode.')
+  ipcMain.handle(
+    'git:diff',
+    async (_event: IpcMainInvokeEvent, repoPath: string, mode: DiffMode) => {
+      const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
+      if (mode !== 'staged' && mode !== 'unstaged') {
+        throw new Error('Invalid diff mode.')
+      }
+      return getDiff(normalized, mode)
     }
-    return getDiff(normalized, mode)
-  })
+  )
 
-  ipcMain.handle('git:commit', async (_event, repoPath: string, title: string, body?: string) => {
-    const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
-    const safeTitle = assertString(title, 'title').trim()
-    if (!safeTitle || safeTitle.length > 200) {
-      throw new Error('Invalid commit title.')
+  ipcMain.handle(
+    'git:commit',
+    async (_event: IpcMainInvokeEvent, repoPath: string, title: string, body?: string) => {
+      const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
+      const safeTitle = assertString(title, 'title').trim()
+      if (!safeTitle || safeTitle.length > 200) {
+        throw new Error('Invalid commit title.')
+      }
+      const safeBody = body === undefined ? undefined : assertString(body, 'body')
+      return commit(normalized, safeTitle, safeBody)
     }
-    const safeBody = body === undefined ? undefined : assertString(body, 'body')
-    return commit(normalized, safeTitle, safeBody)
-  })
+  )
 
-  ipcMain.handle('git:generateCommitMessage', async (_event, repoPath: string) => {
-    const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
-    return generateCommitMessage(normalized)
-  })
+  ipcMain.handle(
+    'git:generateCommitMessage',
+    async (_event: IpcMainInvokeEvent, repoPath: string) => {
+      const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
+      return generateCommitMessage(normalized)
+    }
+  )
 
-  ipcMain.handle('git:stageAll', async (_event, repoPath: string) => {
+  ipcMain.handle('git:stageAll', async (_event: IpcMainInvokeEvent, repoPath: string) => {
     const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
     await stageAll(normalized)
     return { ok: true }
   })
 
-  ipcMain.handle('git:getRemotes', async (_event, repoPath: string) => {
+  ipcMain.handle('git:getRemotes', async (_event: IpcMainInvokeEvent, repoPath: string) => {
     const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
     return getRemotes(normalized)
   })
 
-  ipcMain.handle('git:setRemoteOrigin', async (_event, repoPath: string, url: string) => {
-    const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
-    const safeUrl = assertString(url, 'url').trim()
+  ipcMain.handle(
+    'git:setRemoteOrigin',
+    async (_event: IpcMainInvokeEvent, repoPath: string, url: string) => {
+      const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
+      const safeUrl = assertString(url, 'url').trim()
 
-    // Validate URL format (SSH or HTTPS)
-    const isValidUrl =
-      safeUrl.startsWith('git@') || safeUrl.startsWith('https://') || safeUrl.startsWith('ssh://')
-    if (!safeUrl || !isValidUrl) {
-      throw new Error('Invalid remote URL format. Use SSH (git@...) or HTTPS (https://...).')
+      // Validate URL format (SSH or HTTPS)
+      const isValidUrl =
+        safeUrl.startsWith('git@') || safeUrl.startsWith('https://') || safeUrl.startsWith('ssh://')
+      if (!safeUrl || !isValidUrl) {
+        throw new Error('Invalid remote URL format. Use SSH (git@...) or HTTPS (https://...).')
+      }
+
+      await setRemoteOrigin(normalized, safeUrl)
+      return { ok: true }
     }
+  )
 
-    await setRemoteOrigin(normalized, safeUrl)
-    return { ok: true }
-  })
+  ipcMain.handle(
+    'git:ignore',
+    async (_event: IpcMainInvokeEvent, repoPath: string, filePath: string) => {
+      const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
+      const safeFilePath = assertString(filePath, 'filePath')
+      await addToGitignore(normalized, safeFilePath)
+      return { ok: true }
+    }
+  )
 
-  ipcMain.handle('git:ignore', async (_event, repoPath: string, filePath: string) => {
-    const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
-    const safeFilePath = assertString(filePath, 'filePath')
-    await addToGitignore(normalized, safeFilePath)
-    return { ok: true }
-  })
+  ipcMain.handle(
+    'git:push',
+    async (_event: IpcMainInvokeEvent, repoPath: string, accountId: string) => {
+      const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
+      const safeAccountId = assertString(accountId, 'accountId')
+      const settings = getSettings()
+      return pushWithIdentity(normalized, safeAccountId, settings.strictHostKeyChecking)
+    }
+  )
 
-  ipcMain.handle('git:push', async (_event, repoPath: string, accountId: string) => {
-    const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
-    const safeAccountId = assertString(accountId, 'accountId')
-    const settings = getSettings()
-    return pushWithIdentity(normalized, safeAccountId, settings.strictHostKeyChecking)
-  })
+  ipcMain.handle(
+    'git:pull',
+    async (_event: IpcMainInvokeEvent, repoPath: string, accountId: string) => {
+      const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
+      const safeAccountId = assertString(accountId, 'accountId')
+      const settings = getSettings()
+      return pullWithIdentity(normalized, safeAccountId, settings.strictHostKeyChecking)
+    }
+  )
 
-  ipcMain.handle('git:pull', async (_event, repoPath: string, accountId: string) => {
-    const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
-    const safeAccountId = assertString(accountId, 'accountId')
-    const settings = getSettings()
-    return pullWithIdentity(normalized, safeAccountId, settings.strictHostKeyChecking)
-  })
-
-  ipcMain.handle('git:fetch', async (_event, repoPath: string, accountId: string) => {
-    const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
-    const safeAccountId = assertString(accountId, 'accountId')
-    const settings = getSettings()
-    await fetchWithIdentity(normalized, safeAccountId, settings.strictHostKeyChecking)
-    return { ok: true }
-  })
+  ipcMain.handle(
+    'git:fetch',
+    async (_event: IpcMainInvokeEvent, repoPath: string, accountId: string) => {
+      const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
+      const safeAccountId = assertString(accountId, 'accountId')
+      const settings = getSettings()
+      await fetchWithIdentity(normalized, safeAccountId, settings.strictHostKeyChecking)
+      return { ok: true }
+    }
+  )
 
   ipcMain.handle(
     'git:createPullRequest',
-    async (_event, repoPath: string, options: PullRequestOptions) => {
+    async (_event: IpcMainInvokeEvent, repoPath: string, options: PullRequestOptions) => {
       const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
       if (!isRecord(options)) {
         throw new Error('Invalid pull request options.')
@@ -347,7 +371,7 @@ async function registerIpcHandlers(): Promise<void> {
   ipcMain.handle('settings:get', async () => getSettingsPublic())
   ipcMain.handle(
     'settings:update',
-    async (_event, input: Partial<ReturnType<typeof getSettings>>) => {
+    async (_event: IpcMainInvokeEvent, input: Partial<ReturnType<typeof getSettings>>) => {
       if (!isRecord(input)) {
         throw new Error('Invalid settings payload.')
       }
@@ -453,7 +477,7 @@ async function registerIpcHandlers(): Promise<void> {
     }
   })
 
-  ipcMain.handle('secrets:save', async (_event, input: unknown) => {
+  ipcMain.handle('secrets:save', async (_event: IpcMainInvokeEvent, input: unknown) => {
     try {
       if (!isRecord(input)) {
         throw new Error('Invalid secret payload.')
@@ -518,7 +542,7 @@ async function registerIpcHandlers(): Promise<void> {
     }
   })
 
-  ipcMain.handle('secrets:delete', async (_event, input: unknown) => {
+  ipcMain.handle('secrets:delete', async (_event: IpcMainInvokeEvent, input: unknown) => {
     try {
       if (!isRecord(input)) {
         throw new Error('Invalid secret payload.')
@@ -560,7 +584,7 @@ async function registerIpcHandlers(): Promise<void> {
     }
   })
 
-  ipcMain.handle('shell:openExternal', async (_event, url: string) => {
+  ipcMain.handle('shell:openExternal', async (_event: IpcMainInvokeEvent, url: string) => {
     const safeUrl = assertString(url, 'url')
     if (!isAllowedExternalUrl(safeUrl)) {
       throw new Error('URL not allowed.')

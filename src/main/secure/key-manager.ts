@@ -2,6 +2,7 @@ import { app, safeStorage } from 'electron'
 import { promises as fs } from 'fs'
 import { join } from 'path'
 import { randomUUID } from 'crypto'
+import ElectronStore from 'electron-store'
 import type { Account } from '../../index'
 
 type StoreSchema = {
@@ -26,19 +27,6 @@ type StoreSchema = {
     theme: 'dark'
   }
 }
-
-type ElectronStoreType<T> = {
-  get<K extends keyof T>(key: K, defaultValue?: T[K]): T[K]
-  set<K extends keyof T>(key: K, value: T[K]): void
-  set(value: Partial<T>): void
-}
-
-// Handle ESM/CJS interop for electron-store
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const ElectronStoreModule = require('electron-store')
-const ElectronStore = (ElectronStoreModule.default || ElectronStoreModule) as new <T>(
-  options: unknown
-) => ElectronStoreType<T>
 
 const DEFAULT_SETTINGS: StoreSchema['settings'] = {
   aiCloudModel: 'gpt-4o-mini',

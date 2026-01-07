@@ -2,9 +2,12 @@ import type { AiContext, AiProvider, CommitMessage } from '../interfaces'
 import { buildUserPrompt, CYBERSECURITY_INSTRUCTION, SYSTEM_PROMPT } from '../prompts'
 import { parseAiResponse } from '../helpers'
 
+/** Default Ollama endpoint for local AI generation */
+const DEFAULT_OLLAMA_URL = 'http://localhost:11434/api/generate'
+
 export class LocalProvider implements AiProvider {
   // Config usually includes the base URL
-  constructor(private baseUrl: string = 'http://localhost:11434/api/generate') {}
+  constructor(private baseUrl: string = DEFAULT_OLLAMA_URL) {}
 
   async generate(
     context: AiContext,
@@ -57,12 +60,19 @@ export class LocalProvider implements AiProvider {
         })
       }
 
-      if (!response.ok) return null
-
-      const data = (await response.json()) as {
-        response?: string
-        choices?: Array<{ message?: { content?: string } }>
+      if (!response.ok) {
+        console.error(`Local AI request failed with status ${response.status}`)
+        return null
       }
+
+      let data: { response?: string; choices?: Array<{ message?: { content?: string } }> }
+      try {
+        data = (await response.json()) as typeof data
+      } catch (parseError) {
+        console.error('Failed to parse local AI response as JSON:', parseError)
+        return null
+      }
+
       let rawText = ''
 
       if (isOllamaGenerate) {
@@ -73,7 +83,12 @@ export class LocalProvider implements AiProvider {
 
       return parseAiResponse(rawText || '')
     } catch (error) {
-      console.error('Local generation failed:', error)
+      // Log meaningful error context for debugging
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.error(`Local AI request timed out after ${timeoutMs}ms`)
+      } else {
+        console.error('Local generation failed:', error)
+      }
       return null
     } finally {
       clearTimeout(timer)

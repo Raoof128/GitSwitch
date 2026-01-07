@@ -1,7 +1,4 @@
-// Handle ESM/CJS interop for simple-git
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const simpleGitModule = require('simple-git')
-const simpleGit = simpleGitModule.simpleGit || simpleGitModule.default?.simpleGit || simpleGitModule
+import { simpleGit } from 'simple-git'
 import type { GitResponseError } from 'simple-git'
 import { promises as fs, rmSync, existsSync } from 'fs'
 import { tmpdir } from 'os'
@@ -223,8 +220,7 @@ async function checkDiffSize(
     const linesMatch = stats.match(/(\d+)\s+insertion/)
     const deletionsMatch = stats.match(/(\d+)\s+deletion/)
 
-    const totalLines =
-      parseInt(linesMatch?.[1] || '0') + parseInt(deletionsMatch?.[1] || '0')
+    const totalLines = parseInt(linesMatch?.[1] || '0') + parseInt(deletionsMatch?.[1] || '0')
 
     if (totalLines > maxLines) {
       return { ok: false, reason: `Diff is too large (${totalLines} lines > ${maxLines} limit).` }

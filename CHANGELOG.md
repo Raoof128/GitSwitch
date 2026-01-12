@@ -4,6 +4,14 @@
 
 - Raouf: (entries appended below)
 - Raouf: 2026-01-12 (Australia/Sydney)
+  - Scope: Build System (ESM Interop Fix)
+  - Summary: Fixed `TypeError: ElectronStore is not a constructor` and potential runtime errors with other ESM dependencies.
+    1. FIX: Configured `electron-vite` to bundle ESM-only dependencies (`electron-store`, `chokidar`, `@google/genai`) into the Main process CJS build. This ensures correct default export handling and prevents `ERR_REQUIRE_ESM`.
+  - Files: electron.vite.config.ts
+  - Verification: `npm run build` passed. Main bundle size increased ~1.2MB reflecting bundled deps.
+  - Follow-ups: None.
+
+- Raouf: 2026-01-12 (Australia/Sydney)
   - Scope: AI Integration (Model Updates)
   - Summary: Added support for latest Google Gemini models (Gemini 3, 2.5, 2.0).
     1. NEW: Added `gemini-3-pro`, `gemini-3-flash`, `gemini-2.5-pro`, `gemini-2.5-flash`, `gemini-2.0-flash` (stable), and `gemini-2.0-pro-exp`.

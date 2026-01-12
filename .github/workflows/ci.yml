@@ -28,5 +28,8 @@ jobs:
       - name: Type Check
         run: npm run typecheck
 
+      - name: Test
+        run: npm test
+
       - name: Build
         run: npm run build:linux # Linux build is fastest for CI check

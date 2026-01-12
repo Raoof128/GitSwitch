@@ -58,6 +58,10 @@ npm run build:win
 npm run build:linux
 ```
 
+## 📐 Architecture
+
+For a high-level overview of the application's structure, security model, and data flow, please read our [Architecture Guide](ARCHITECTURE.md).
+
 ## 🤖 AI Configuration
 
 1.  Get a generic API Key from [Google AI Studio](https://aistudio.google.com/).

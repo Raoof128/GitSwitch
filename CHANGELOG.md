@@ -4,6 +4,17 @@
 
 - Raouf: (entries appended below)
 - Raouf: 2026-01-12 (Australia/Sydney)
+  - Scope: Project Audit & Professional Standards
+  - Summary: Comprehensive audit to align with production-grade standards.
+    1. DOCS: Added `ARCHITECTURE.md` detailing system design and security model. Updated `README.md`, `CONTRIBUTING.md`, and `CODE_OF_CONDUCT.md` to professional standards.
+    2. CI/CD: Added `npm test` step to GitHub Actions workflow for automated verification.
+    3. CLEANUP: Removed debug console logging from AI commit generation logic.
+    4. QUALITY: Verified full lint/typecheck/test pass.
+  - Files: ARCHITECTURE.md, README.md, CONTRIBUTING.md, CODE_OF_CONDUCT.md, .github/workflows/ci.yml, src/main/ai/commit-generate.ts
+  - Verification: `npm run lint` (clean), `npm run typecheck` (clean), `npm test` (passed).
+  - Follow-ups: None.
+
+- Raouf: 2026-01-12 (Australia/Sydney)
   - Scope: Build System (Runtime Fix)
   - Summary: Fixed `Uncaught Exception: Error: Could not resolve "bufferutil"` by explicitly externalizing `ws` optional peer dependencies.
     1. FIX: Added `rollupOptions.external` for `bufferutil` and `utf-8-validate` in `electron.vite.config.ts`. This allows the bundled `ws` module to fail gracefully when these optional native modules are missing, instead of the bundler injecting throwing stubs.

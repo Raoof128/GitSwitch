@@ -202,11 +202,6 @@ function getProvider(
 
 export async function generateCommitMessage(repoPath: string): Promise<CommitMessage> {
   const settings = getSettings()
-  console.log('[AI] Settings state:', {
-    provider: settings.aiProvider,
-    cloudModel: settings.aiCloudModel,
-    timeout: settings.aiTimeoutSec
-  })
 
   // 1. Collect Context
   let context: AiContext
@@ -288,7 +283,6 @@ export async function generateCommitMessage(repoPath: string): Promise<CommitMes
   try {
     const timeout = settings.aiTimeoutSec > 0 ? settings.aiTimeoutSec * 1000 : DEFAULT_TIMEOUT_MS
     const result = await selection.provider.generate(context, apiKey, selection.model, timeout)
-    console.log('[AI] Raw provider result:', result)
 
     // Wipe key
     apiKey = ''

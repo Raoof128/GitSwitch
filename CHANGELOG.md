@@ -4,6 +4,14 @@
 
 - Raouf: (entries appended below)
 - Raouf: 2026-01-12 (Australia/Sydney)
+  - Scope: Build System (Runtime Fix)
+  - Summary: Fixed `Uncaught Exception: Error: Could not resolve "bufferutil"` by explicitly externalizing `ws` optional peer dependencies.
+    1. FIX: Added `rollupOptions.external` for `bufferutil` and `utf-8-validate` in `electron.vite.config.ts`. This allows the bundled `ws` module to fail gracefully when these optional native modules are missing, instead of the bundler injecting throwing stubs.
+  - Files: electron.vite.config.ts
+  - Verification: `npm run build` passed.
+  - Follow-ups: None.
+
+- Raouf: 2026-01-12 (Australia/Sydney)
   - Scope: Build System (ESM Interop Fix)
   - Summary: Fixed `TypeError: ElectronStore is not a constructor` and potential runtime errors with other ESM dependencies.
     1. FIX: Configured `electron-vite` to bundle ESM-only dependencies (`electron-store`, `chokidar`, `@google/genai`) into the Main process CJS build. This ensures correct default export handling and prevents `ERR_REQUIRE_ESM`.

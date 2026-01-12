@@ -4,7 +4,12 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin({ exclude: ['electron-store', 'chokidar', '@google/genai'] })]
+    plugins: [externalizeDepsPlugin({ exclude: ['electron-store', 'chokidar', '@google/genai'] })],
+    build: {
+      rollupOptions: {
+        external: ['bufferutil', 'utf-8-validate']
+      }
+    }
   },
   preload: {
     plugins: [externalizeDepsPlugin()]

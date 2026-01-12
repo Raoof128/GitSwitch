@@ -29,7 +29,7 @@ type StoreSchema = {
 }
 
 const DEFAULT_SETTINGS: StoreSchema['settings'] = {
-  aiCloudModel: 'gpt-4o-mini',
+  aiCloudModel: 'gemini-3-flash',
   aiLocalModel: 'qwen2.5-coder:7b',
   aiLocalUrl: 'http://localhost:11434/api/generate',
   aiProvider: 'offline',

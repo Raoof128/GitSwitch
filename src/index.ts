@@ -66,7 +66,16 @@ export type PublishStatus = {
   url?: string
 }
 
-export type AiCloudModel = 'gpt-4o-mini' | 'gpt-4o' | 'gemini-2.0-flash-exp'
+export type AiCloudModel =
+  | 'gpt-4o-mini'
+  | 'gpt-4o'
+  | 'gemini-2.0-flash-exp'
+  | 'gemini-2.0-flash'
+  | 'gemini-2.0-pro-exp'
+  | 'gemini-2.5-flash'
+  | 'gemini-2.5-pro'
+  | 'gemini-3-flash'
+  | 'gemini-3-pro'
 
 export type Account = {
   id: string

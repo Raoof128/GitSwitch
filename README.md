@@ -10,11 +10,12 @@
 ## 🚀 Features
 
 *   **Multi-Account Management**: Easily switch between GitHub/GitLab accounts (Personal, Work, etc.).
-*   **AI Commit Generation**: Automatically generate semantic commit titles and detailed descriptions using Gemini 1.5 Flash.
-*   **Smart Diff Viewer**: View staged and unstaged changes with syntax highlighting.
+*   **AI Commit Generation**: Automatically generate semantic commit titles and detailed descriptions using the latest **Gemini 3** models.
+*   **Smart Diff Viewer**: View staged and unstaged changes with syntax highlighting and large-diff protection.
+*   **Security Hardened**: Enforced timeouts, input sanitization, and secure OS-keychain storage for all secrets.
 *   **Drag & Drop**: Add repositories by simply dragging folders.
-*   **Privacy First**: API keys are stored securely in your OS keychain.
-*   **Dark Mode**: Sleek, modern URL-inspired interface.
+*   **Privacy First**: API keys are redacted from logs and wiped from memory immediately after use.
+*   **Dark Mode**: Sleek, modern URL-inspired interface with Cyberpunk aesthetics.
 
 ## 🛠️ Tech Stack
 

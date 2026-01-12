@@ -3,6 +3,37 @@
 ## Unreleased
 
 - Raouf: (entries appended below)
+- Raouf: 2026-01-12 (Australia/Sydney)
+  - Scope: AI Integration (Model Updates)
+  - Summary: Added support for latest Google Gemini models (Gemini 3, 2.5, 2.0).
+    1. NEW: Added `gemini-3-pro`, `gemini-3-flash`, `gemini-2.5-pro`, `gemini-2.5-flash`, `gemini-2.0-flash` (stable), and `gemini-2.0-pro-exp`.
+    2. DEFAULT: Updated default cloud model to `gemini-3-flash` for improved speed and cost-efficiency.
+    3. UX: Reorganized model selection dropdown into clear groups (Gemini 3, 2.5, 2.0, 1.5, Legacy).
+  - Files: src/index.ts, src/main/secure/key-manager.ts, src/main/ai/providers/gemini.ts, src/renderer/src/components/settings/SettingsIntegrations.tsx
+  - Verification: `npm run typecheck`, `npm run lint` (clean).
+  - Follow-ups: None.
+
+- Raouf: 2026-01-12 (Australia/Sydney)
+  - Scope: Production Readiness Audit (Final Polish)
+  - Summary: Completed final hardening pass. Fixed security timeouts, watcher correctness, and build configuration.
+    1. SECURITY: Added 30s timeout to `git pull` and `git fetch` operations to prevent network hangs.
+    2. CORRECTNESS: Updated file watcher to monitor the entire repository root (respecting .gitignore) instead of just `src/app/lib`, fixing change detection for projects with different structures.
+    3. RELEASE: Disabled placeholder code signing identity in `electron-builder.yml` to allow successful ad-hoc/unsigned builds in CI/dev environments.
+  - Files: src/main/git/git-service.ts, src/main/git/watcher.ts, electron-builder.yml
+  - Verification: `npm run typecheck`, `npm run lint` (clean), manual review of logic.
+  - Follow-ups: None. Ready for release candidate.
+
+- Raouf: 2026-01-12 (Australia/Sydney)
+  - Scope: Dependency Updates & Test Infrastructure
+  - Summary: Updated all outdated dependencies and added test scripts to package.json for improved test coverage.
+    1. HIGH: Updated 8 outdated dependencies (@google/genai 1.34.0→1.35.0, @types/node 22.19.1→25.0.6, @types/react 19.2.7→19.2.8, electron-builder 26.0.12→26.4.0, eslint-plugin-react-hooks 5.2.0→7.0.1, framer-motion 12.23.26→12.25.0, tailwindcss 3.4.13→3.4.19, vite 7.2.6→7.3.1).
+    2. MEDIUM: Added new test scripts (test:unit, test:integration, test:all, test:coverage) to package.json.
+    3. MEDIUM: Verified build, lint, typecheck, and original tests pass after updates.
+    4. LOW: Confirmed 0 vulnerabilities after dependency updates via `npm audit`.
+  - Files: package.json
+  - Verification: `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build` all pass with 0 errors.
+  - Follow-ups: Add comprehensive unit and integration tests for git operations, AI providers, and key management once test environment is properly configured with mocked electron-store.
+
 - Raouf: 2026-01-07 (Australia/Sydney)
   - Scope: Code Quality Audit (Comprehensive Fix)
   - Summary: Fixed 17 audit issues across Critical, High, and Medium severity levels. Resolved all TypeScript, error handling, security, and performance issues identified in the codebase audit.

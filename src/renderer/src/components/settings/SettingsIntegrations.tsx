@@ -172,16 +172,26 @@ export function SettingsIntegrations(): JSX.Element {
             onChange={(event) => setCloudModel(event.target.value)}
             className="mb-2 w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel-muted)] px-2 py-1 text-xs"
           >
-            <optgroup label="Google Gemini 1.5 (Recommended)">
-              <option value="gemini-1.5-flash">Gemini 1.5 Flash (Fast & Cheap)</option>
-              <option value="gemini-1.5-flash-8b">Gemini 1.5 Flash 8B (Fastest)</option>
-              <option value="gemini-1.5-pro">Gemini 1.5 Pro (Best Quality)</option>
+            <optgroup label="Google Gemini 3 (Latest)">
+              <option value="gemini-3-flash">Gemini 3 Flash (Fastest & Efficient)</option>
+              <option value="gemini-3-pro">Gemini 3 Pro (Most Capable)</option>
             </optgroup>
-            <optgroup label="Google Gemini Experimental">
-              <option value="gemini-exp-1206">Gemini Exp 1206 (Reasoning)</option>
+            <optgroup label="Google Gemini 2.5">
+              <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+              <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+            </optgroup>
+            <optgroup label="Google Gemini 2.0">
+              <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+              <option value="gemini-2.0-pro-exp">Gemini 2.0 Pro (Exp)</option>
+            </optgroup>
+            <optgroup label="Google Gemini 1.5 (Legacy)">
+              <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+              <option value="gemini-1.5-flash-8b">Gemini 1.5 Flash 8B</option>
+              <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+            </optgroup>
+            <optgroup label="Legacy / Experimental">
               <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash Exp</option>
-            </optgroup>
-            <optgroup label="Legacy">
+              <option value="gemini-exp-1206">Gemini Exp 1206</option>
               <option value="gemini-1.0-pro">Gemini 1.0 Pro</option>
             </optgroup>
           </select>

@@ -22,7 +22,7 @@ directories:
     entitlementsInherit: build/entitlements.mac.plist
     extendInfo:
     notarize: false
-    identity: 'Developer ID Application: YOUR_NAME (TEAM_ID)' # Replace with actual signing identity
+    # identity: 'Developer ID Application: YOUR_NAME (TEAM_ID)' # Replace with actual signing identity
   dmg:
     artifactName: ${name}-${version}.${ext}
   linux:

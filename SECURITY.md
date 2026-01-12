@@ -17,6 +17,8 @@ We take security seriously. If you discover a security vulnerability, please do 
 
 ## Security Best Practices
 
-*   **API Keys**: Never commit API keys (Gemini, GitHub Tokens) to the repository. The application uses secure storage for sensitive data.
-*   **Dependencies**: We regularly audit dependencies for vulnerabilities using `npm audit`.
-*   **Input Validation**: All AI inputs and Git commands are sanitized to prevent injection attacks.
+*   **Secure Storage**: API keys and tokens (Gemini, GitHub, GitLab) are encrypted at rest using the OS keychain (`safeStorage`) and never exposed to the renderer process.
+*   **Memory Hygiene**: Sensitive credentials are scrubbed from memory immediately after use.
+*   **Network Security**: All Git operations enforce strict timeouts to prevent denial-of-service via hanging connections.
+*   **Input Validation**: All IPC handlers and Git commands are strictly typed and sanitized to prevent injection attacks.
+*   **Content Security Policy**: A strict CSP is enforced in production builds.

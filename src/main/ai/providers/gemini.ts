@@ -65,7 +65,7 @@ export class GeminiProvider implements AiProvider {
     // No try-catch here - let the orchestrator handle the error so it's visible to the user
     // Configure to accept all content (Git diffs can be flagged falsely as unsafe)
     const responsePromise = ai.models.generateContent({
-      model: model || 'gemini-1.5-flash',
+      model: model || 'gemini-3-flash',
       contents: [
         {
           role: 'user',

@@ -520,7 +520,8 @@ export async function pullWithIdentity(
   const sshCommand = `ssh -i "${tempKeyPath}" -o IdentitiesOnly=yes -o StrictHostKeyChecking=${strictValue}`
 
   try {
-    const git = simpleGit({ baseDir: repoPath })
+    // Enforce 30s timeout for network operations
+    const git = simpleGit({ baseDir: repoPath, timeout: { block: 30000 } })
     // Configure git to use the SSH command for this operation
     const env = { ...process.env, GIT_SSH_COMMAND: sshCommand }
 
@@ -551,7 +552,9 @@ export async function fetchWithIdentity(
   const sshCommand = `ssh -i "${tempKeyPath}" -o IdentitiesOnly=yes -o StrictHostKeyChecking=${strictValue}`
 
   try {
-    const git = simpleGit({ baseDir: repoPath })
+    // Enforce 30s timeout for network operations
+    const git = simpleGit({ baseDir: repoPath, timeout: { block: 30000 } })
+    // Configure git to use the SSH command for this operation
     const env = { ...process.env, GIT_SSH_COMMAND: sshCommand }
     await git.env(env).fetch(['--all'])
   } catch (error) {

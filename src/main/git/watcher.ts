@@ -1,5 +1,4 @@
 import chokidar, { type FSWatcher } from 'chokidar'
-import { join } from 'path'
 import { getStatus } from './git-service'
 import type { GitStatusPayload } from '../../index'
 
@@ -14,14 +13,6 @@ export function createRepoWatcher(repoPath: string, onStatus: StatusHandler): FS
   if (repoPath.length > 4096) {
     throw new Error('Repository path too long for watching.')
   }
-
-  const headPath = join(repoPath, '.git', 'HEAD')
-  const indexPath = join(repoPath, '.git', 'index')
-  const configPath = join(repoPath, '.git', 'config')
-  // Targeted watching of directories that actually change frequently
-  const srcPath = join(repoPath, 'src')
-  const appPath = join(repoPath, 'app')
-  const libPath = join(repoPath, 'lib')
 
   let timer: NodeJS.Timeout | null = null
   let consecutiveErrors = 0
@@ -67,7 +58,9 @@ export function createRepoWatcher(repoPath: string, onStatus: StatusHandler): FS
     }, 300) // Increase debounce to 300ms
   }
 
-  const watcher = chokidar.watch([headPath, indexPath, configPath, srcPath, appPath, libPath], {
+  // Watch the entire repo path to ensure we catch changes in root files or other directories
+  // The ignored filter handles node_modules and .git effectively
+  const watcher = chokidar.watch(repoPath, {
     ignored: (path) => {
       if (path.length > 4096) return true
       if (path.includes('node_modules')) return true

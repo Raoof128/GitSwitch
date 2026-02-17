@@ -3,6 +3,23 @@
 ## Unreleased
 
 - Raouf: (entries appended below)
+- Raouf: 2026-02-17 (Australia/Sydney)
+  - Scope: Metadata Update
+  - Summary: Updated developer contact email to raoof.r12@gmail.com across project metadata (package.json, electron-builder.yml).
+  - Files: package.json, electron-builder.yml
+  - Verification: Manual verification of file content.
+
+- Raouf: 2026-02-17 (Australia/Sydney)
+  - Scope: Production Readiness & Installer
+  - Summary: Finalized app for production release. Unified build scripts, added `dist` for installers, and corrected app identity.
+    1. SCRIPTS: Added `npm run dist` to create installers for the current OS.
+    2. SCRIPTS: Unified `build:*` scripts to include mandatory `npm run typecheck` and `npm run lint` for release safety.
+    3. BUILD: Corrected `AppUserModelId` to `com.gitswitch.app` for proper Windows taskbar/notification behavior.
+    4. CONFIG: Refined `electron-builder.yml` categories and targets; updated maintainer metadata.
+    5. DOCS: Updated README.md with clearer build instructions and current homepage.
+  - Files: package.json, src/main/index.ts, electron-builder.yml, README.md
+  - Verification: `npm run build`, `npm run typecheck`, and `npm run lint` all pass.
+
 - Raouf: 2026-01-12 (Australia/Sydney)
   - Scope: Project Audit & Professional Standards
   - Summary: Comprehensive audit to align with production-grade standards.

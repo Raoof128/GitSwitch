@@ -45,20 +45,28 @@
 
 ## 🏗️ Building
 
-To create a production build for your OS:
+To create a production-ready installer for your current OS:
 
 ```bash
-# macOS
+npm run dist
+```
+
+Alternatively, build specifically for a target platform:
+
+```bash
+# macOS (.dmg)
 npm run build:mac
 
-# Windows
+# Windows (.exe)
 npm run build:win
 
-# Linux
+# Linux (.AppImage, .deb)
 npm run build:linux
 ```
 
-## 📐 Architecture
+All build commands automatically run type-checking and linting to ensure production quality. Built artifacts are located in the `dist/` directory.
+
+## 📐 Architecture & Security
 
 For a high-level overview of the application's structure, security model, and data flow, please read our [Architecture Guide](ARCHITECTURE.md).
 

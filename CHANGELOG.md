@@ -9,7 +9,7 @@
     1. SECURITY: Hardened external URL validation, exposed secret-storage failures to the UI, and added trusted-host coverage tests.
     2. RELIABILITY: Fixed default-account fallback for pull/fetch flows, aligned renderer settings defaults with persisted defaults, and tightened shared IPC typing.
     3. TESTING: Added focused tests for URL policy, AI helpers, git URL parsing, and account-selection logic; enabled `vitest` coverage reporting.
-    4. DOCS/CONFIG: Rewrote README, architecture, security, contributing, and conduct docs; added API reference, usage examples, troubleshooting docs, Dependabot, CODEOWNERS, security workflow, devcontainer support, build-resource fixes, and macOS entitlements.
+    4. DOCS/CONFIG: Rewrote README, architecture, security, contributing, and conduct docs; added API reference, usage examples, troubleshooting docs, CODEOWNERS, security workflow, devcontainer support, build-resource fixes, and macOS entitlements.
     5. DEPENDENCIES: Added `@vitest/coverage-v8`, refreshed the lockfile, and ran `npm audit fix` to reduce the audit report to 0 vulnerabilities.
   - Files: src/index.ts, src/main/index.ts, src/main/security/*, src/main/ai/helpers.test.ts, src/main/git/git-utils.test.ts, src/main/secure/key-manager.ts, src/preload/*, src/renderer/src/**/*, vitest.config.ts, package.json, package-lock.json, README.md, ARCHITECTURE.md, SECURITY.md, CONTRIBUTING.md, CODE_OF_CONDUCT.md, electron-builder.yml, .gitignore, .github/*, docs/*, .devcontainer/*, resources/entitlements.mac.plist
   - Verification: `npm run lint`, `npm run typecheck`, `npm test`, `npm run test:coverage`, `npm run build`, and `npm audit --audit-level=high` all pass.
@@ -640,3 +640,15 @@
   - Files: AGENT.md, CHANGELOG.md, src/main/git/git-service.ts
   - Verification: not run (not requested)
   - Follow-ups: run `npm run dev` and confirm new repos no longer error on diff
+- Raouf: 2026-03-11 (Australia/Sydney)
+  - Scope: renderer theme
+  - Summary: apply the Jungle Green, Strawberry Red, Orange, Pacific Blue, and Sand Dune palette across renderer theme tokens, status colors, diff highlights, glass surfaces, and accent glows
+  - Files: AGENT.md, CHANGELOG.md, src/renderer/src/App.tsx, src/renderer/src/assets/main.css
+  - Verification: `npm run lint`
+  - Follow-ups: run `npm run dev` and visually confirm the refreshed theme across desktop views
+- Raouf: 2026-03-11 (Australia/Sydney)
+  - Scope: repo automation
+  - Summary: remove the GitHub Dependabot configuration and clean up the changelog reference so dependency updates remain manual
+  - Files: AGENT.md, CHANGELOG.md, .github/dependabot.yml
+  - Verification: not run (not requested)
+  - Follow-ups: none

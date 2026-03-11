@@ -374,10 +374,10 @@ function App(): JSX.Element {
                     />
                     <span
                       aria-hidden="true"
-                      className="absolute inset-0 rounded-full border border-[var(--ui-accent-border)]/70 opacity-70 shadow-[0_0_8px_rgba(136,192,208,0.35)] motion-safe:animate-spin motion-safe:[animation-duration:8s] motion-reduce:animate-none"
+                      className="absolute inset-0 rounded-full border border-[var(--ui-accent-border)]/70 opacity-70 shadow-[0_0_8px_rgba(43,158,179,0.35)] motion-safe:animate-spin motion-safe:[animation-duration:8s] motion-reduce:animate-none"
                     />
                     <svg
-                      className="relative h-3.5 w-3.5 text-[var(--ui-text)] drop-shadow-[0_0_6px_rgba(136,192,208,0.35)]"
+                      className="relative h-3.5 w-3.5 text-[var(--ui-text)] drop-shadow-[0_0_6px_rgba(43,158,179,0.35)]"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -391,7 +391,7 @@ function App(): JSX.Element {
                     </svg>
                     <span
                       aria-hidden="true"
-                      className="absolute -right-0.5 -top-0.5 h-1.5 w-1.5 rounded-full bg-[var(--ui-accent)] shadow-[0_0_8px_rgba(136,192,208,0.7)] motion-safe:animate-pulse motion-safe:[animation-duration:2.4s] motion-reduce:animate-none"
+                      className="absolute -right-0.5 -top-0.5 h-1.5 w-1.5 rounded-full bg-[var(--ui-accent)] shadow-[0_0_8px_rgba(43,158,179,0.7)] motion-safe:animate-pulse motion-safe:[animation-duration:2.4s] motion-reduce:animate-none"
                     />
                   </span>
                 </button>

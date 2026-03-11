@@ -634,3 +634,15 @@
   - Files: AGENT.md, CHANGELOG.md, src/main/git/git-service.ts
   - Verification: not run (not requested)
   - Follow-ups: run `npm run dev` and confirm new repos no longer error on diff
+- Raouf: 2026-03-11 (Australia/Sydney)
+  - Scope: renderer theme
+  - Summary: apply the Jungle Green, Strawberry Red, Orange, Pacific Blue, and Sand Dune palette across renderer theme tokens, status colors, diff highlights, glass surfaces, and accent glows
+  - Files: AGENT.md, CHANGELOG.md, src/renderer/src/App.tsx, src/renderer/src/assets/main.css
+  - Verification: `npm run lint`
+  - Follow-ups: run `npm run dev` and visually confirm the refreshed theme across desktop views
+- Raouf: 2026-03-11 (Australia/Sydney)
+  - Scope: repo automation
+  - Summary: remove the GitHub Dependabot configuration and document that dependency updates are now handled manually
+  - Files: AGENT.md, CHANGELOG.md, .github/dependabot.yml
+  - Verification: not run (not requested)
+  - Follow-ups: none

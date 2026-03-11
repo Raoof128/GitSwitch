@@ -7,68 +7,56 @@
   font-size: clamp(13px, 0.8vw + 8px, 16px);
   color-scheme: dark;
 
-  /* Quick Nord Palette */
-  --ui-bg: #2e3440;
-  /* Background */
-  --ui-panel: #3b4252;
-  /* Surface */
-  --ui-panel-muted: #303646;
-  /* Secondary surface */
-  --ui-border: #434c5e;
-  /* Structural outline */
-  --ui-border-soft: #4c566a;
-  --ui-hover: #4c566a;
+  /* Custom Palette: Jungle Green / Strawberry Red / Orange / Pacific Blue / Sand Dune */
+  --ui-bg: #121d1c;
+  --ui-panel: #1b2c29;
+  --ui-panel-muted: #162523;
+  --ui-border: #35524e;
+  --ui-border-soft: #4f7269;
+  --ui-hover: rgba(43, 158, 179, 0.14);
 
-  --ui-accent: #88c0d0;
-  /* Frost accent */
-  --ui-accent-bg: rgba(136, 192, 208, 0.12);
-  --ui-accent-bg-strong: rgba(136, 192, 208, 0.2);
-  --ui-accent-border: rgba(136, 192, 208, 0.45);
-  --ui-text: #eceff4;
-  /* Snow text */
-  --ui-text-muted: #d8dee9;
-  /* Softer snow */
+  --ui-accent: #2b9eb3;
+  --ui-accent-bg: rgba(43, 158, 179, 0.14);
+  --ui-accent-bg-strong: rgba(43, 158, 179, 0.24);
+  --ui-accent-border: rgba(43, 158, 179, 0.44);
+  --ui-text: #f4efdc;
+  --ui-text-muted: #dbd5b5;
 
   /* Functional status */
-  --ui-status-added: #a3be8c;
-  /* Success/Git added */
-  --ui-status-modified: #ebcb8b;
-  /* Warning */
-  --ui-status-deleted: #bf616a;
-  /* Error */
-  --ui-status-untracked: #81a1c1;
-  /* Accent alternate */
-  --ui-status-added-bg: rgba(163, 190, 140, 0.12);
-  --ui-status-added-border: rgba(163, 190, 140, 0.35);
-  --ui-status-modified-bg: rgba(235, 203, 139, 0.12);
-  --ui-status-modified-border: rgba(235, 203, 139, 0.35);
-  --ui-status-deleted-bg: rgba(191, 97, 106, 0.12);
-  --ui-status-deleted-border: rgba(191, 97, 106, 0.35);
+  --ui-status-added: #44af69;
+  --ui-status-modified: #fcab10;
+  --ui-status-deleted: #f8333c;
+  --ui-status-untracked: #2b9eb3;
+  --ui-status-added-bg: rgba(68, 175, 105, 0.14);
+  --ui-status-added-border: rgba(68, 175, 105, 0.36);
+  --ui-status-modified-bg: rgba(252, 171, 16, 0.14);
+  --ui-status-modified-border: rgba(252, 171, 16, 0.36);
+  --ui-status-deleted-bg: rgba(248, 51, 60, 0.14);
+  --ui-status-deleted-border: rgba(248, 51, 60, 0.36);
 
   /* Code syntax */
-  --code-keyword: #81a1c1;
-  --code-function: #88c0d0;
-  --code-string: #a3be8c;
+  --code-keyword: #2b9eb3;
+  --code-function: #44af69;
+  --code-string: #fcab10;
 
-  /* Additional Frost accents */
-  --brand-cyan: #81a1c1;
+  --brand-cyan: #2b9eb3;
 
-  --ui-diff-insert: rgba(163, 190, 140, 0.15);
-  --ui-diff-delete: rgba(191, 97, 106, 0.15);
-  --ui-diff-gutter-insert: rgba(163, 190, 140, 0.35);
-  --ui-diff-gutter-delete: rgba(191, 97, 106, 0.35);
+  --ui-diff-insert: rgba(68, 175, 105, 0.16);
+  --ui-diff-delete: rgba(248, 51, 60, 0.16);
+  --ui-diff-gutter-insert: rgba(68, 175, 105, 0.34);
+  --ui-diff-gutter-delete: rgba(248, 51, 60, 0.34);
 
   --ui-radius-sm: 8px;
   --ui-radius-md: 12px;
   --ui-radius-lg: 16px;
 
-  --glass-bg: rgba(59, 66, 82, 0.68);
-  --glass-bg-strong: rgba(59, 66, 82, 0.82);
-  --glass-bg-muted: rgba(46, 52, 64, 0.6);
-  --glass-border: rgba(236, 239, 244, 0.16);
-  --glass-highlight: rgba(255, 255, 255, 0.08);
-  --glass-shadow: 0 16px 32px rgba(15, 18, 26, 0.35);
-  --glass-shadow-soft: 0 10px 24px rgba(15, 18, 26, 0.25);
+  --glass-bg: rgba(27, 44, 41, 0.72);
+  --glass-bg-strong: rgba(22, 37, 35, 0.84);
+  --glass-bg-muted: rgba(18, 29, 28, 0.72);
+  --glass-border: rgba(219, 213, 181, 0.18);
+  --glass-highlight: rgba(252, 171, 16, 0.08);
+  --glass-shadow: 0 16px 32px rgba(8, 15, 14, 0.42);
+  --glass-shadow-soft: 0 10px 24px rgba(8, 15, 14, 0.3);
   --glass-blur: 18px;
   --glass-saturation: 1.15;
 }
@@ -76,8 +64,10 @@
 body {
   @apply text-[var(--ui-text)] antialiased;
   background-color: var(--ui-bg);
-  background-image: radial-gradient(circle at 12% 10%, rgba(136, 192, 208, 0.12), transparent 45%),
-    radial-gradient(circle at 88% 80%, rgba(129, 161, 193, 0.12), transparent 48%);
+  background-image:
+    radial-gradient(circle at 14% 12%, rgba(43, 158, 179, 0.18), transparent 42%),
+    radial-gradient(circle at 82% 18%, rgba(68, 175, 105, 0.16), transparent 38%),
+    radial-gradient(circle at 76% 82%, rgba(252, 171, 16, 0.12), transparent 34%);
   background-attachment: fixed;
   font-family:
     'IBM Plex Sans',
@@ -107,8 +97,14 @@ body::before {
   left: 0;
   bottom: 0;
   right: 0;
-  background: linear-gradient(rgba(38, 43, 54, 0) 50%, rgba(21, 25, 32, 0.1) 50%),
-    linear-gradient(90deg, rgba(136, 192, 208, 0.025), rgba(129, 161, 193, 0.02), rgba(136, 192, 208, 0.025));
+  background:
+    linear-gradient(rgba(18, 29, 28, 0) 50%, rgba(8, 15, 14, 0.12) 50%),
+    linear-gradient(
+      90deg,
+      rgba(43, 158, 179, 0.03),
+      rgba(68, 175, 105, 0.02),
+      rgba(252, 171, 16, 0.03)
+    );
   z-index: 9999;
   background-size: 100% 2px, 3px 100%;
   pointer-events: none;
@@ -141,8 +137,8 @@ body::before {
 }
 
 ::selection {
-  background: rgba(136, 192, 208, 0.25);
-  color: #eceff4;
+  background: rgba(43, 158, 179, 0.28);
+  color: var(--ui-text);
 }
 
 .glass-panel {
@@ -344,7 +340,7 @@ button:hover:not(:disabled) {
 .hover-card:hover {
   background-image:
     linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0)),
-    linear-gradient(180deg, rgba(136, 192, 208, 0.14), rgba(46, 52, 64, 0.08));
+    linear-gradient(180deg, rgba(43, 158, 179, 0.16), rgba(18, 29, 28, 0.1));
   box-shadow: 0 0 0 1px var(--glass-border);
 }
 
@@ -460,7 +456,7 @@ button:hover:not(:disabled) {
 }
 
 .diff-view .diff-line:hover {
-  background: rgba(136, 192, 208, 0.12);
+  background: rgba(43, 158, 179, 0.12);
 }
 
 .diff-view .diff-code-insert {

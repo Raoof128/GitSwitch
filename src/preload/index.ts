@@ -1,10 +1,12 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import type {
+  BranchSummary,
   SettingsPublic,
   SettingsUpdateInput,
   CommitMessage,
   CommitResult,
   DiffMode,
+  GitDiffOptions,
   GitStatus,
   GitStatusPayload,
   PullRequestOptions,
@@ -20,8 +22,22 @@ const api = {
   selectFolder: (): Promise<string | null> => ipcRenderer.invoke('dialog:openDirectory'),
   getGitStatus: (repoPath: string): Promise<GitStatus> =>
     ipcRenderer.invoke('git:status', repoPath),
-  getGitDiff: (repoPath: string, mode: DiffMode): Promise<string> =>
-    ipcRenderer.invoke('git:diff', repoPath, mode),
+  getGitDiff: (repoPath: string, mode: DiffMode, options?: GitDiffOptions): Promise<string> =>
+    ipcRenderer.invoke('git:diff', repoPath, mode, options),
+  gitListBranches: (repoPath: string): Promise<BranchSummary[]> =>
+    ipcRenderer.invoke('git:listBranches', repoPath),
+  gitCheckoutBranch: (repoPath: string, branchName: string): Promise<{ current: string | null }> =>
+    ipcRenderer.invoke('git:checkoutBranch', repoPath, branchName),
+  gitCreateBranch: (
+    repoPath: string,
+    branchName: string,
+    fromBranch?: string
+  ): Promise<{ current: string | null }> =>
+    ipcRenderer.invoke('git:createBranch', repoPath, branchName, fromBranch),
+  gitDiscardChanges: (repoPath: string): Promise<{ ok: boolean }> =>
+    ipcRenderer.invoke('git:discardChanges', repoPath),
+  gitHardReset: (repoPath: string): Promise<{ ok: boolean }> =>
+    ipcRenderer.invoke('git:hardReset', repoPath),
   gitCommit: (repoPath: string, title: string, body?: string): Promise<CommitResult> =>
     ipcRenderer.invoke('git:commit', repoPath, title, body),
   generateCommitMessage: (repoPath: string): Promise<CommitMessage> =>

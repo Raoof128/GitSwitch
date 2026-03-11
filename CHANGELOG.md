@@ -652,3 +652,9 @@
   - Files: AGENT.md, CHANGELOG.md, .github/dependabot.yml
   - Verification: not run (not requested)
   - Follow-ups: none
+- Raouf: 2026-03-11 (Australia/Sydney)
+  - Scope: app ux, onboarding, responsive workflow
+  - Summary: add first-run onboarding, repo health overview, responsive shell behavior, branch management, command palette actions, stronger diff controls, safer destructive confirmations, and clearer operation feedback across sync and AI flows
+  - Files: AGENT.md, CHANGELOG.md, src/index.ts, src/main/index.ts, src/main/git/git-service.ts, src/preload/index.ts, src/preload/index.d.ts, src/renderer/src/App.tsx, src/renderer/src/App.test.tsx, src/renderer/src/components/branch/*, src/renderer/src/components/command/*, src/renderer/src/components/dashboard/*, src/renderer/src/components/diff/DiffView.tsx, src/renderer/src/components/settings/SettingsView.tsx, src/renderer/src/components/sidebar/FileList.tsx, src/renderer/src/components/sidebar/RepoList.tsx, src/renderer/src/components/sidebar/Sidebar.tsx, src/renderer/src/components/ui/*, src/renderer/src/store/useRepoStore.ts
+  - Verification: `npm run lint`, `npm run typecheck`, `npm test`
+  - Follow-ups: visually validate the responsive breakpoints and command-palette branch flow in a packaged desktop window

@@ -1,8 +1,16 @@
-import { describe, it, expect } from 'vitest'
+import { beforeEach, describe, it, expect } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { SettingsView } from './components/settings/SettingsView'
+import { useRepoStore } from './store/useRepoStore'
 
 describe('SettingsView', () => {
+  beforeEach(() => {
+    useRepoStore.setState({
+      settingsOpen: false,
+      settingsTab: 'general'
+    })
+  })
+
   it('switches tabs on click', async () => {
     render(<SettingsView />)
 

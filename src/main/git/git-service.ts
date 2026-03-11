@@ -4,7 +4,15 @@ import { promises as fs, rmSync, existsSync } from 'fs'
 import { tmpdir } from 'os'
 import { dirname, join } from 'path'
 import { spawn } from 'child_process'
-import type { CommitResult, CommitMessage, DiffMode, GitStatus, PushResult } from '../../index'
+import type {
+  BranchSummary,
+  CommitResult,
+  CommitMessage,
+  DiffMode,
+  GitDiffOptions,
+  GitStatus,
+  PushResult
+} from '../../index'
 import { loadKey, getSettings } from '../secure/key-manager'
 import { generateOfflineCommitMessage } from './commit-generator'
 
@@ -190,6 +198,81 @@ export async function getRemotes(repoPath: string): Promise<Array<{ name: string
   }
 }
 
+export async function listBranches(repoPath: string): Promise<BranchSummary[]> {
+  try {
+    const git = simpleGit({ baseDir: repoPath })
+    const summary = await git.branch(['--list'])
+    return summary.all.map((name) => ({
+      name,
+      current: summary.current === name,
+      remote: false
+    }))
+  } catch (error) {
+    throw new Error(getGitErrorMessage(error, 'Failed to list branches.'))
+  }
+}
+
+export async function checkoutBranch(
+  repoPath: string,
+  branchName: string
+): Promise<{ current: string | null }> {
+  try {
+    const git = simpleGit({ baseDir: repoPath })
+    await git.checkout(branchName)
+    const status = await git.status()
+    return { current: status.current }
+  } catch (error) {
+    throw new Error(getGitErrorMessage(error, 'Failed to switch branches.'))
+  }
+}
+
+export async function createBranch(
+  repoPath: string,
+  branchName: string,
+  fromBranch?: string
+): Promise<{ current: string | null }> {
+  try {
+    const git = simpleGit({ baseDir: repoPath })
+    const branchSummary = await git.branchLocal()
+    if (branchSummary.all.includes(branchName)) {
+      throw new Error(`Branch "${branchName}" already exists.`)
+    }
+
+    if (fromBranch?.trim()) {
+      await git.raw(['checkout', '-b', branchName, fromBranch.trim()])
+    } else {
+      await git.checkoutLocalBranch(branchName)
+    }
+
+    const status = await git.status()
+    return { current: status.current }
+  } catch (error) {
+    throw new Error(getGitErrorMessage(error, 'Failed to create the branch.'))
+  }
+}
+
+export async function discardChanges(repoPath: string): Promise<void> {
+  try {
+    const git = simpleGit({ baseDir: repoPath })
+    try {
+      await git.raw(['restore', '--worktree', '--source=HEAD', '--', '.'])
+    } catch {
+      await git.checkout(['--', '.'])
+    }
+  } catch (error) {
+    throw new Error(getGitErrorMessage(error, 'Failed to discard changes.'))
+  }
+}
+
+export async function hardResetToHead(repoPath: string): Promise<void> {
+  try {
+    const git = simpleGit({ baseDir: repoPath })
+    await git.reset(['--hard', 'HEAD'])
+  } catch (error) {
+    throw new Error(getGitErrorMessage(error, 'Failed to hard reset the repository.'))
+  }
+}
+
 export async function setRemoteOrigin(repoPath: string, url: string): Promise<void> {
   try {
     const git = simpleGit({ baseDir: repoPath })
@@ -240,13 +323,20 @@ async function checkDiffSize(
   }
 }
 
-export async function getDiff(repoPath: string, mode: DiffMode = 'unstaged'): Promise<string> {
+export async function getDiff(
+  repoPath: string,
+  mode: DiffMode = 'unstaged',
+  options: GitDiffOptions = {}
+): Promise<string> {
   const git = simpleGit({ baseDir: repoPath })
   const settings = getSettings()
   const maxBytes = settings.diffLimitKb > 0 ? settings.diffLimitKb * 1024 : DEFAULT_DIFF_BYTES
   const maxLines = settings.diffLimitLines > 0 ? settings.diffLimitLines : DEFAULT_DIFF_LINES
 
   const diffArgs = mode === 'staged' ? ['--cached'] : []
+  if (options.ignoreWhitespace) {
+    diffArgs.push('-w')
+  }
 
   // Safety check before loading full diff into memory
   const sizeCheck = await checkDiffSize(git, diffArgs, maxLines)

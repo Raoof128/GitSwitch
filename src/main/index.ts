@@ -6,10 +6,15 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { createRepoWatcher } from './git/watcher'
 import {
+  checkoutBranch,
   commit,
+  createBranch,
+  discardChanges,
+  hardResetToHead,
   getDiff,
   getRemotes,
   getStatus,
+  listBranches,
   pushWithIdentity,
   pullWithIdentity,
   fetchWithIdentity,
@@ -41,7 +46,13 @@ import {
 } from './secure/key-manager'
 import { createPullRequest } from './git/pull-request'
 import { generateCommitMessage } from './ai/commit-generate'
-import type { DiffMode, PullRequestOptions, SecretsResult, SettingsUpdateInput } from '../index'
+import type {
+  DiffMode,
+  GitDiffOptions,
+  PullRequestOptions,
+  SecretsResult,
+  SettingsUpdateInput
+} from '../index'
 import { isAllowedExternalUrl } from './security/url-policy'
 
 let mainWindow: BrowserWindow | null = null
@@ -144,6 +155,34 @@ const assertKeys = (input: Record<string, unknown>, allowed: string[], label: st
   }
 }
 
+const hasInvalidBranchCharacters = (branchName: string): boolean =>
+  [...branchName].some((character) => {
+    const code = character.charCodeAt(0)
+    return code <= 31 || ['~', '^', ':', '?', '*', '[', '\\'].includes(character)
+  })
+
+const assertBranchName = (value: unknown, field: string): string => {
+  const branchName = assertString(value, field).trim()
+  const hasStructuralIssue =
+    branchName.startsWith('/') ||
+    branchName.endsWith('/') ||
+    branchName.includes('//') ||
+    branchName.includes('..') ||
+    branchName.includes('@{') ||
+    branchName.includes('/.') ||
+    /\s/.test(branchName)
+
+  if (
+    !branchName ||
+    branchName.length > 255 ||
+    hasStructuralIssue ||
+    hasInvalidBranchCharacters(branchName)
+  ) {
+    throw new Error(`Invalid ${field}.`)
+  }
+  return branchName
+}
+
 const MAX_PATH_LENGTH = 4096
 
 const expandHome = (input: string): string => {
@@ -235,14 +274,70 @@ async function registerIpcHandlers(): Promise<void> {
 
   ipcMain.handle(
     'git:diff',
-    async (_event: IpcMainInvokeEvent, repoPath: string, mode: DiffMode) => {
+    async (
+      _event: IpcMainInvokeEvent,
+      repoPath: string,
+      mode: DiffMode,
+      options?: GitDiffOptions
+    ) => {
       const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
       if (mode !== 'staged' && mode !== 'unstaged') {
         throw new Error('Invalid diff mode.')
       }
-      return getDiff(normalized, mode)
+      if (options !== undefined) {
+        if (!isRecord(options)) {
+          throw new Error('Invalid diff options.')
+        }
+        assertKeys(options, ['ignoreWhitespace'], 'diff options')
+      }
+      const ignoreWhitespace =
+        options && 'ignoreWhitespace' in options
+          ? assertBoolean(options.ignoreWhitespace, 'ignoreWhitespace')
+          : false
+      return getDiff(normalized, mode, { ignoreWhitespace })
     }
   )
+
+  ipcMain.handle('git:listBranches', async (_event: IpcMainInvokeEvent, repoPath: string) => {
+    const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
+    return listBranches(normalized)
+  })
+
+  ipcMain.handle(
+    'git:checkoutBranch',
+    async (_event: IpcMainInvokeEvent, repoPath: string, branchName: string) => {
+      const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
+      return checkoutBranch(normalized, assertBranchName(branchName, 'branchName'))
+    }
+  )
+
+  ipcMain.handle(
+    'git:createBranch',
+    async (
+      _event: IpcMainInvokeEvent,
+      repoPath: string,
+      branchName: string,
+      fromBranch?: string
+    ) => {
+      const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
+      const safeBranchName = assertBranchName(branchName, 'branchName')
+      const safeFromBranch =
+        fromBranch === undefined ? undefined : assertBranchName(fromBranch, 'fromBranch')
+      return createBranch(normalized, safeBranchName, safeFromBranch)
+    }
+  )
+
+  ipcMain.handle('git:discardChanges', async (_event: IpcMainInvokeEvent, repoPath: string) => {
+    const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
+    await discardChanges(normalized)
+    return { ok: true }
+  })
+
+  ipcMain.handle('git:hardReset', async (_event: IpcMainInvokeEvent, repoPath: string) => {
+    const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
+    await hardResetToHead(normalized)
+    return { ok: true }
+  })
 
   ipcMain.handle(
     'git:commit',

@@ -24,6 +24,16 @@ export type GitStatusPayload = {
 
 export type DiffMode = 'staged' | 'unstaged'
 
+export type GitDiffOptions = {
+  ignoreWhitespace?: boolean
+}
+
+export type BranchSummary = {
+  name: string
+  current: boolean
+  remote: boolean
+}
+
 export type AiProvider = 'offline' | 'local' | 'cloud'
 export type AiPersona = 'standard' | 'cybersecurity'
 export type AppTheme = 'dark'

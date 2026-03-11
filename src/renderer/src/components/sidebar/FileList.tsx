@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useMemo, useState, JSX } from 'react'
+import { useMemo, useState, type JSX, type MouseEvent as ReactMouseEvent } from 'react'
+import type { DiffMode } from '../../../../index'
 import { useRepoStore } from '../../store/useRepoStore'
 import { fadeSlideIn, listItem, useReducedMotionSafe } from '../motion/motion'
 
@@ -19,9 +20,21 @@ type ConfirmDialogState = {
   path: string
 }
 
-export function FileList(): JSX.Element {
-  const { status, reducedMotion, addToIgnore } = useRepoStore()
-  const files = useMemo(() => status?.files ?? [], [status])
+type FileListProps = {
+  mode: DiffMode
+}
+
+export function FileList({ mode }: FileListProps): JSX.Element {
+  const { status, reducedMotion, addToIgnore, focusedDiffFile, setFocusedDiffFile } = useRepoStore()
+  const files = useMemo(() => {
+    const changedFiles = status?.files ?? []
+    if (mode === 'unstaged') {
+      return changedFiles
+    }
+
+    const staged = new Set(status?.staged ?? [])
+    return changedFiles.filter((file) => staged.has(file.path))
+  }, [mode, status])
   const reduceMotion = useReducedMotionSafe(reducedMotion)
   const listVariants = useMemo(() => listItem(reduceMotion), [reduceMotion])
   const containerVariants = useMemo(() => fadeSlideIn(reduceMotion), [reduceMotion])
@@ -33,7 +46,7 @@ export function FileList(): JSX.Element {
     path: ''
   })
 
-  const handleIgnoreClick = (path: string, e: React.MouseEvent): void => {
+  const handleIgnoreClick = (path: string, e: ReactMouseEvent): void => {
     e.stopPropagation()
     setConfirmDialog({ isOpen: true, path })
   }
@@ -110,7 +123,9 @@ export function FileList(): JSX.Element {
       </AnimatePresence>
 
       {files.length === 0 && (
-        <div className="text-xs text-[var(--ui-text-muted)]">No modified files.</div>
+        <div className="rounded-2xl border border-dashed border-[var(--glass-border)] px-3 py-5 text-center text-xs text-[var(--ui-text-muted)]">
+          {mode === 'staged' ? 'No staged files.' : 'No modified files.'}
+        </div>
       )}
       <div className="space-y-1">
         <AnimatePresence initial={false}>
@@ -125,7 +140,12 @@ export function FileList(): JSX.Element {
                 animate="visible"
                 exit="exit"
                 transition={shouldAnimate ? undefined : { duration: 0 }}
-                className="group hover-card flex items-center justify-between rounded-md px-2 py-1 text-xs text-slate-300"
+                className={`group hover-card flex items-center justify-between rounded-xl border px-2 py-2 text-xs text-slate-300 ${
+                  focusedDiffFile === file.path
+                    ? 'border-[var(--ui-accent-border)] bg-[var(--ui-accent-bg)]'
+                    : 'border-transparent'
+                }`}
+                onClick={() => setFocusedDiffFile(file.path)}
               >
                 <div className="flex flex-1 items-center gap-2 overflow-hidden">
                   <span className="truncate" title={file.path}>

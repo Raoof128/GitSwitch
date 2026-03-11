@@ -1,14 +1,13 @@
-import { useMemo, useState, useRef, JSX } from 'react'
+import { useMemo, useRef, JSX } from 'react'
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { SettingsAccounts } from './SettingsAccounts'
 import { SettingsAdvanced } from './SettingsAdvanced'
 import { SettingsGeneral } from './SettingsGeneral'
 import { SettingsIntegrations } from './SettingsIntegrations'
-
-type SettingsTab = 'accounts' | 'advanced' | 'general' | 'integrations'
+import { useRepoStore, type SettingsTab } from '../../store/useRepoStore'
 
 export function SettingsView(): JSX.Element {
-  const [tab, setTab] = useState<SettingsTab>('general')
+  const { settingsTab: tab, setSettingsTab } = useRepoStore()
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
 
   const handleKeyDown = (event: ReactKeyboardEvent<HTMLElement>): void => {
@@ -18,12 +17,12 @@ export function SettingsView(): JSX.Element {
     if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
       event.preventDefault()
       const nextIndex = (currentIndex + 1) % tabs.length
-      setTab(tabs[nextIndex])
+      setSettingsTab(tabs[nextIndex])
       tabRefs.current[nextIndex]?.focus()
     } else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
       event.preventDefault()
       const prevIndex = (currentIndex - 1 + tabs.length) % tabs.length
-      setTab(tabs[prevIndex])
+      setSettingsTab(tabs[prevIndex])
       tabRefs.current[prevIndex]?.focus()
     }
   }
@@ -43,12 +42,15 @@ export function SettingsView(): JSX.Element {
   }, [tab])
 
   return (
-    <div className="flex flex-1 overflow-hidden">
-      <aside className="glass-panel glass-panel-muted w-48 border-r border-[var(--glass-border)] px-3 py-4">
+    <div className="flex flex-1 flex-col overflow-hidden lg:flex-row">
+      <aside className="glass-panel glass-panel-muted border-b border-[var(--glass-border)] px-3 py-4 lg:w-48 lg:border-b-0 lg:border-r">
         <div className="mb-2 text-xs uppercase tracking-[0.2em] text-[var(--ui-text-muted)]">
           Settings
         </div>
-        <nav className="space-y-1 text-xs" onKeyDown={handleKeyDown}>
+        <nav
+          className="grid grid-cols-2 gap-1 text-xs sm:grid-cols-4 lg:grid-cols-1"
+          onKeyDown={handleKeyDown}
+        >
           {[
             { id: 'general', label: 'General' },
             { id: 'integrations', label: 'Integrations' },
@@ -64,7 +66,7 @@ export function SettingsView(): JSX.Element {
                 tabRefs.current[tabIndex] = el
               }}
               type="button"
-              onClick={() => setTab(item.id as SettingsTab)}
+              onClick={() => setSettingsTab(item.id as SettingsTab)}
               className={`w-full rounded-md px-2 py-1 text-left ${
                 tab === item.id
                   ? 'bg-[var(--ui-hover)] text-[var(--ui-text)]'
@@ -76,7 +78,7 @@ export function SettingsView(): JSX.Element {
           ))}
         </nav>
       </aside>
-      <div className="flex-1 overflow-y-auto px-5 py-5">{content}</div>
+      <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-5 sm:py-5">{content}</div>
     </div>
   )
 }

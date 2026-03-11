@@ -1,10 +1,12 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
 import type {
+  BranchSummary,
   SettingsPublic,
   SettingsUpdateInput,
   CommitMessage,
   CommitResult,
   DiffMode,
+  GitDiffOptions,
   GitStatus,
   GitStatusPayload,
   PullRequestOptions,
@@ -19,7 +21,16 @@ import type {
 export interface PreloadApi {
   selectFolder: () => Promise<string | null>
   getGitStatus: (repoPath: string) => Promise<GitStatus>
-  getGitDiff: (repoPath: string, mode: DiffMode) => Promise<string>
+  getGitDiff: (repoPath: string, mode: DiffMode, options?: GitDiffOptions) => Promise<string>
+  gitListBranches: (repoPath: string) => Promise<BranchSummary[]>
+  gitCheckoutBranch: (repoPath: string, branchName: string) => Promise<{ current: string | null }>
+  gitCreateBranch: (
+    repoPath: string,
+    branchName: string,
+    fromBranch?: string
+  ) => Promise<{ current: string | null }>
+  gitDiscardChanges: (repoPath: string) => Promise<{ ok: boolean }>
+  gitHardReset: (repoPath: string) => Promise<{ ok: boolean }>
   gitCommit: (repoPath: string, title: string, body?: string) => Promise<CommitResult>
   generateCommitMessage: (repoPath: string) => Promise<CommitMessage>
   gitStageAll: (repoPath: string) => Promise<{ ok: boolean }>

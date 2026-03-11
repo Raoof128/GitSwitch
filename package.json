@@ -47,7 +47,7 @@
     "@electron-toolkit/eslint-config-ts": "^3.1.0",
     "@electron-toolkit/tsconfig": "^2.0.0",
     "@testing-library/jest-dom": "^6.4.2",
-    "@testing-library/react": "^16.0.0",
+    "@testing-library/react": "^16.3.2",
     "@types/node": "^25.0.6",
     "@types/react": "^19.2.8",
     "@types/react-dom": "^19.2.3",

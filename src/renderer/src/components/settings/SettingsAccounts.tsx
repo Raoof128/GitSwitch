@@ -79,27 +79,36 @@ export function SettingsAccounts(): JSX.Element {
 
   return (
     <section className="space-y-4">
-      <div className="text-sm font-semibold">Accounts (SSH identities)</div>
+      <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#00ffaa]">
+        Accounts (SSH identities)
+      </div>
 
       {feedback && (
         <div
-          className={`rounded-md border px-3 py-2 text-xs ${
+          className={`rounded-none border px-3 py-2 text-xs ${
             feedback.tone === 'success'
-              ? 'border-[var(--ui-status-added-border)] bg-[var(--ui-status-added-bg)] text-[var(--ui-status-added)]'
-              : 'border-[var(--ui-status-deleted-border)] bg-[var(--ui-status-deleted-bg)] text-[var(--ui-status-deleted)]'
+              ? 'border-[#00ffaa]/30 bg-[rgba(0,255,170,0.06)] text-[#00ffaa]'
+              : 'border-[#ff3366]/30 bg-[rgba(255,51,102,0.06)] text-[#ff3366]'
           }`}
+          style={
+            feedback.tone === 'success'
+              ? { textShadow: '0 0 6px rgba(0,255,170,0.4)' }
+              : { textShadow: '0 0 6px rgba(255,51,102,0.4)' }
+          }
         >
           {feedback.message}
         </div>
       )}
 
-      <div className="glass-card rounded-md p-4 text-xs">
+      <div className="rounded-none border border-[#2a2a2a] bg-[#141414] p-4 text-xs">
         <div className="mb-3">
-          <label className="mb-1 block text-[var(--ui-text-muted)]">Default account</label>
+          <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.18em] text-[#666666]">
+            Default account
+          </label>
           <select
             value={defaultAccountId ?? ''}
             onChange={(event) => handleDefaultChange(event.target.value)}
-            className="w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel-muted)] px-2 py-1 text-xs"
+            className="w-full rounded-none border border-[#2a2a2a] bg-[#0a0a0a] px-2 py-1 text-xs text-[#e0e0e0]"
           >
             <option value="">None</option>
             {accounts.map((account) => (
@@ -112,26 +121,26 @@ export function SettingsAccounts(): JSX.Element {
 
         <div className="mb-3 space-y-2">
           {accounts.length === 0 && (
-            <div className="text-[var(--ui-text-muted)]">No accounts configured.</div>
+            <div className="text-[#666666]">No accounts configured.</div>
           )}
           {accounts.map((account) => (
             <div
               key={account.id}
-              className={`flex items-center justify-between rounded-md border border-[var(--glass-border)] px-2 py-1 ${
-                selectedAccountId === account.id ? 'bg-[var(--ui-hover)]' : ''
+              className={`flex items-center justify-between rounded-none border border-[#2a2a2a] px-2 py-1 ${
+                selectedAccountId === account.id ? 'bg-[rgba(0,255,170,0.08)]' : ''
               }`}
             >
               {editingId === account.id ? (
                 <input
                   value={editingName}
                   onChange={(event) => setEditingName(event.target.value)}
-                  className="mr-2 flex-1 rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs"
+                  className="mr-2 flex-1 rounded-none border border-[#2a2a2a] bg-[#0a0a0a] px-2 py-1 text-xs text-[#e0e0e0]"
                 />
               ) : (
                 <button
                   type="button"
                   onClick={() => setSelectedAccountId(account.id)}
-                  className="mr-2 flex-1 text-left"
+                  className="mr-2 flex-1 text-left text-[#e0e0e0]"
                 >
                   {account.name}
                 </button>
@@ -140,7 +149,7 @@ export function SettingsAccounts(): JSX.Element {
                 <button
                   type="button"
                   onClick={commitRename}
-                  className="mr-2 rounded-md border border-[var(--glass-border)] px-2 py-1 text-[10px] hover:bg-[var(--ui-hover)]"
+                  className="btn-neon mr-2 rounded-none px-2 py-1 text-[10px]"
                 >
                   Save
                 </button>
@@ -148,7 +157,7 @@ export function SettingsAccounts(): JSX.Element {
                 <button
                   type="button"
                   onClick={() => startRename(account.id, account.name)}
-                  className="mr-2 rounded-md border border-[var(--glass-border)] px-2 py-1 text-[10px] hover:bg-[var(--ui-hover)]"
+                  className="mr-2 rounded-none border border-[#2a2a2a] px-2 py-1 text-[10px] text-[#00ffaa] hover:bg-[rgba(0,255,170,0.08)] hover:underline"
                 >
                   Rename
                 </button>
@@ -156,7 +165,7 @@ export function SettingsAccounts(): JSX.Element {
               <button
                 type="button"
                 onClick={() => void handleDelete(account.id)}
-                className="rounded-md border border-[var(--glass-border)] px-2 py-1 text-[10px] hover:bg-[var(--ui-hover)]"
+                className="btn-neon-pink rounded-none px-2 py-1 text-[10px]"
               >
                 Remove
               </button>
@@ -164,27 +173,27 @@ export function SettingsAccounts(): JSX.Element {
           ))}
         </div>
 
-        <div className="glass-panel glass-panel-muted rounded-md border border-[var(--glass-border)] p-3">
-          <div className="mb-2 text-[11px] uppercase tracking-[0.2em] text-[var(--ui-text-muted)]">
+        <div className="rounded-none border border-[#2a2a2a] bg-[#0a0a0a] p-3">
+          <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#00ffaa]">
             Add account
           </div>
           <input
             value={accountName}
             onChange={(event) => setAccountName(event.target.value)}
             placeholder="Account name"
-            className="mb-2 w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs"
+            className="mb-2 w-full rounded-none border border-[#2a2a2a] bg-[#0a0a0a] px-2 py-1 text-xs text-[#e0e0e0]"
           />
           <textarea
             value={privateKey}
             onChange={(event) => setPrivateKey(event.target.value)}
             placeholder="Paste private key"
             rows={4}
-            className="mb-2 w-full resize-none rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs"
+            className="mb-2 w-full resize-none rounded-none border border-[#2a2a2a] bg-[#0a0a0a] px-2 py-1 text-xs text-[#e0e0e0]"
           />
           <button
             type="button"
             onClick={handleAdd}
-            className="rounded-md border border-[var(--glass-border)] px-3 py-1 text-xs font-semibold hover:bg-[var(--ui-hover)]"
+            className="btn-neon rounded-none px-3 py-1 text-xs font-semibold"
           >
             Save account
           </button>

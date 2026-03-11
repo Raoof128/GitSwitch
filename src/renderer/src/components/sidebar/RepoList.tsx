@@ -59,10 +59,10 @@ export function RepoList(): JSX.Element {
     <div>
       <div className="mb-3 flex items-center justify-between gap-2">
         <div>
-          <h2 className="text-xs uppercase tracking-[0.2em] text-[var(--ui-text-muted)]">
+          <h2 className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#666666]">
             Repositories
           </h2>
-          <div className="mt-1 text-[11px] text-[var(--ui-text-muted)]">
+          <div className="mt-1 text-[11px] text-[#666666]">
             Search, pin, and switch context faster.
           </div>
         </div>
@@ -71,9 +71,9 @@ export function RepoList(): JSX.Element {
           onClick={addRepo}
           whileTap={scaleTap(reduceMotion)}
           title="Add repository (Ctrl/⌘+O)"
-          className="rounded-xl border border-[var(--glass-border)] px-3 py-2 text-xs font-semibold text-slate-300 hover:border-[var(--ui-border-soft)] hover:bg-[var(--ui-hover)] hover:text-[var(--ui-text)]"
+          className="border border-[#00ffaa] px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#00ffaa] transition-shadow hover:shadow-[0_0_20px_rgba(0,255,170,0.15)]"
         >
-          + Add
+          + ADD
         </motion.button>
       </div>
 
@@ -81,11 +81,11 @@ export function RepoList(): JSX.Element {
         value={repoQuery}
         onChange={(event) => setRepoQuery(event.target.value)}
         placeholder="Search repositories"
-        className="mb-3 w-full rounded-xl border border-[var(--glass-border)] bg-[var(--ui-panel)] px-3 py-2 text-xs"
+        className="mb-3 w-full border border-[#2a2a2a] bg-[#0a0a0a] px-3 py-2 text-xs text-[#e0e0e0] placeholder-[#666666] focus:border-[#00ffaa] focus:shadow-[0_0_12px_rgba(0,255,170,0.15)] focus:outline-none"
       />
 
       {repos.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-[var(--glass-border)] px-4 py-6 text-xs text-[var(--ui-text-muted)]">
+        <div className="border border-dashed border-[#2a2a2a] bg-[#0a0a0a] px-4 py-6 text-xs text-[#666666]">
           No repositories yet. Add one to unlock the onboarding and repo overview flow.
         </div>
       )}
@@ -93,7 +93,7 @@ export function RepoList(): JSX.Element {
       <div className="space-y-4">
         {sections.map((section) => (
           <div key={section.id}>
-            <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ui-text-muted)]">
+            <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#666666]">
               {section.title}
             </div>
             <div className="space-y-1">
@@ -109,10 +109,10 @@ export function RepoList(): JSX.Element {
                     animate="visible"
                     exit="exit"
                     className={cx(
-                      'hover-card relative rounded-2xl border px-3 py-3 transition',
+                      'hover-card relative border px-3 py-3 transition',
                       isActive
-                        ? 'border-[var(--ui-accent-border)] bg-[var(--ui-accent-bg)]'
-                        : 'border-[var(--glass-border)] bg-[var(--ui-panel)]/35'
+                        ? 'border-[#00ffaa] bg-[#141414] shadow-[0_0_20px_rgba(0,255,170,0.15)]'
+                        : 'border-[#2a2a2a] bg-[#141414]/35'
                     )}
                   >
                     <button
@@ -121,16 +121,16 @@ export function RepoList(): JSX.Element {
                       className="w-full text-left"
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <span className="truncate text-sm font-semibold text-[var(--ui-text)]">
+                        <span className="truncate text-sm font-semibold text-[#e0e0e0]">
                           {repo.name}
                         </span>
                         {isActive && (
-                          <span className="rounded-full bg-[var(--ui-accent-bg)] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--ui-accent)]">
+                          <span className="rounded-full bg-[#00ffaa]/10 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#00ffaa]" style={{ textShadow: '0 0 8px rgba(0, 255, 170, 0.6)' }}>
                             Active
                           </span>
                         )}
                       </div>
-                      <div className="mt-1 break-all pr-16 text-[11px] leading-5 text-[var(--ui-text-muted)]">
+                      <div className="mt-1 break-all pr-16 text-[11px] leading-5 text-[#666666]">
                         {repo.path}
                       </div>
                     </button>
@@ -139,16 +139,16 @@ export function RepoList(): JSX.Element {
                       <button
                         type="button"
                         onClick={() => toggleRepoPin(repo.path)}
-                        className="rounded-full border border-[var(--glass-border)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--ui-text-muted)] hover:bg-[var(--ui-hover)]"
+                        className="border border-[#2a2a2a] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#666666] transition-shadow hover:border-[#00ffaa] hover:text-[#00ffaa] hover:shadow-[0_0_12px_rgba(0,255,170,0.1)]"
                       >
-                        {isPinned ? 'Unpin' : 'Pin'}
+                        {isPinned ? 'UNPIN' : 'PIN'}
                       </button>
                       <button
                         type="button"
                         onClick={() => void removeRepo(repo.path)}
-                        className="rounded-full border border-[var(--glass-border)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--ui-text-muted)] hover:bg-[var(--ui-status-deleted-bg)] hover:text-[var(--ui-status-deleted)]"
+                        className="border border-[#2a2a2a] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#666666] transition-shadow hover:border-[#ff3366] hover:text-[#ff3366] hover:shadow-[0_0_12px_rgba(255,51,102,0.15)]"
                       >
-                        Remove
+                        REMOVE
                       </button>
                     </div>
                   </motion.div>
@@ -159,7 +159,7 @@ export function RepoList(): JSX.Element {
         ))}
 
         {repos.length > 0 && sections.length === 0 && (
-          <div className="rounded-2xl border border-dashed border-[var(--glass-border)] px-4 py-6 text-xs text-[var(--ui-text-muted)]">
+          <div className="border border-dashed border-[#2a2a2a] bg-[#0a0a0a] px-4 py-6 text-xs text-[#666666]">
             No repositories match the current search.
           </div>
         )}

@@ -75,7 +75,7 @@ export function FileList({ mode }: FileListProps): JSX.Element {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
             onClick={handleCancelIgnore}
           >
             <motion.div
@@ -83,20 +83,20 @@ export function FileList({ mode }: FileListProps): JSX.Element {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: reduceMotion ? 1 : 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="mx-4 max-w-sm rounded-lg border border-[var(--glass-border)] bg-[var(--ui-panel)] p-4 shadow-xl"
+              className="mx-4 max-w-sm border border-[#2a2a2a] bg-[#141414] p-4 shadow-[0_0_40px_rgba(0,0,0,0.5)]"
               role="dialog"
               aria-modal="true"
               aria-labelledby="confirm-dialog-title"
             >
               <h3
                 id="confirm-dialog-title"
-                className="mb-2 text-sm font-semibold text-[var(--ui-text)]"
+                className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#e0e0e0]"
               >
                 Add to .gitignore?
               </h3>
-              <p className="mb-4 text-xs text-[var(--ui-text-muted)]">
+              <p className="mb-4 text-xs text-[#666666]">
                 Are you sure you want to add{' '}
-                <code className="rounded bg-[var(--ui-panel-muted)] px-1 py-0.5">
+                <code className="border border-[#2a2a2a] bg-[#0a0a0a] px-1 py-0.5 font-mono text-[#e0e0e0]">
                   {confirmDialog.path}
                 </code>{' '}
                 to .gitignore?
@@ -105,16 +105,16 @@ export function FileList({ mode }: FileListProps): JSX.Element {
                 <button
                   type="button"
                   onClick={handleCancelIgnore}
-                  className="rounded-md border border-[var(--glass-border)] px-3 py-1 text-xs text-[var(--ui-text-muted)] hover:bg-[var(--ui-hover)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)]"
+                  className="border border-[#2a2a2a] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#666666] transition-shadow hover:border-[#e0e0e0] hover:text-[#e0e0e0] focus:outline-none"
                 >
-                  Cancel
+                  CANCEL
                 </button>
                 <button
                   type="button"
                   onClick={handleConfirmIgnore}
-                  className="rounded-md border border-[var(--ui-accent-border)] bg-[var(--ui-accent-bg)] px-3 py-1 text-xs font-semibold text-[var(--ui-accent)] hover:bg-[var(--ui-accent-bg-strong)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)]"
+                  className="border border-[#00ffaa] bg-[#00ffaa] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#0a0a0a] transition-shadow hover:shadow-[0_0_20px_rgba(0,255,170,0.3)] focus:outline-none"
                 >
-                  Confirm
+                  CONFIRM
                 </button>
               </div>
             </motion.div>
@@ -123,7 +123,7 @@ export function FileList({ mode }: FileListProps): JSX.Element {
       </AnimatePresence>
 
       {files.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-[var(--glass-border)] px-3 py-5 text-center text-xs text-[var(--ui-text-muted)]">
+        <div className="border border-dashed border-[#2a2a2a] bg-[#0a0a0a] px-3 py-5 text-center text-xs text-[#666666]">
           {mode === 'staged' ? 'No staged files.' : 'No modified files.'}
         </div>
       )}
@@ -131,6 +131,7 @@ export function FileList({ mode }: FileListProps): JSX.Element {
         <AnimatePresence initial={false}>
           {files.map((file) => {
             const code = getStatusCode(file.index, file.working_dir)
+            const isFocused = focusedDiffFile === file.path
             return (
               <motion.div
                 key={file.path}
@@ -140,22 +141,22 @@ export function FileList({ mode }: FileListProps): JSX.Element {
                 animate="visible"
                 exit="exit"
                 transition={shouldAnimate ? undefined : { duration: 0 }}
-                className={`group hover-card flex items-center justify-between rounded-xl border px-2 py-2 text-xs text-slate-300 ${
-                  focusedDiffFile === file.path
-                    ? 'border-[var(--ui-accent-border)] bg-[var(--ui-accent-bg)]'
+                className={`group hover-card flex items-center justify-between border px-2 py-2 text-xs text-[#e0e0e0] ${
+                  isFocused
+                    ? 'border-l-2 border-l-[#00ffaa] border-t-[#2a2a2a] border-r-[#2a2a2a] border-b-[#2a2a2a] bg-[#141414] shadow-[inset_4px_0_12px_rgba(0,255,170,0.1)]'
                     : 'border-transparent'
                 }`}
                 onClick={() => setFocusedDiffFile(file.path)}
               >
                 <div className="flex flex-1 items-center gap-2 overflow-hidden">
-                  <span className="truncate" title={file.path}>
+                  <span className="truncate font-mono" title={file.path}>
                     {file.path}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={(e) => handleIgnoreClick(file.path, e)}
-                    className="rounded p-0.5 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)] hover:bg-[var(--ui-hover)]"
+                    className="border border-transparent p-0.5 opacity-0 transition-opacity hover:border-[#2a2a2a] hover:text-[#e0e0e0] group-hover:opacity-100 focus-visible:opacity-100 focus:outline-none"
                     title="Add to .gitignore"
                     aria-label="Add file to .gitignore"
                   >
@@ -169,7 +170,7 @@ export function FileList({ mode }: FileListProps): JSX.Element {
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      className="text-[var(--ui-text-muted)] hover:text-[var(--ui-text)]"
+                      className="text-[#666666] hover:text-[#e0e0e0]"
                     >
                       <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
                       <line x1="1" y1="1" x2="23" y2="23" />
@@ -177,7 +178,7 @@ export function FileList({ mode }: FileListProps): JSX.Element {
                   </button>
                   <span
                     data-status={code}
-                    className="status-indicator font-semibold w-4 text-center"
+                    className="status-indicator w-4 text-center font-bold"
                   >
                     {code}
                   </span>

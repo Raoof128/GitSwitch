@@ -49,68 +49,76 @@ export function SettingsAdvanced(): JSX.Element {
 
   return (
     <section className="space-y-4">
-      <div className="text-sm font-semibold">Advanced</div>
-      <div className="glass-card rounded-md p-4 text-xs">
+      <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#00ffaa]">
+        Advanced
+      </div>
+      <div className="rounded-none border border-[#2a2a2a] bg-[#141414] p-4 text-xs">
         <div className="mb-3">
-          <label className="mb-1 block text-[var(--ui-text-muted)]">Diff size limit (lines)</label>
+          <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.18em] text-[#666666]">
+            Diff size limit (lines)
+          </label>
           <input
             value={limitLines}
             onChange={(event) => setLimitLines(Number(event.target.value))}
             type="number"
             min={50}
             max={2000}
-            className="w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs"
+            className="w-full rounded-none border border-[#2a2a2a] bg-[#0a0a0a] px-2 py-1 text-xs text-[#e0e0e0]"
           />
         </div>
         <div className="mb-3">
-          <label className="mb-1 block text-[var(--ui-text-muted)]">Diff size limit (KB)</label>
+          <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.18em] text-[#666666]">
+            Diff size limit (KB)
+          </label>
           <input
             value={limitKb}
             onChange={(event) => setLimitKb(Number(event.target.value))}
             type="number"
             min={10}
             max={512}
-            className="w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs"
+            className="w-full rounded-none border border-[#2a2a2a] bg-[#0a0a0a] px-2 py-1 text-xs text-[#e0e0e0]"
           />
         </div>
         <div className="mb-3">
-          <label className="mb-1 block text-[var(--ui-text-muted)]">AI timeout (seconds)</label>
+          <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.18em] text-[#666666]">
+            AI timeout (seconds)
+          </label>
           <input
             value={timeout}
             onChange={(event) => setTimeoutValue(Number(event.target.value))}
             type="number"
             min={3}
             max={60}
-            className="w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs"
+            className="w-full rounded-none border border-[#2a2a2a] bg-[#0a0a0a] px-2 py-1 text-xs text-[#e0e0e0]"
           />
         </div>
         <div className="mb-3 flex items-center justify-between">
-          <span className="text-[var(--ui-text-muted)]">Enable AI redaction</span>
+          <span className="text-[#666666]">Enable AI redaction</span>
           <input
             type="checkbox"
             checked={redaction}
             onChange={(event) => setRedaction(event.target.checked)}
-            className="h-4 w-4 accent-[var(--ui-accent)]"
+            className="h-4 w-4 rounded-none accent-[#00ffaa]"
           />
         </div>
         <div className="mb-3 flex items-center justify-between">
-          <span className="text-[var(--ui-text-muted)]">Strict host key checking</span>
+          <span className="text-[#666666]">Strict host key checking</span>
           <input
             type="checkbox"
             checked={strictHost}
             onChange={(event) => setStrictHost(event.target.checked)}
-            className="h-4 w-4 accent-[var(--ui-accent)]"
+            className="h-4 w-4 rounded-none accent-[#00ffaa]"
           />
         </div>
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={handleSave}
-            className="rounded-md border border-[var(--glass-border)] px-3 py-1 text-xs font-semibold hover:bg-[var(--ui-hover)]"
+            className="btn-neon rounded-none px-3 py-1 text-xs font-semibold"
           >
             Save Advanced
           </button>
-          <div className="text-[10px] text-[var(--ui-text-muted)]">
+          <div className="text-[10px] text-[#666666]">
             Reset disabled in hardened mode.
           </div>
         </div>

@@ -29,51 +29,57 @@ export function SettingsGeneral(): JSX.Element {
 
   return (
     <section className="space-y-4">
-      <div className="text-sm font-semibold">General</div>
-      <div className="glass-card rounded-md p-4 text-xs">
+      <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#00ffaa]">
+        General
+      </div>
+      <div className="rounded-none border border-[#2a2a2a] bg-[#141414] p-4 text-xs">
         <div className="mb-3">
-          <label className="mb-1 block text-[var(--ui-text-muted)]">Theme</label>
+          <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.18em] text-[#666666]">
+            Theme
+          </label>
           <select
             value={theme}
             disabled
-            className="w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel-muted)] px-2 py-1 text-xs opacity-60"
+            className="w-full rounded-none border border-[#2a2a2a] bg-[#0a0a0a] px-2 py-1 text-xs text-[#e0e0e0] opacity-60"
           >
             <option value="dark">Dark (default)</option>
           </select>
         </div>
         <div className="mb-3 flex items-center justify-between">
-          <span className="text-[var(--ui-text-muted)]">Reduced motion</span>
+          <span className="text-[#666666]">Reduced motion</span>
           <input
             type="checkbox"
             checked={motion}
             onChange={(event) => setMotion(event.target.checked)}
-            className="h-4 w-4 accent-[var(--ui-accent)]"
+            className="h-4 w-4 rounded-none"
           />
         </div>
         <div className="mb-3">
-          <label className="mb-1 block text-[var(--ui-text-muted)]">Default base branch</label>
+          <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.18em] text-[#666666]">
+            Default base branch
+          </label>
           <select
             value={baseBranch}
             onChange={(event) => setBaseBranch(event.target.value as 'main' | 'master')}
-            className="w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel-muted)] px-2 py-1 text-xs"
+            className="w-full rounded-none border border-[#2a2a2a] bg-[#0a0a0a] px-2 py-1 text-xs text-[#e0e0e0]"
           >
             <option value="main">main</option>
             <option value="master">master</option>
           </select>
         </div>
         <div className="mb-3 flex items-center justify-between">
-          <span className="text-[var(--ui-text-muted)]">Like GitSwitch</span>
+          <span className="text-[#666666]">Like GitSwitch</span>
           <input
             type="checkbox"
             checked={liked}
             onChange={(event) => setLiked(event.target.checked)}
-            className="h-4 w-4 accent-[var(--ui-accent)]"
+            className="h-4 w-4 rounded-none"
           />
         </div>
         <button
           type="button"
           onClick={handleSave}
-          className="rounded-md border border-[var(--glass-border)] px-3 py-1 text-xs font-semibold hover:bg-[var(--ui-hover)]"
+          className="btn-neon rounded-none px-3 py-1 text-xs font-semibold"
         >
           Save General
         </button>

@@ -187,11 +187,11 @@ export function CommandPalette({
 
   return (
     <div
-      className="fixed inset-0 z-[70] flex items-start justify-center bg-[rgba(8,15,14,0.75)] px-4 pt-[10vh]"
+      className="fixed inset-0 z-[70] flex items-start justify-center bg-black/60 px-4 pt-[10vh]"
       onClick={onClose}
     >
       <div
-        className="glass-elevated w-full max-w-3xl rounded-[28px] border border-[var(--glass-border)] p-4"
+        className="w-full max-w-2xl rounded-none border border-[#2a2a2a] bg-[#0e0e0e] p-4"
         onClick={(event) => event.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -201,18 +201,21 @@ export function CommandPalette({
           <div>
             <div
               id="command-palette-title"
-              className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--ui-accent)]"
+              className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#00ffaa]"
             >
-              Command Palette
+              COMMAND PALETTE
             </div>
-            <div className="mt-1 text-xs text-[var(--ui-text-muted)]">
-              Search repos, branches, and high-frequency actions. Shortcut: Ctrl/Cmd + K
+            <div className="mt-1 text-xs text-[#666666]">
+              Search repos, branches, and high-frequency actions. Shortcut:{' '}
+              <span className="inline-block rounded-none border border-[#2a2a2a] bg-[#141414] px-1.5 py-0.5 font-mono text-[10px] text-[#00ffaa]">
+                Ctrl/Cmd + K
+              </span>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full border border-[var(--glass-border)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ui-text-muted)] hover:bg-[var(--ui-hover)]"
+            className="btn-neon rounded-none border border-[#00ffaa] bg-transparent px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#00ffaa] transition-shadow hover:shadow-[0_0_10px_rgba(0,255,170,0.3)]"
           >
             Close
           </button>
@@ -223,12 +226,12 @@ export function CommandPalette({
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Type an action, repository, or branch"
-          className="mt-4 w-full rounded-2xl border border-[var(--glass-border)] bg-[var(--ui-panel)] px-4 py-3 text-sm"
+          className="mt-4 w-full rounded-none border border-[#2a2a2a] bg-[#0a0a0a] px-4 py-3 font-mono text-sm text-[#e0e0e0] placeholder-[#666666] focus:border-[#00ffaa] focus:shadow-[0_0_8px_rgba(0,255,170,0.2)] focus:outline-none"
         />
 
         <div className="mt-4 max-h-[28rem] space-y-2 overflow-y-auto pr-1">
           {items.length === 0 && (
-            <div className="rounded-2xl border border-dashed border-[var(--glass-border)] px-4 py-8 text-center text-sm text-[var(--ui-text-muted)]">
+            <div className="rounded-none border border-dashed border-[#2a2a2a] px-4 py-8 text-center text-sm text-[#666666]">
               No matching actions or branches.
             </div>
           )}
@@ -240,20 +243,20 @@ export function CommandPalette({
                 item.onSelect()
                 onClose()
               }}
-              className="flex w-full items-start justify-between rounded-2xl border border-[var(--glass-border)] bg-[var(--ui-panel)]/45 px-4 py-3 text-left hover:bg-[var(--ui-hover)]"
+              className="hover-card flex w-full items-start justify-between rounded-none border border-[#2a2a2a] bg-[#141414]/45 px-4 py-3 text-left transition-shadow hover:border-[#00ffaa]/40 hover:shadow-[0_0_12px_rgba(0,255,170,0.15)]"
             >
               <div>
-                <div className="text-[10px] uppercase tracking-[0.18em] text-[var(--ui-text-muted)]">
+                <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#666666]">
                   {item.group}
                 </div>
-                <div className="mt-1 text-sm font-semibold text-[var(--ui-text)]">{item.label}</div>
+                <div className="mt-1 text-sm font-semibold text-[#e0e0e0]">{item.label}</div>
                 {item.subtitle && (
-                  <div className="mt-1 break-all text-xs text-[var(--ui-text-muted)]">
+                  <div className="mt-1 break-all text-xs text-[#666666]">
                     {item.subtitle}
                   </div>
                 )}
               </div>
-              <span className="mt-1 text-xs font-semibold text-[var(--ui-accent)]">Run</span>
+              <span className="mt-1 text-xs font-bold uppercase text-[#00ffaa]">RUN</span>
             </button>
           ))}
         </div>

@@ -52,7 +52,7 @@ export function DiffView({ diffText, mode }: DiffViewProps): JSX.Element {
 
   if (!diffText.trim()) {
     return (
-      <div className="glass-card flex h-full min-h-[18rem] items-center justify-center rounded-[24px] border border-dashed border-[var(--glass-border)] px-6 text-sm text-[var(--ui-text-muted)]">
+      <div className="flex h-full min-h-[18rem] items-center justify-center rounded-none border border-dashed border-[#2a2a2a] bg-[#0e0e0e] px-6 text-sm text-[#666666]">
         {mode === 'staged'
           ? 'No staged diff yet. Stage files to review the exact commit payload.'
           : 'No diff to review. Modify a file or fetch a repository to populate the diff surface.'}
@@ -62,16 +62,16 @@ export function DiffView({ diffText, mode }: DiffViewProps): JSX.Element {
 
   if (isError || isLimited) {
     return (
-      <div className="glass-card rounded-[24px] border border-[var(--ui-status-modified-border)] bg-[var(--ui-status-modified-bg)] p-5 text-sm text-[var(--ui-status-modified)]">
-        <div className="font-semibold">Diff preview unavailable</div>
-        <div className="mt-2 text-xs leading-6 text-[var(--ui-text)]/80">{diffText}</div>
+      <div className="rounded-none border border-[#ffcc00] bg-[#141414] p-5 text-sm text-[#ffcc00]">
+        <div className="font-bold">Diff preview unavailable</div>
+        <div className="mt-2 text-xs leading-6 text-[#e0e0e0]/80">{diffText}</div>
       </div>
     )
   }
 
   if (files.length === 0) {
     return (
-      <div className="glass-card rounded-[24px] border border-[var(--glass-border)] px-6 py-8 text-sm text-[var(--ui-text-muted)]">
+      <div className="rounded-none border border-[#2a2a2a] bg-[#0e0e0e] px-6 py-8 text-sm text-[#666666]">
         GitSwitch could not render this diff as structured hunks. Try switching modes or review the
         patch in a terminal for the full raw output.
       </div>
@@ -88,46 +88,49 @@ export function DiffView({ diffText, mode }: DiffViewProps): JSX.Element {
         exit="exit"
         className="diff-view space-y-4"
       >
-        <div className="glass-card sticky top-0 z-20 rounded-[24px] border border-[var(--glass-border)] px-4 py-3">
+        <div className="sticky top-0 z-20 rounded-none border-b border-[#2a2a2a] bg-[#0a0a0a] px-4 py-3">
           <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
             <div>
-              <div className="text-[11px] uppercase tracking-[0.24em] text-[var(--ui-accent)]">
-                Diff Workspace
+              <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#00ffaa]">
+                DIFF WORKSPACE
               </div>
-              <div className="mt-1 text-xs text-[var(--ui-text-muted)]">
+              <div className="mt-1 text-xs text-[#666666]">
                 Jump between changed files, switch layouts, and filter whitespace-only churn.
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
+                aria-pressed={diffViewType === 'split'}
                 onClick={() => setDiffViewType('split')}
-                className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${
+                className={`neon-badge rounded-none border px-3 py-1.5 font-mono text-xs font-bold ${
                   diffViewType === 'split'
-                    ? 'border-[var(--ui-accent-border)] bg-[var(--ui-accent-bg)] text-[var(--ui-accent)]'
-                    : 'border-[var(--glass-border)] text-[var(--ui-text-muted)] hover:bg-[var(--ui-hover)]'
+                    ? 'border-[#00ffaa] text-[#00ffaa] shadow-[0_0_8px_rgba(0,255,170,0.2)]'
+                    : 'border-[#2a2a2a] text-[#666666] hover:border-[#666666]'
                 }`}
               >
                 Side by Side
               </button>
               <button
                 type="button"
+                aria-pressed={diffViewType === 'unified'}
                 onClick={() => setDiffViewType('unified')}
-                className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${
+                className={`neon-badge rounded-none border px-3 py-1.5 font-mono text-xs font-bold ${
                   diffViewType === 'unified'
-                    ? 'border-[var(--ui-accent-border)] bg-[var(--ui-accent-bg)] text-[var(--ui-accent)]'
-                    : 'border-[var(--glass-border)] text-[var(--ui-text-muted)] hover:bg-[var(--ui-hover)]'
+                    ? 'border-[#00ffaa] text-[#00ffaa] shadow-[0_0_8px_rgba(0,255,170,0.2)]'
+                    : 'border-[#2a2a2a] text-[#666666] hover:border-[#666666]'
                 }`}
               >
                 Unified
               </button>
               <button
                 type="button"
+                aria-pressed={ignoreWhitespace}
                 onClick={() => setIgnoreWhitespace(!ignoreWhitespace)}
-                className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${
+                className={`neon-badge rounded-none border px-3 py-1.5 font-mono text-xs font-bold ${
                   ignoreWhitespace
-                    ? 'border-[var(--ui-status-added-border)] bg-[var(--ui-status-added-bg)] text-[var(--ui-status-added)]'
-                    : 'border-[var(--glass-border)] text-[var(--ui-text-muted)] hover:bg-[var(--ui-hover)]'
+                    ? 'border-[#00ffaa] text-[#00ffaa] shadow-[0_0_8px_rgba(0,255,170,0.2)]'
+                    : 'border-[#2a2a2a] text-[#666666] hover:border-[#666666]'
                 }`}
               >
                 Ignore Whitespace
@@ -144,10 +147,10 @@ export function DiffView({ diffText, mode }: DiffViewProps): JSX.Element {
                   key={`${file.oldPath}-${file.newPath}`}
                   type="button"
                   onClick={() => setFocusedDiffFile(pathLabel)}
-                  className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-semibold ${
+                  className={`neon-badge whitespace-nowrap rounded-none border px-3 py-1.5 font-mono text-xs font-bold ${
                     isActive
-                      ? 'border-[var(--ui-accent-border)] bg-[var(--ui-accent-bg)] text-[var(--ui-accent)]'
-                      : 'border-[var(--glass-border)] text-[var(--ui-text-muted)] hover:bg-[var(--ui-hover)]'
+                      ? 'border-[#00ffaa] text-[#00ffaa] shadow-[0_0_8px_rgba(0,255,170,0.2)]'
+                      : 'border-[#2a2a2a] text-[#666666] hover:border-[#666666]'
                   }`}
                 >
                   {pathLabel}
@@ -158,7 +161,7 @@ export function DiffView({ diffText, mode }: DiffViewProps): JSX.Element {
         </div>
 
         {isTruncated && (
-          <div className="rounded-2xl border border-[var(--ui-status-modified-border)] bg-[var(--ui-status-modified-bg)] p-4 text-xs text-[var(--ui-status-modified)]">
+          <div className="neon-badge-yellow rounded-none border border-[#ffcc00] bg-[#141414] p-4 text-xs text-[#ffcc00]">
             Showing the first {MAX_DISPLAY_FILES} of {allFiles.length} changed files for renderer
             safety.
           </div>
@@ -170,26 +173,26 @@ export function DiffView({ diffText, mode }: DiffViewProps): JSX.Element {
             <section
               key={`${file.oldPath}-${file.newPath}`}
               id={`diff-file-${encodeURIComponent(pathLabel)}`}
-              className="diff-view-container rounded-[24px] border border-[var(--glass-border)]"
+              className="diff-view-container rounded-none border border-[#2a2a2a]"
             >
-              <div className="sticky top-[5.75rem] z-10 flex items-center justify-between gap-3 border-b border-[var(--glass-border)] bg-[var(--ui-panel)]/88 px-4 py-3 backdrop-blur">
+              <div className="sticky top-[5.75rem] z-10 flex items-center justify-between gap-3 border-b border-[#2a2a2a] bg-[#141414] px-4 py-3">
                 <div>
-                  <div className="text-sm font-semibold text-[var(--ui-text)]">{pathLabel}</div>
-                  <div className="mt-1 text-[11px] uppercase tracking-[0.16em] text-[var(--ui-text-muted)]">
+                  <div className="text-sm font-semibold text-[#e0e0e0]">{pathLabel}</div>
+                  <div className="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#666666]">
                     {file.type}
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={() => setFocusedDiffFile(pathLabel)}
-                  className="rounded-full border border-[var(--glass-border)] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--ui-text-muted)] hover:bg-[var(--ui-hover)]"
+                  className="btn-neon rounded-none border border-[#00ffaa] bg-transparent px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#00ffaa] transition-shadow hover:shadow-[0_0_10px_rgba(0,255,170,0.3)]"
                 >
                   Focus
                 </button>
               </div>
               <Diff viewType={diffViewType} diffType={file.type} hunks={file.hunks}>
                 {(hunks) => (
-                  <div className="bg-[var(--ui-panel-muted)]/80">
+                  <div className="bg-[#0a0a0a]/80">
                     {hunks.map((hunk) => (
                       <Hunk key={hunk.content} hunk={hunk} />
                     ))}

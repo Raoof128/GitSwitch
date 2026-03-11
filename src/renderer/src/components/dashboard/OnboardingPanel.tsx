@@ -48,17 +48,20 @@ export function OnboardingPanel({
   ]
 
   return (
-    <section className="glass-card rounded-[24px] border border-[var(--glass-border)] p-5 sm:p-6">
+    <section className="border border-[#2a2a2a] bg-[#141414] p-5 sm:p-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="max-w-2xl">
-          <div className="text-[11px] uppercase tracking-[0.28em] text-[var(--ui-accent)]">
+          <div className="label-brutal label-accent">
             First-Run Flow
           </div>
-          <h2 className="mt-3 text-2xl font-semibold leading-tight text-[var(--ui-text)] sm:text-3xl">
+          <h2
+            className="mt-3 font-mono text-2xl font-bold uppercase leading-tight text-[#e0e0e0] sm:text-3xl"
+            style={{ textShadow: '0 0 10px rgba(224, 224, 224, 0.15)' }}
+          >
             GitSwitch helps you move between repos, branches, and review-ready changes without
             losing trust in what Git is doing.
           </h2>
-          <p className="mt-3 max-w-xl text-sm leading-6 text-[var(--ui-text-muted)]">
+          <p className="mt-3 max-w-xl text-sm leading-6 text-[#666666]">
             The fastest way to get value is simple: load a repository, choose the SSH identity you
             want for sync operations, and connect AI only if it supports your workflow.
           </p>
@@ -66,7 +69,7 @@ export function OnboardingPanel({
         <button
           type="button"
           onClick={onDismiss}
-          className="self-start rounded-full border border-[var(--glass-border)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--ui-text-muted)] hover:bg-[var(--ui-hover)]"
+          className="btn-neon self-start px-3 py-1 text-[10px]"
         >
           Hide
         </button>
@@ -76,29 +79,30 @@ export function OnboardingPanel({
         {steps.map((step) => (
           <div
             key={step.title}
-            className={`rounded-2xl border p-4 ${
-              step.done
-                ? 'border-[var(--ui-status-added-border)] bg-[var(--ui-status-added-bg)]'
-                : 'border-[var(--glass-border)] bg-[var(--ui-panel)]/50'
-            }`}
+            className="border border-[#2a2a2a] bg-[#0e0e0e] p-4"
+            style={{
+              borderLeftWidth: '2px',
+              borderLeftColor: step.done ? '#00ffaa' : '#2a2a2a',
+              ...(step.done ? { boxShadow: 'inset 2px 0 8px -4px rgba(0, 255, 170, 0.3)' } : {})
+            }}
           >
             <div className="flex items-center justify-between gap-3">
-              <div className="text-sm font-semibold text-[var(--ui-text)]">{step.title}</div>
+              <div className="text-sm font-semibold text-[#e0e0e0]">{step.title}</div>
               <span
-                className={`rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${
+                className={`rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] ${
                   step.done
-                    ? 'bg-[var(--ui-status-added-bg)] text-[var(--ui-status-added)]'
-                    : 'bg-[var(--ui-hover)] text-[var(--ui-text-muted)]'
+                    ? 'neon-badge neon-badge-green'
+                    : 'neon-badge neon-badge-yellow'
                 }`}
               >
                 {step.done ? 'Ready' : 'Pending'}
               </span>
             </div>
-            <div className="mt-2 text-xs leading-5 text-[var(--ui-text-muted)]">{step.detail}</div>
+            <div className="mt-2 text-xs leading-5 text-[#666666]">{step.detail}</div>
             <button
               type="button"
               onClick={step.onAction}
-              className="mt-4 rounded-xl border border-[var(--glass-border)] px-3 py-2 text-xs font-semibold text-[var(--ui-text)] hover:bg-[var(--ui-hover)]"
+              className="btn-neon mt-4"
             >
               {step.done ? 'Review' : step.actionLabel}
             </button>

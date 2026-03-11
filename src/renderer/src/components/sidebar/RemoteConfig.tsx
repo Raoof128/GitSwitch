@@ -41,23 +41,23 @@ export function RemoteConfig(): JSX.Element | null {
   }
 
   return (
-    <div className="glass-card mt-4 rounded-md p-3">
+    <div className="mt-4 border border-[#2a2a2a] bg-[#141414] p-3">
       <div className="mb-2">
-        <div className="text-xs uppercase tracking-[0.2em] text-[var(--ui-text-muted)]">
+        <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#666666]">
           Remote Origin
         </div>
       </div>
 
       {hasOrigin ? (
         <div className="mb-2 text-[11px]">
-          <span className="text-[var(--ui-status-added)]">✓</span>{' '}
-          <span className="break-all text-[var(--ui-text-muted)]">
+          <span className="text-[#00ffaa]" style={{ textShadow: '0 0 8px rgba(0, 255, 170, 0.6)' }}>✓</span>{' '}
+          <span className="break-all font-mono text-[#666666]">
             {originRemote?.url || 'Set'}
           </span>
         </div>
       ) : (
-        <div className="mb-2 text-[11px] text-[var(--ui-status-modified)]">
-          ⚠️ No remote origin configured
+        <div className="mb-2 text-[11px] font-bold text-[#ffcc00]" style={{ textShadow: '0 0 8px rgba(255, 204, 0, 0.4)' }}>
+          WARNING: No remote origin configured
         </div>
       )}
 
@@ -69,18 +69,18 @@ export function RemoteConfig(): JSX.Element | null {
             setError(null)
           }}
           placeholder={hasOrigin ? 'Update remote URL...' : 'git@github.com:user/repo.git'}
-          className="w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs text-slate-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)]"
+          className="w-full border border-[#2a2a2a] bg-[#0a0a0a] px-2 py-1 text-xs text-[#e0e0e0] placeholder-[#666666] focus:border-[#00ffaa] focus:shadow-[0_0_12px_rgba(0,255,170,0.15)] focus:outline-none"
         />
 
         {error && (
-          <div className="rounded border border-[var(--ui-status-deleted-border)] bg-[var(--ui-status-deleted-bg)] px-2 py-1 text-[10px] text-[var(--ui-status-deleted)]">
+          <div className="border border-[#ff3366]/30 bg-[#ff3366]/5 px-2 py-1 text-[10px] font-bold text-[#ff3366]" style={{ textShadow: '0 0 8px rgba(255, 51, 102, 0.4)' }}>
             {error}
           </div>
         )}
 
         {success && (
-          <div className="rounded border border-[var(--ui-status-added-border)] bg-[var(--ui-status-added-bg)] px-2 py-1 text-[10px] text-[var(--ui-status-added)]">
-            ✓ Remote origin saved
+          <div className="border border-[#00ffaa]/30 bg-[#00ffaa]/5 px-2 py-1 text-[10px] font-bold text-[#00ffaa]" style={{ textShadow: '0 0 8px rgba(0, 255, 170, 0.6)' }}>
+            ORIGIN SAVED
           </div>
         )}
 
@@ -89,11 +89,11 @@ export function RemoteConfig(): JSX.Element | null {
           onClick={handleSave}
           disabled={saving || !remoteUrl.trim()}
           whileTap={scaleTap(reduceMotion)}
-          className="flex w-full items-center justify-center gap-1.5 rounded-md border-2 border-[var(--ui-accent-border)] bg-[var(--ui-accent-bg)] py-1.5 text-xs font-medium text-[var(--ui-accent)] transition-colors hover:bg-[var(--ui-accent-bg-strong)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)] disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-1.5 border border-[#00ffaa] py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#00ffaa] transition-shadow hover:shadow-[0_0_20px_rgba(0,255,170,0.15)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
         >
           {saving ? (
             <svg
-              className="h-3.5 w-3.5 animate-spin"
+              className="h-3.5 w-3.5 animate-spin text-[#00ffaa]"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -128,7 +128,7 @@ export function RemoteConfig(): JSX.Element | null {
               />
             </svg>
           )}
-          {hasOrigin ? 'Update Origin' : 'Set Origin'}
+          {hasOrigin ? 'UPDATE ORIGIN' : 'SET ORIGIN'}
         </motion.button>
       </div>
     </div>

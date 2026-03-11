@@ -30,12 +30,16 @@ type RepoOverviewProps = {
   }
 }
 
-const warningClasses: Record<OverviewWarning['tone'], string> = {
-  error:
-    'border-[var(--ui-status-deleted-border)] bg-[var(--ui-status-deleted-bg)] text-[var(--ui-status-deleted)]',
-  info: 'border-[var(--ui-accent-border)] bg-[var(--ui-accent-bg)] text-[var(--ui-accent)]',
-  warning:
-    'border-[var(--ui-status-modified-border)] bg-[var(--ui-status-modified-bg)] text-[var(--ui-status-modified)]'
+const warningCardClasses: Record<OverviewWarning['tone'], string> = {
+  error: 'bg-[#141414] border border-l-2 p-4 border-l-[#ff3366]',
+  info: 'bg-[#141414] border border-l-2 p-4 border-l-[#00ffaa]',
+  warning: 'bg-[#141414] border border-l-2 p-4 border-l-[#ffcc00]'
+}
+
+const warningTextClasses: Record<OverviewWarning['tone'], string> = {
+  error: 'text-[#ff3366]',
+  info: 'text-[#00ffaa]',
+  warning: 'text-[#ffcc00]'
 }
 
 const formatLastFetch = (timestamp: number | null): string => {
@@ -76,14 +80,14 @@ export function RepoOverview({
 }: RepoOverviewProps): JSX.Element {
   return (
     <section className="space-y-4">
-      <div className="glass-card rounded-[24px] border border-[var(--glass-border)] p-5">
+      <div className="border border-[#2a2a2a] bg-[#141414] p-5">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
-            <div className="text-[11px] uppercase tracking-[0.28em] text-[var(--ui-accent)]">
+            <div className="label-brutal label-accent">
               Repository Overview
             </div>
-            <div className="mt-2 text-2xl font-semibold text-[var(--ui-text)]">{repoName}</div>
-            <div className="mt-1 break-all text-xs leading-5 text-[var(--ui-text-muted)]">
+            <div className="mt-2 text-2xl font-bold uppercase tracking-[0.04em] text-[#e0e0e0]">{repoName}</div>
+            <div className="mt-1 break-all text-xs leading-5 text-[#666666]">
               {repoPath}
             </div>
           </div>
@@ -91,14 +95,14 @@ export function RepoOverview({
             <button
               type="button"
               onClick={onFetch}
-              className="rounded-xl border border-[var(--glass-border)] px-3 py-2 text-xs font-semibold text-[var(--ui-text)] hover:bg-[var(--ui-hover)]"
+              className="btn-neon"
             >
               {isFetching ? 'Fetching…' : 'Fetch'}
             </button>
             <button
               type="button"
               onClick={onOpenCommandPalette}
-              className="rounded-xl border border-[var(--ui-accent-border)] bg-[var(--ui-accent-bg)] px-3 py-2 text-xs font-semibold text-[var(--ui-accent)] hover:bg-[var(--ui-accent-bg-strong)]"
+              className="btn-neon"
             >
               Command Palette
             </button>
@@ -106,61 +110,85 @@ export function RepoOverview({
         </div>
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-          <div className="rounded-2xl border border-[var(--glass-border)] bg-[var(--ui-panel)]/50 p-4">
-            <div className="text-[10px] uppercase tracking-[0.18em] text-[var(--ui-text-muted)]">
+          <div className="border border-[#2a2a2a] bg-[#0e0e0e] p-4">
+            <div className="label-brutal">
               Current Branch
             </div>
-            <div className="mt-2 text-lg font-semibold text-[var(--ui-text)]">
+            <div
+              className="mt-2 font-mono text-lg font-semibold text-[#00ffaa]"
+              style={{ textShadow: '0 0 8px rgba(0, 255, 170, 0.5)' }}
+            >
               {currentBranch ?? 'Detached HEAD'}
             </div>
           </div>
-          <div className="rounded-2xl border border-[var(--glass-border)] bg-[var(--ui-panel)]/50 p-4">
-            <div className="text-[10px] uppercase tracking-[0.18em] text-[var(--ui-text-muted)]">
+          <div className="border border-[#2a2a2a] bg-[#0e0e0e] p-4">
+            <div className="label-brutal">
               Ahead / Behind
             </div>
-            <div className="mt-2 text-lg font-semibold text-[var(--ui-text)]">
-              {stats.ahead} / {stats.behind}
+            <div className="mt-2 font-mono text-lg font-semibold">
+              <span
+                className="text-[#00ffaa]"
+                style={{ textShadow: '0 0 8px rgba(0, 255, 170, 0.4)' }}
+              >
+                ↑{stats.ahead}
+              </span>
+              {' '}
+              <span
+                className="text-[#ff3366]"
+                style={{ textShadow: '0 0 8px rgba(255, 51, 102, 0.4)' }}
+              >
+                ↓{stats.behind}
+              </span>
             </div>
           </div>
-          <div className="rounded-2xl border border-[var(--glass-border)] bg-[var(--ui-panel)]/50 p-4">
-            <div className="text-[10px] uppercase tracking-[0.18em] text-[var(--ui-text-muted)]">
+          <div className="border border-[#2a2a2a] bg-[#0e0e0e] p-4">
+            <div className="label-brutal">
               Working Tree
             </div>
-            <div className="mt-2 text-lg font-semibold text-[var(--ui-text)]">
+            <div
+              className="mt-2 font-mono text-lg font-semibold text-[#e0e0e0]"
+              style={{ textShadow: '0 0 6px rgba(224, 224, 224, 0.3)' }}
+            >
               {stats.changedFiles} changed
             </div>
-            <div className="mt-1 text-[11px] text-[var(--ui-text-muted)]">
+            <div className="mt-1 text-[11px] text-[#666666]">
               {stats.stagedFiles} staged
             </div>
           </div>
-          <div className="rounded-2xl border border-[var(--glass-border)] bg-[var(--ui-panel)]/50 p-4">
-            <div className="text-[10px] uppercase tracking-[0.18em] text-[var(--ui-text-muted)]">
+          <div className="border border-[#2a2a2a] bg-[#0e0e0e] p-4">
+            <div className="label-brutal">
               Active Account
             </div>
-            <div className="mt-2 text-lg font-semibold text-[var(--ui-text)]">
+            <div
+              className="mt-2 font-mono text-lg font-semibold text-[#e0e0e0]"
+              style={{ textShadow: '0 0 6px rgba(224, 224, 224, 0.3)' }}
+            >
               {activeAccountName ?? 'No account'}
             </div>
             {!canSync && (
               <button
                 type="button"
                 onClick={onOpenSettingsAccounts}
-                className="mt-2 text-[11px] font-semibold text-[var(--ui-accent)] hover:underline"
+                className="mt-2 text-[11px] font-semibold text-[#00ffaa] hover:underline"
               >
                 Configure account
               </button>
             )}
           </div>
-          <div className="rounded-2xl border border-[var(--glass-border)] bg-[var(--ui-panel)]/50 p-4">
-            <div className="text-[10px] uppercase tracking-[0.18em] text-[var(--ui-text-muted)]">
+          <div className="border border-[#2a2a2a] bg-[#0e0e0e] p-4">
+            <div className="label-brutal">
               Last Fetch
             </div>
-            <div className="mt-2 text-lg font-semibold text-[var(--ui-text)]">
+            <div
+              className="mt-2 font-mono text-lg font-semibold text-[#e0e0e0]"
+              style={{ textShadow: '0 0 6px rgba(224, 224, 224, 0.3)' }}
+            >
               {formatLastFetch(lastFetchAt)}
             </div>
             <button
               type="button"
               onClick={onOpenSettingsIntegrations}
-              className="mt-2 text-[11px] font-semibold text-[var(--ui-accent)] hover:underline"
+              className="mt-2 text-[11px] font-semibold text-[#00ffaa] hover:underline"
             >
               Review AI setup
             </button>
@@ -173,23 +201,26 @@ export function RepoOverview({
           {stats.warnings.map((warning) => (
             <div
               key={`${warning.title}-${warning.detail}`}
-              className={`glass-card rounded-2xl border p-4 ${warningClasses[warning.tone]}`}
+              className={warningCardClasses[warning.tone]}
             >
-              <div className="text-sm font-semibold">{warning.title}</div>
-              <div className="mt-1 text-xs leading-5 opacity-90">{warning.detail}</div>
+              <div className={`text-sm font-semibold ${warningTextClasses[warning.tone]}`}>{warning.title}</div>
+              <div className="mt-1 text-xs leading-5 text-[#e0e0e0] opacity-90">{warning.detail}</div>
             </div>
           ))}
         </div>
       )}
 
       {hasChanges && (
-        <div className="glass-card rounded-[24px] border border-[var(--glass-border)] p-5">
+        <div className="border border-[#2a2a2a] bg-[#141414] p-5">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div>
-              <div className="text-[11px] uppercase tracking-[0.28em] text-[var(--ui-status-modified)]">
+              <div
+                className="label-brutal text-[#ff3366]"
+                style={{ textShadow: '0 0 8px rgba(255, 51, 102, 0.4)' }}
+              >
                 Dangerous Actions
               </div>
-              <div className="mt-2 text-sm leading-6 text-[var(--ui-text-muted)]">
+              <div className="mt-2 text-sm leading-6 text-[#666666]">
                 Destructive Git operations should never be one-click casual. GitSwitch will show a
                 confirmation preview before applying them.
               </div>
@@ -198,14 +229,14 @@ export function RepoOverview({
               <button
                 type="button"
                 onClick={onDiscardChanges}
-                className="rounded-xl border border-[var(--ui-status-modified-border)] bg-[var(--ui-status-modified-bg)] px-3 py-2 text-xs font-semibold text-[var(--ui-status-modified)] hover:bg-[var(--ui-status-modified-bg)]/80"
+                className="btn-neon btn-neon-yellow"
               >
                 Discard Unstaged
               </button>
               <button
                 type="button"
                 onClick={onHardReset}
-                className="rounded-xl border border-[var(--ui-status-deleted-border)] bg-[var(--ui-status-deleted-bg)] px-3 py-2 text-xs font-semibold text-[var(--ui-status-deleted)] hover:bg-[var(--ui-status-deleted-bg)]/80"
+                className="btn-neon btn-neon-pink"
               >
                 Hard Reset to HEAD
               </button>

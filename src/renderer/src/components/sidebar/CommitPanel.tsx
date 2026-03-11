@@ -39,9 +39,9 @@ export function CommitPanel(): JSX.Element {
   const isStaging = stageStatus === 'loading'
 
   return (
-    <div className="glass-card mt-6 rounded-md p-3">
+    <div className="mt-6 border border-[#2a2a2a] bg-[#141414] p-3">
       <div className="mb-2">
-        <div className="text-xs uppercase tracking-[0.2em] text-[var(--ui-text-muted)]">Commit</div>
+        <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#666666]">Commit</div>
       </div>
       <div className="space-y-2">
         <div className="flex items-center gap-2">
@@ -56,7 +56,7 @@ export function CommitPanel(): JSX.Element {
                 commit()
               }
             }}
-            className="w-full flex-1 rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs text-slate-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)] disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full flex-1 border border-[#2a2a2a] bg-[#0a0a0a] px-2 py-1 text-xs text-[#e0e0e0] placeholder-[#666666] focus:border-[#00ffaa] focus:shadow-[0_0_12px_rgba(0,255,170,0.15)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           />
           <motion.button
             type="button"
@@ -64,9 +64,9 @@ export function CommitPanel(): JSX.Element {
             whileTap={scaleTap(reduceMotion)}
             disabled={isGenerateDisabled}
             title="Generate message (Shift+Ctrl/⌘+G)"
-            className="rounded-md border border-[var(--glass-border)] px-2 py-1 text-[10px] text-slate-300 hover:border-[var(--ui-border-soft)] hover:bg-[var(--ui-hover)] hover:text-[var(--ui-text)] disabled:cursor-not-allowed disabled:opacity-50"
+            className="border border-[#00ffaa] px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#00ffaa] transition-shadow hover:shadow-[0_0_20px_rgba(0,255,170,0.15)] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {generateStatus === 'loading' ? 'Generating…' : 'Generate ✨'}
+            {generateStatus === 'loading' ? 'GENERATING...' : 'GENERATE'}
           </motion.button>
         </div>
         <textarea
@@ -75,25 +75,25 @@ export function CommitPanel(): JSX.Element {
           placeholder="Description (optional)"
           rows={3}
           disabled={isGenerating}
-          className="w-full resize-none rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel)] px-2 py-1 text-xs text-slate-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)] disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full resize-none border border-[#2a2a2a] bg-[#0a0a0a] px-2 py-1 text-xs text-[#e0e0e0] placeholder-[#666666] focus:border-[#00ffaa] focus:shadow-[0_0_12px_rgba(0,255,170,0.15)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
         />
-        <div className="text-[11px] text-[var(--ui-text-muted)]">
+        <div className="text-[11px] text-[#666666]">
           Staged files: {stagedSummary.count}
           {stagedSummary.files.length > 0 && (
-            <span className="block text-[var(--ui-text-muted)]">
+            <span className="block text-[#666666]">
               {stagedSummary.files.join(', ')}
-              {stagedSummary.count > stagedSummary.files.length ? '…' : ''}
+              {stagedSummary.count > stagedSummary.files.length ? '...' : ''}
             </span>
           )}
         </div>
         {titleLength > 72 && (
-          <div className="rounded border border-[var(--ui-status-modified-border)] bg-[var(--ui-status-modified-bg)] px-2 py-1 text-[11px] text-[var(--ui-status-modified)]">
-            ⚠️ Title exceeds 72 characters (may be truncated)
+          <div className="border border-[#ffcc00]/30 bg-[#ffcc00]/5 px-2 py-1 text-[11px] font-bold text-[#ffcc00]" style={{ textShadow: '0 0 8px rgba(255, 204, 0, 0.4)' }}>
+            WARNING: Title exceeds 72 characters (may be truncated)
           </div>
         )}
         {commitError && (
-          <div className="rounded border border-[var(--ui-status-deleted-border)] bg-[var(--ui-status-deleted-bg)] px-2 py-1 text-[11px] text-[var(--ui-status-deleted)]">
-            ❌ {commitError}
+          <div className="border border-[#ff3366]/30 bg-[#ff3366]/5 px-2 py-1 text-[11px] font-bold text-[#ff3366]" style={{ textShadow: '0 0 8px rgba(255, 51, 102, 0.4)' }}>
+            ERROR: {commitError}
           </div>
         )}
         <motion.button
@@ -101,11 +101,11 @@ export function CommitPanel(): JSX.Element {
           onClick={stageAll}
           disabled={isStageDisabled}
           whileTap={scaleTap(reduceMotion)}
-          className="flex w-full items-center justify-center gap-1.5 rounded-md border-2 border-[var(--ui-accent-border)] bg-[var(--ui-accent-bg)] py-1.5 text-xs font-medium text-[var(--ui-accent)] transition-colors hover:bg-[var(--ui-accent-bg-strong)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)] disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-1.5 border border-[#00ffaa] py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#00ffaa] transition-shadow hover:shadow-[0_0_20px_rgba(0,255,170,0.15)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isStaging ? (
             <svg
-              className="h-3.5 w-3.5 animate-spin text-[var(--ui-accent)]"
+              className="h-3.5 w-3.5 animate-spin text-[#00ffaa]"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -136,7 +136,7 @@ export function CommitPanel(): JSX.Element {
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
             </svg>
           )}
-          Stage All
+          STAGE ALL
         </motion.button>
 
         <div className="flex items-center gap-2 px-1">
@@ -145,11 +145,12 @@ export function CommitPanel(): JSX.Element {
             id="auto-push"
             checked={autoPush}
             onChange={(e) => updateSettings({ autoPush: e.target.checked })}
-            className="h-3 w-3 rounded border-[var(--glass-border)] bg-[var(--ui-panel)] text-[var(--ui-accent)] focus:ring-[var(--ui-accent)]"
+            className="h-3 w-3 appearance-none border border-[#2a2a2a] bg-[#0a0a0a] checked:border-[#00ffaa] checked:bg-[#00ffaa] focus:ring-0 focus:ring-offset-0"
+            style={{ borderRadius: 0 }}
           />
           <label
             htmlFor="auto-push"
-            className="cursor-pointer select-none text-[10px] text-[var(--ui-text-muted)] hover:text-[var(--ui-text)]"
+            className="cursor-pointer select-none text-[10px] uppercase tracking-[0.12em] text-[#666666] hover:text-[#e0e0e0]"
           >
             Push immediately after commit
           </label>
@@ -161,7 +162,7 @@ export function CommitPanel(): JSX.Element {
           disabled={isDisabled}
           whileTap={scaleTap(reduceMotion)}
           title="Commit (Ctrl/⌘+Enter)"
-          className="relative w-full rounded-md border border-[var(--glass-border)] px-2 py-1 text-xs font-semibold text-slate-200 hover:bg-[var(--ui-hover)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)] disabled:cursor-not-allowed disabled:opacity-50"
+          className="relative w-full bg-[#00ffaa] px-2 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#0a0a0a] transition-shadow hover:shadow-[0_0_20px_rgba(0,255,170,0.3)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
         >
           <span className={commitStatus === 'loading' ? 'opacity-0' : 'opacity-100'}>
             {branchLabel}
@@ -170,13 +171,13 @@ export function CommitPanel(): JSX.Element {
             {commitStatus === 'loading' && (
               <motion.span
                 key="spinner"
-                className="absolute inset-0 flex items-center justify-center text-slate-200"
+                className="absolute inset-0 flex items-center justify-center text-[#0a0a0a]"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
                 <motion.span
-                  className="h-3 w-3 rounded-full border border-[var(--ui-border-soft)] border-t-transparent"
+                  className="h-3 w-3 border border-[#0a0a0a] border-t-transparent"
                   animate={reduceMotion ? {} : { rotate: 360 }}
                   transition={
                     reduceMotion
@@ -189,13 +190,14 @@ export function CommitPanel(): JSX.Element {
             {commitStatus === 'success' && (
               <motion.span
                 key="success"
-                className="absolute inset-0 flex items-center justify-center text-[var(--ui-status-added)]"
+                className="absolute inset-0 flex items-center justify-center text-[#0a0a0a]"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.16 }}
+                style={{ textShadow: '0 0 8px rgba(0, 255, 170, 0.6)' }}
               >
-                ✓
+                COMMITTED
               </motion.span>
             )}
           </AnimatePresence>

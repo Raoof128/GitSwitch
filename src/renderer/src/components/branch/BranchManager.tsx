@@ -42,16 +42,16 @@ export function BranchManager({
   }
 
   return (
-    <section className="glass-card rounded-[24px] border border-[var(--glass-border)] p-5">
+    <section className="border border-[#2a2a2a] bg-[#141414] p-5">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
         <div>
-          <div className="text-[11px] uppercase tracking-[0.28em] text-[var(--ui-accent)]">
+          <div className="label-brutal label-accent">
             Branch Workflow
           </div>
-          <div className="mt-2 text-lg font-semibold text-[var(--ui-text)]">
+          <div className="mt-2 text-lg font-semibold text-[#e0e0e0]">
             {currentBranch ? `Currently on ${currentBranch}` : 'No named branch checked out'}
           </div>
-          <div className="mt-1 text-xs leading-5 text-[var(--ui-text-muted)]">
+          <div className="mt-1 text-xs leading-5 text-[#666666]">
             Search local branches, jump back to recent work, or create a fresh branch from the
             current HEAD.
           </div>
@@ -59,20 +59,23 @@ export function BranchManager({
         <button
           type="button"
           onClick={onOpenCommandPalette}
-          className="rounded-xl border border-[var(--glass-border)] px-3 py-2 text-xs font-semibold text-[var(--ui-text)] hover:bg-[var(--ui-hover)]"
+          className="btn-neon"
         >
           Open Palette
         </button>
       </div>
 
       <div className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,1.2fr),minmax(20rem,0.8fr)]">
-        <div className="rounded-2xl border border-[var(--glass-border)] bg-[var(--ui-panel)]/40 p-4">
+        <div className="border border-[#2a2a2a] bg-[#0e0e0e] p-4">
           <div className="flex items-center justify-between gap-3">
-            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--ui-text-muted)]">
+            <div className="label-brutal">
               Search Branches
             </div>
             {status === 'loading' && (
-              <div className="text-[10px] uppercase tracking-[0.14em] text-[var(--ui-accent)]">
+              <div
+                className="label-brutal text-[#00ffaa]"
+                style={{ textShadow: '0 0 8px rgba(0, 255, 170, 0.4)' }}
+              >
                 Updating
               </div>
             )}
@@ -81,12 +84,12 @@ export function BranchManager({
             value={branchQuery}
             onChange={(event) => setBranchQuery(event.target.value)}
             placeholder="Search local branches"
-            className="mt-3 w-full rounded-xl border border-[var(--glass-border)] bg-[var(--ui-panel)] px-3 py-2 text-sm"
+            className="mt-3 w-full border border-[#2a2a2a] bg-[#0a0a0a] px-3 py-2 text-sm text-[#e0e0e0] placeholder-[#666666] outline-none focus:border-[#00ffaa] focus:shadow-[0_0_8px_rgba(0,255,170,0.3)]"
           />
 
           <div className="mt-4 max-h-64 space-y-2 overflow-y-auto pr-1">
             {filteredBranches.length === 0 && (
-              <div className="rounded-2xl border border-dashed border-[var(--glass-border)] px-4 py-5 text-center text-xs text-[var(--ui-text-muted)]">
+              <div className="border border-dashed border-[#2a2a2a] px-4 py-5 text-center text-xs text-[#666666]">
                 No matching branches.
               </div>
             )}
@@ -96,19 +99,34 @@ export function BranchManager({
                 type="button"
                 onClick={() => onCheckoutBranch(branch.name)}
                 disabled={branch.current}
-                className={`flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left ${
+                className={`hover-card flex w-full items-center justify-between border px-4 py-3 text-left transition-shadow ${
                   branch.current
-                    ? 'border-[var(--ui-status-added-border)] bg-[var(--ui-status-added-bg)] text-[var(--ui-status-added)]'
-                    : 'border-[var(--glass-border)] bg-[var(--ui-panel)]/50 text-[var(--ui-text)] hover:bg-[var(--ui-hover)]'
+                    ? 'border-[#2a2a2a] bg-[#0e0e0e] text-[#00ffaa]'
+                    : 'border-[#2a2a2a] bg-[#0e0e0e] text-[#e0e0e0] hover:shadow-[0_0_12px_rgba(0,255,170,0.15)]'
                 }`}
+                style={
+                  branch.current
+                    ? {
+                        borderLeftWidth: '2px',
+                        borderLeftColor: '#00ffaa',
+                        boxShadow: 'inset 2px 0 8px -4px rgba(0, 255, 170, 0.3)'
+                      }
+                    : {}
+                }
               >
                 <div>
                   <div className="text-sm font-semibold">{branch.name}</div>
-                  <div className="mt-1 text-[11px] text-[var(--ui-text-muted)]">
+                  <div className="mt-1 text-[11px] text-[#666666]">
                     {branch.current ? 'Current branch' : 'Checkout branch'}
                   </div>
                 </div>
-                <span className="rounded-full border border-current/20 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em]">
+                <span
+                  className={`rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] ${
+                    branch.current
+                      ? 'neon-badge neon-badge-green'
+                      : 'neon-badge neon-badge-pink'
+                  }`}
+                >
                   {branch.current ? 'Active' : 'Switch'}
                 </span>
               </button>
@@ -117,18 +135,18 @@ export function BranchManager({
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-2xl border border-[var(--glass-border)] bg-[var(--ui-panel)]/40 p-4">
-            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--ui-text-muted)]">
+          <div className="border border-[#2a2a2a] bg-[#0e0e0e] p-4">
+            <div className="label-brutal">
               Create Branch
             </div>
-            <div className="mt-2 text-xs leading-5 text-[var(--ui-text-muted)]">
+            <div className="mt-2 text-xs leading-5 text-[#666666]">
               New branches are created from the current branch unless you switch first.
             </div>
             <input
               value={newBranchName}
               onChange={(event) => setNewBranchName(event.target.value)}
               placeholder="feature/refined-onboarding"
-              className="mt-3 w-full rounded-xl border border-[var(--glass-border)] bg-[var(--ui-panel)] px-3 py-2 text-sm"
+              className="mt-3 w-full border border-[#2a2a2a] bg-[#0a0a0a] px-3 py-2 text-sm text-[#e0e0e0] placeholder-[#666666] outline-none focus:border-[#00ffaa] focus:shadow-[0_0_8px_rgba(0,255,170,0.3)]"
               onKeyDown={(event) => {
                 if (event.key === 'Enter') {
                   handleCreateBranch()
@@ -138,19 +156,19 @@ export function BranchManager({
             <button
               type="button"
               onClick={handleCreateBranch}
-              className="mt-3 rounded-xl border border-[var(--ui-accent-border)] bg-[var(--ui-accent-bg)] px-3 py-2 text-xs font-semibold text-[var(--ui-accent)] hover:bg-[var(--ui-accent-bg-strong)]"
+              className="btn-neon mt-3"
             >
               Create from {currentBranch ?? 'HEAD'}
             </button>
           </div>
 
-          <div className="rounded-2xl border border-[var(--glass-border)] bg-[var(--ui-panel)]/40 p-4">
-            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--ui-text-muted)]">
+          <div className="border border-[#2a2a2a] bg-[#0e0e0e] p-4">
+            <div className="label-brutal">
               Recent Branches
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
               {recentBranches.length === 0 && (
-                <div className="text-xs text-[var(--ui-text-muted)]">
+                <div className="text-xs text-[#666666]">
                   Branch history appears here after you switch branches.
                 </div>
               )}
@@ -159,7 +177,7 @@ export function BranchManager({
                   key={branchName}
                   type="button"
                   onClick={() => onCheckoutBranch(branchName)}
-                  className="rounded-full border border-[var(--glass-border)] px-3 py-1.5 text-xs font-semibold text-[var(--ui-text)] hover:bg-[var(--ui-hover)]"
+                  className="neon-badge neon-badge-green rounded-full px-3 py-1.5 text-xs font-semibold transition-shadow hover:shadow-[0_0_8px_rgba(0,255,170,0.3)]"
                 >
                   {branchName}
                 </button>

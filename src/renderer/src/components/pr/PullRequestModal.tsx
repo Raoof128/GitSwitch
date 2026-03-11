@@ -82,10 +82,6 @@ export function PullRequestModal(): JSX.Element | null {
     [updatePrForm]
   )
 
-  const handleClose = useCallback(() => {
-    closePrModal()
-  }, [closePrModal])
-
   const handleDraftChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       updatePrForm({ draft: event.target.checked })
@@ -106,10 +102,6 @@ export function PullRequestModal(): JSX.Element | null {
     }
   }, [prResult.url])
 
-  const handleSubmit = useCallback(() => {
-    submitPullRequest()
-  }, [submitPullRequest])
-
   const handleTitleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       updatePrForm({ title: event.target.value })
@@ -122,16 +114,19 @@ export function PullRequestModal(): JSX.Element | null {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
       <div
         ref={modalRef}
-        className="glass-elevated w-full max-w-lg rounded-lg p-4"
+        className="w-full max-w-lg rounded-none border border-[#2a2a2a] bg-[#0e0e0e] p-4"
         role="dialog"
         aria-modal="true"
         aria-labelledby="pr-modal-title"
       >
-        <div id="pr-modal-title" className="mb-3 text-sm font-semibold">
-          Create Pull Request
+        <div
+          id="pr-modal-title"
+          className="mb-3 font-mono text-sm font-bold uppercase tracking-[0.18em] text-[#e0e0e0]"
+        >
+          CREATE PULL REQUEST
         </div>
         <div className="space-y-2">
           <input
@@ -139,50 +134,54 @@ export function PullRequestModal(): JSX.Element | null {
             value={prForm.title}
             onChange={handleTitleChange}
             placeholder="Title"
-            className="w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel-muted)] px-2 py-2 text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)]"
+            className="w-full rounded-none border border-[#2a2a2a] bg-[#0a0a0a] px-2 py-2 text-xs text-[#e0e0e0] placeholder-[#666666] focus:border-[#00ffaa] focus:shadow-[0_0_8px_rgba(0,255,170,0.2)] focus:outline-none"
           />
           <textarea
             value={prForm.body}
             onChange={handleBodyChange}
             placeholder="Description"
             rows={4}
-            className="w-full resize-none rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel-muted)] px-2 py-2 text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)]"
+            className="w-full resize-none rounded-none border border-[#2a2a2a] bg-[#0a0a0a] px-2 py-2 text-xs text-[#e0e0e0] placeholder-[#666666] focus:border-[#00ffaa] focus:shadow-[0_0_8px_rgba(0,255,170,0.2)] focus:outline-none"
           />
           <div className="grid grid-cols-2 gap-2">
             <input
               value={prForm.baseBranch}
               onChange={handleBaseChange}
               placeholder="Base branch"
-              className="w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel-muted)] px-2 py-2 text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)]"
+              className="w-full rounded-none border border-[#2a2a2a] bg-[#0a0a0a] px-2 py-2 text-xs text-[#e0e0e0] placeholder-[#666666] focus:border-[#00ffaa] focus:shadow-[0_0_8px_rgba(0,255,170,0.2)] focus:outline-none"
             />
             <input
               value={prForm.headBranch}
               onChange={handleHeadChange}
               placeholder="Head branch"
-              className="w-full rounded-md border border-[var(--glass-border)] bg-[var(--ui-panel-muted)] px-2 py-2 text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ui-accent)]"
+              className="w-full rounded-none border border-[#2a2a2a] bg-[#0a0a0a] px-2 py-2 text-xs text-[#e0e0e0] placeholder-[#666666] focus:border-[#00ffaa] focus:shadow-[0_0_8px_rgba(0,255,170,0.2)] focus:outline-none"
             />
           </div>
-          <label className="flex items-center gap-2 text-xs text-slate-300">
+          <label className="flex items-center gap-2 text-xs text-[#e0e0e0]">
             <input
               type="checkbox"
               checked={Boolean(prForm.draft)}
               onChange={handleDraftChange}
-              className="h-4 w-4 accent-[var(--ui-accent)]"
+              className="h-4 w-4 appearance-none rounded-none border border-[#2a2a2a] bg-[#0a0a0a] checked:border-[#00ffaa] checked:bg-[#00ffaa]"
             />
             Draft PR
           </label>
         </div>
 
         {prResult.status === 'error' && (
-          <div className="mt-3 text-xs text-[var(--ui-status-deleted)]">{prResult.message}</div>
+          <div className="mt-3 text-xs text-[#ff3366]" style={{ textShadow: '0 0 8px rgba(255,51,102,0.4)' }}>
+            {prResult.message}
+          </div>
         )}
         {prResult.status === 'success' && prResult.url && (
-          <div className="mt-3 flex items-center justify-between text-xs text-[var(--ui-status-added)]">
-            <span>PR created</span>
+          <div className="mt-3 flex items-center justify-between text-xs">
+            <span className="text-[#00ffaa]" style={{ textShadow: '0 0 8px rgba(0,255,170,0.4)' }}>
+              PR created
+            </span>
             <button
               type="button"
               onClick={handleOpenPr}
-              className="rounded-md border border-[var(--glass-border)] px-2 py-1 text-xs hover:bg-[var(--ui-hover)]"
+              className="btn-neon rounded-none border border-[#00ffaa] bg-transparent px-2 py-1 text-xs font-bold uppercase tracking-[0.18em] text-[#00ffaa] transition-shadow hover:shadow-[0_0_10px_rgba(0,255,170,0.3)]"
             >
               Open PR
             </button>
@@ -192,18 +191,18 @@ export function PullRequestModal(): JSX.Element | null {
         <div className="mt-4 flex justify-end gap-2">
           <button
             type="button"
-            onClick={handleClose}
-            className="rounded-md border border-[var(--glass-border)] px-3 py-1 text-xs hover:bg-[var(--ui-hover)]"
+            onClick={closePrModal}
+            className="rounded-none border border-[#2a2a2a] bg-transparent px-3 py-1 text-xs text-[#e0e0e0] transition-colors hover:border-[#666666]"
           >
             Cancel
           </button>
           <button
             type="button"
             disabled={isDisabled || prResult.status === 'loading'}
-            onClick={handleSubmit}
-            className="rounded-md border border-[var(--glass-border)] px-3 py-1 text-xs font-semibold disabled:opacity-40 hover:bg-[var(--ui-hover)]"
+            onClick={submitPullRequest}
+            className="btn-neon rounded-none border border-[#00ffaa] bg-transparent px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-[#00ffaa] transition-shadow disabled:opacity-40 hover:shadow-[0_0_10px_rgba(0,255,170,0.3)]"
           >
-            {prResult.status === 'loading' ? 'Creating…' : 'Create PR'}
+            {prResult.status === 'loading' ? 'Creating...' : 'Create PR'}
           </button>
         </div>
       </div>

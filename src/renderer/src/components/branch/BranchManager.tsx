@@ -65,7 +65,7 @@ export function BranchManager({
         </button>
       </div>
 
-      <div className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,1.2fr),minmax(20rem,0.8fr)]">
+      <div className="mt-5 grid gap-4 overflow-hidden xl:grid-cols-[minmax(0,1.2fr),minmax(20rem,0.8fr)]">
         <div className="border border-[#2a2a2a] bg-[#0e0e0e] p-4">
           <div className="flex items-center justify-between gap-3">
             <div className="label-brutal">

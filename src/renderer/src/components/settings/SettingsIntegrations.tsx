@@ -174,7 +174,7 @@ export function SettingsIntegrations(): JSX.Element {
         <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[#00ffaa]">
           AI Commit Generator
         </div>
-        <div className="mb-3 grid grid-cols-2 gap-4">
+        <div className="mb-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.18em] text-[#666666]">
               Provider
@@ -264,14 +264,17 @@ export function SettingsIntegrations(): JSX.Element {
             <optgroup label="Google Gemini 3 (Latest)">
               <option value="gemini-3-flash">Gemini 3 Flash (Fastest & Efficient)</option>
               <option value="gemini-3-pro">Gemini 3 Pro (Most Capable)</option>
+              <option value="gemini-3.1-flash-lite-preview">Gemini 3.1 Flash Lite (Preview)</option>
             </optgroup>
             <optgroup label="Google Gemini 2.5">
               <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
               <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+              <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite (Budget)</option>
             </optgroup>
             <optgroup label="Google Gemini 2.0">
               <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
               <option value="gemini-2.0-pro-exp">Gemini 2.0 Pro (Exp)</option>
+              <option value="gemini-2.0-flash-lite">Gemini 2.0 Flash Lite</option>
             </optgroup>
             <optgroup label="Google Gemini 1.5 (Legacy)">
               <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>

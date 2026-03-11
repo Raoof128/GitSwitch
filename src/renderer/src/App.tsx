@@ -420,7 +420,7 @@ function App(): JSX.Element {
 
   /* ── Render ── */
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[var(--ui-bg)] text-[var(--ui-text)]">
+    <div className="flex h-screen w-screen flex-col-reverse overflow-hidden bg-[var(--ui-bg)] text-[var(--ui-text)] sm:flex-row">
       {/* ══════════ ACTIVITY RAIL ══════════ */}
       <nav className="activity-rail" role="tablist">
         <div className="flex flex-col items-center gap-1">
@@ -490,7 +490,7 @@ function App(): JSX.Element {
           </div>
 
           {/* Right: actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <select
               aria-label="Quick swap account"
               value={selectedAccountId ?? ''}
@@ -642,7 +642,7 @@ function App(): JSX.Element {
                         <div
                           className="flex shrink-0 flex-col overflow-hidden"
                           style={{
-                            width: wideLayout ? 360 : '100%',
+                            width: wideLayout ? 'min(360px, 100%)' : '100%',
                           }}
                         >
                           {/* File list section */}

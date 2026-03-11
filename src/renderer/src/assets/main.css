@@ -921,6 +921,51 @@ button:hover:not(:disabled) {
   animation: none !important;
 }
 
+/* ═══ RESPONSIVE — small screens ═══ */
+@media (max-width: 639px) {
+  .activity-rail {
+    width: 100%;
+    min-width: unset;
+    height: 48px;
+    flex-direction: row;
+    justify-content: center;
+    padding-top: 0;
+    padding: 0 0.5rem;
+    border-right: none;
+    border-top: 1px solid var(--ui-border);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+  }
+
+  .activity-rail > div {
+    flex-direction: row;
+  }
+
+  .rail-btn.active::before {
+    left: 25%;
+    top: -1px;
+    height: 2px;
+    width: 50%;
+    bottom: auto;
+  }
+
+  .top-bar {
+    height: auto;
+    min-height: 44px;
+    padding: 0.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  /* Add padding for bottom nav */
+  main {
+    padding-bottom: 48px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .spider-loader * {
     animation: none !important;

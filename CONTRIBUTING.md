@@ -1,52 +1,65 @@
-# Contributing to Gitswitch
+# Contributing to GitSwitch
 
-Thank you for your interest in contributing to Gitswitch! We welcome contributions from everyone.
+GitSwitch is maintained as a production desktop application. Treat every change as if it could ship to end users.
 
-## Getting Started
+## Prerequisites
 
-1.  **Fork the repository** on GitHub.
-2.  **Clone your fork** locally:
-    ```bash
-    git clone https://github.com/your-username/gitswitch.git
-    cd gitswitch
-    ```
-3.  **Install dependencies**:
-    ```bash
-    npm install
-    ```
-4.  **Create a branch** for your feature or fix:
-    ```bash
-    git checkout -b feature/amazing-feature
-    ```
+- Node.js 20+
+- npm 10+
+- Git 2.40+
+- A workstation with an available system keychain if you are testing secret storage
 
-## Development Workflow
+## Local Setup
 
-*   **Run Development Server**: `npm run dev`
-*   **Type Check**: `npm run typecheck`
-*   **Lint**: `npm run lint`
-*   **Format**: `npm run format`
-
-## Commit Guidelines
-
-We use conventional commits. Please strictly follow this format:
-
-```
-type(scope): subject
-
-body
+```bash
+git clone https://github.com/Raoof128/GitSwitch.git
+cd GitSwitch
+npm install
+npm run dev
 ```
 
-*   **Types**: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`.
-*   **Scope**: e.g., `ui`, `git`, `ai`, `store`.
-*   **Subject**: Short imperative summary (no capital, no dot).
+## Development Standards
 
-## Pull Request Process
+- Keep privileged operations in the main process. Do not move filesystem, shell, git, or secret work into the renderer.
+- Preserve the Electron security model: sandboxed renderer, context isolation, no Node integration.
+- Add or update tests with every non-trivial change.
+- Update documentation when behavior, workflows, or configuration changes.
+- Do not commit secrets, personal keys, or generated build artifacts.
 
-1.  Ensure all checks pass (`npm run typecheck`, `npm run lint`).
-2.  Update documentation if applicable.
-3.  Open a Pull Request against the `main` branch.
-4.  Provide a clear description of changes and link related issues.
+## Branch and Commit Guidance
 
-## Reporting Issues
+- Use focused branches such as `feat/<topic>` or `fix/<topic>`.
+- Follow conventional commits with a scoped subject, for example `fix(git): harden remote validation`.
+- Keep commit messages imperative and concise.
 
-Please use the GitHub Issue Tracker to report bugs or request features. Provide as much detail as possible, including steps to reproduce and system information.
+## Verification Before Opening a PR
+
+```bash
+npm run lint
+npm run typecheck
+npm test
+npm run test:coverage
+npm run build
+```
+
+## Pull Requests
+
+Every pull request should include:
+
+- A concise description of the change
+- Notes about user-facing behavior or security impact
+- Linked issues if applicable
+- Updated tests and docs where relevant
+
+## Security-Sensitive Changes
+
+Changes involving IPC, secret storage, authentication, packaging, external URLs, or git execution should include:
+
+- Threat or abuse-case consideration
+- Negative-path tests where possible
+- A note in the PR description explaining the risk and mitigation
+
+## Reporting Bugs and Feature Requests
+
+- Use GitHub Issues for bugs, UX issues, and feature requests.
+- Use private email reporting for vulnerabilities as described in [SECURITY.md](SECURITY.md).

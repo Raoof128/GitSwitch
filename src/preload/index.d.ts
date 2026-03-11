@@ -1,5 +1,7 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
 import type {
+  SettingsPublic,
+  SettingsUpdateInput,
   CommitMessage,
   CommitResult,
   DiffMode,
@@ -12,33 +14,6 @@ import type {
   SecretsSaveInput,
   SecretsDeleteInput
 } from '../index'
-
-/** Settings returned from main process (public subset) */
-export interface SettingsPublic {
-  aiCloudModel: string
-  aiLocalModel: string
-  aiLocalUrl: string
-  aiProvider: 'offline' | 'local' | 'cloud'
-  aiRedactionEnabled: boolean
-  aiTimeoutSec: number
-  autoPush: boolean
-  defaultAccountId?: string | null
-  defaultBaseBranch: 'main' | 'master'
-  diffLimitKb: number
-  diffLimitLines: number
-  hasAiKey: boolean
-  hasGitHubToken: boolean
-  hasGitLabToken: boolean
-  likeApp: boolean
-  reducedMotion: boolean
-  strictHostKeyChecking: boolean
-  theme: 'dark'
-}
-
-/** Settings update payload */
-export type SettingsUpdateInput = Partial<
-  Omit<SettingsPublic, 'hasAiKey' | 'hasGitHubToken' | 'hasGitLabToken'>
->
 
 /** IPC API exposed to the renderer process */
 export interface PreloadApi {

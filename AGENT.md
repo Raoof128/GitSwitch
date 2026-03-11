@@ -1,93 +1,87 @@
-# CHANGELOG
+# AGENT
 
-## Unreleased
+## Project Rules
 
-- Raouf: (entries appended below)
-- Raouf: 2026-03-11 (Australia/Sydney)
-  - Scope: Production Audit & Hardening
-  - Summary: Completed a comprehensive repository audit covering security, reliability, testing, documentation, CI, and packaging polish.
-    1. SECURITY: Hardened external URL validation, exposed secret-storage failures to the UI, and added trusted-host coverage tests.
-    2. RELIABILITY: Fixed default-account fallback for pull/fetch flows, aligned renderer settings defaults with persisted defaults, and tightened shared IPC typing.
-    3. TESTING: Added focused tests for URL policy, AI helpers, git URL parsing, and account-selection logic; enabled `vitest` coverage reporting.
-    4. DOCS/CONFIG: Rewrote README, architecture, security, contributing, and conduct docs; added API reference, usage examples, troubleshooting docs, Dependabot, CODEOWNERS, security workflow, devcontainer support, build-resource fixes, and macOS entitlements.
-    5. DEPENDENCIES: Added `@vitest/coverage-v8`, refreshed the lockfile, and ran `npm audit fix` to reduce the audit report to 0 vulnerabilities.
-  - Files: src/index.ts, src/main/index.ts, src/main/security/*, src/main/ai/helpers.test.ts, src/main/git/git-utils.test.ts, src/main/secure/key-manager.ts, src/preload/*, src/renderer/src/**/*, vitest.config.ts, package.json, package-lock.json, README.md, ARCHITECTURE.md, SECURITY.md, CONTRIBUTING.md, CODE_OF_CONDUCT.md, electron-builder.yml, .gitignore, .github/*, docs/*, .devcontainer/*, resources/entitlements.mac.plist
-  - Verification: `npm run lint`, `npm run typecheck`, `npm test`, `npm run test:coverage`, `npm run build`, and `npm audit --audit-level=high` all pass.
-  - Follow-ups: Broaden main-process integration coverage for git execution and keychain-dependent flows.
-- Raouf: 2026-02-17 (Australia/Sydney)
-  - Scope: Metadata Update
-  - Summary: Updated developer contact email to raoof.r12@gmail.com across project metadata (package.json, electron-builder.yml).
-  - Files: package.json, electron-builder.yml
-  - Verification: Manual verification of file content.
+- Keep the renderer sandboxed: contextIsolation true, nodeIntegration false, sandbox true.
+- Run all filesystem and git operations in the main process via IPC.
+- Store key metadata in electron-store; encrypt private keys with safeStorage at ~/.gitswitch/keys/{id}.enc.
+- Create temp SSH key files with 0600 permissions and always clean them up.
+- Maintain the sidebar/files/diff layout structure; avoid random redesigns.
 
-- Raouf: 2026-02-17 (Australia/Sydney)
-  - Scope: Production Readiness & Installer
-  - Summary: Finalized app for production release. Unified build scripts, added `dist` for installers, and corrected app identity.
-    1. SCRIPTS: Added `npm run dist` to create installers for the current OS.
-    2. SCRIPTS: Unified `build:*` scripts to include mandatory `npm run typecheck` and `npm run lint` for release safety.
-    3. BUILD: Corrected `AppUserModelId` to `com.gitswitch.app` for proper Windows taskbar/notification behavior.
-    4. CONFIG: Refined `electron-builder.yml` categories and targets; updated maintainer metadata.
-    5. DOCS: Updated README.md with clearer build instructions and current homepage.
-  - Files: package.json, src/main/index.ts, electron-builder.yml, README.md
-  - Verification: `npm run build`, `npm run typecheck`, and `npm run lint` all pass.
+## Log
 
-- Raouf: 2026-01-12 (Australia/Sydney)
-  - Scope: Project Audit & Professional Standards
-  - Summary: Comprehensive audit to align with production-grade standards.
-    1. DOCS: Added `ARCHITECTURE.md` detailing system design and security model. Updated `README.md`, `CONTRIBUTING.md`, and `CODE_OF_CONDUCT.md` to professional standards.
-    2. CI/CD: Added `npm test` step to GitHub Actions workflow for automated verification.
-    3. CLEANUP: Removed debug console logging from AI commit generation logic.
-    4. QUALITY: Verified full lint/typecheck/test pass.
-  - Files: ARCHITECTURE.md, README.md, CONTRIBUTING.md, CODE_OF_CONDUCT.md, .github/workflows/ci.yml, src/main/ai/commit-generate.ts
-  - Verification: `npm run lint` (clean), `npm run typecheck` (clean), `npm test` (passed).
-  - Follow-ups: None.
+ - Raouf: (entries appended below)
+ - Raouf: 2026-03-11 (Australia/Sydney)
+   - Scope: Production Audit & Hardening
+   - Summary: Completed a full repository audit and brought the project into a cleaner production-ready state.
+     1. SECURITY: Replaced the permissive external URL suffix check with a trusted-host policy and added tests for lookalike-domain rejection.
+     2. RELIABILITY: Propagated secret-storage errors back to the renderer, surfaced feedback in settings, and aligned push/pull/fetch with default-account fallback behavior.
+     3. TYPING: Centralized shared settings/secret IPC contracts, aligned renderer defaults with persisted defaults, and added targeted unit tests plus coverage support.
+     4. REPO: Rebuilt the docs/config layer with refreshed README, architecture and security docs, usage/API/troubleshooting guides, stronger CI/security automation, build metadata fixes, devcontainer support, CODEOWNERS, and packaging entitlements.
+     5. DEPENDENCIES: Added coverage tooling and applied `npm audit fix`, reducing the audit report to 0 known vulnerabilities.
+   - Files: src/index.ts, src/main/index.ts, src/main/security/*, src/main/ai/helpers.test.ts, src/main/git/git-utils.test.ts, src/main/secure/key-manager.ts, src/preload/*, src/renderer/src/**/*, vitest.config.ts, package.json, package-lock.json, README.md, ARCHITECTURE.md, SECURITY.md, CONTRIBUTING.md, CODE_OF_CONDUCT.md, electron-builder.yml, .gitignore, .github/*, docs/*, .devcontainer/*, resources/entitlements.mac.plist
+   - Verification: `npm run lint`, `npm run typecheck`, `npm test`, `npm run test:coverage`, `npm run build`, and `npm audit --audit-level=high` all pass.
+   - Follow-ups: Expand higher-level integration coverage around main-process git and secure-storage flows if you want deeper release-gate confidence.
+ - Raouf: 2026-02-17 (Australia/Sydney)
+   - Scope: Metadata Update
+   - Summary: Updated developer contact email to raoof.r12@gmail.com across project metadata.
+   - Files: package.json, electron-builder.yml
+   - Verification: Manual verification of file content.
 
-- Raouf: 2026-01-12 (Australia/Sydney)
-  - Scope: Build System (Runtime Fix)
-  - Summary: Fixed `Uncaught Exception: Error: Could not resolve "bufferutil"` by explicitly externalizing `ws` optional peer dependencies.
-    1. FIX: Added `rollupOptions.external` for `bufferutil` and `utf-8-validate` in `electron.vite.config.ts`. This allows the bundled `ws` module to fail gracefully when these optional native modules are missing, instead of the bundler injecting throwing stubs.
-  - Files: electron.vite.config.ts
-  - Verification: `npm run build` passed.
-  - Follow-ups: None.
+ - Raouf: 2026-02-17 (Australia/Sydney)
+   - Scope: Production Readiness & Installer
+   - Summary: Finalized app for production release. Unified build scripts, added `dist` for installers, and corrected app identity.
+     1. SCRIPTS: Added `npm run dist` to create installers for the current OS.
+     2. SCRIPTS: Unified `build:*` scripts to include mandatory `npm run typecheck` and `npm run lint` for release safety.
+     3. BUILD: Corrected `AppUserModelId` to `com.gitswitch.app` for proper Windows taskbar/notification behavior.
+     4. CONFIG: Refined `electron-builder.yml` categories and targets; updated maintainer metadata.
+     5. DOCS: Updated README.md with clearer build instructions and current homepage.
+   - Files: package.json, src/main/index.ts, electron-builder.yml, README.md
+   - Verification: `npm run build`, `npm run typecheck`, and `npm run lint` all pass.
+   - Summary: Added ARCHITECTURE.md, updated docs/CI, removed logs.
+   - Files: ARCHITECTURE.md, docs/*, .github/*
+   - Verification: All checks passed.
 
-- Raouf: 2026-01-12 (Australia/Sydney)
-  - Scope: Build System (ESM Interop Fix)
-  - Summary: Fixed `TypeError: ElectronStore is not a constructor` and potential runtime errors with other ESM dependencies.
-    1. FIX: Configured `electron-vite` to bundle ESM-only dependencies (`electron-store`, `chokidar`, `@google/genai`) into the Main process CJS build. This ensures correct default export handling and prevents `ERR_REQUIRE_ESM`.
-  - Files: electron.vite.config.ts
-  - Verification: `npm run build` passed. Main bundle size increased ~1.2MB reflecting bundled deps.
-  - Follow-ups: None.
+ - Raouf: 2026-01-12 (Australia/Sydney)
+   - Scope: Build System (Runtime Fix)
+   - Summary: Externalized `bufferutil`/`utf-8-validate` to fix `ws` runtime error.
+   - Files: electron.vite.config.ts
+   - Verification: Build passed.
 
-- Raouf: 2026-01-12 (Australia/Sydney)
-  - Scope: AI Integration (Model Updates)
-  - Summary: Added support for latest Google Gemini models (Gemini 3, 2.5, 2.0).
-    1. NEW: Added `gemini-3-pro`, `gemini-3-flash`, `gemini-2.5-pro`, `gemini-2.5-flash`, `gemini-2.0-flash` (stable), and `gemini-2.0-pro-exp`.
-    2. DEFAULT: Updated default cloud model to `gemini-3-flash` for improved speed and cost-efficiency.
-    3. UX: Reorganized model selection dropdown into clear groups (Gemini 3, 2.5, 2.0, 1.5, Legacy).
-  - Files: src/index.ts, src/main/secure/key-manager.ts, src/main/ai/providers/gemini.ts, src/renderer/src/components/settings/SettingsIntegrations.tsx
-  - Verification: `npm run typecheck`, `npm run lint` (clean).
-  - Follow-ups: None.
+ - Raouf: 2026-01-12 (Australia/Sydney)
+   - Scope: Build System (ESM Interop Fix)
+   - Summary: Bundled ESM deps (`electron-store`, `chokidar`, `@google/genai`) to fix runtime crash.
+   - Files: electron.vite.config.ts
+   - Verification: Build passed.
 
-- Raouf: 2026-01-12 (Australia/Sydney)
-  - Scope: Production Readiness Audit (Final Polish)
-  - Summary: Completed final hardening pass. Fixed security timeouts, watcher correctness, and build configuration.
-    1. SECURITY: Added 30s timeout to `git pull` and `git fetch` operations to prevent network hangs.
-    2. CORRECTNESS: Updated file watcher to monitor the entire repository root (respecting .gitignore) instead of just `src/app/lib`, fixing change detection for projects with different structures.
-    3. RELEASE: Disabled placeholder code signing identity in `electron-builder.yml` to allow successful ad-hoc/unsigned builds in CI/dev environments.
-  - Files: src/main/git/git-service.ts, src/main/git/watcher.ts, electron-builder.yml
-  - Verification: `npm run typecheck`, `npm run lint` (clean), manual review of logic.
-  - Follow-ups: None. Ready for release candidate.
+ - Raouf: 2026-01-12 (Australia/Sydney)
+   - Scope: AI Integration (Model Updates)
+   - Summary: Added support for latest Google Gemini models (Gemini 3, 2.5, 2.0).
+     1. NEW: Added `gemini-3-pro`, `gemini-3-flash`, `gemini-2.5-pro`, `gemini-2.5-flash`, `gemini-2.0-flash` (stable), and `gemini-2.0-pro-exp`.
+     2. DEFAULT: Updated default cloud model to `gemini-3-flash` for improved speed and cost-efficiency.
+     3. UX: Reorganized model selection dropdown into clear groups (Gemini 3, 2.5, 2.0, 1.5, Legacy).
+   - Files: src/index.ts, src/main/secure/key-manager.ts, src/main/ai/providers/gemini.ts, src/renderer/src/components/settings/SettingsIntegrations.tsx
+   - Verification: `npm run typecheck`, `npm run lint` (clean).
 
-- Raouf: 2026-01-12 (Australia/Sydney)
-  - Scope: Dependency Updates & Test Infrastructure
-  - Summary: Updated all outdated dependencies and added test scripts to package.json for improved test coverage.
-    1. HIGH: Updated 8 outdated dependencies (@google/genai 1.34.0→1.35.0, @types/node 22.19.1→25.0.6, @types/react 19.2.7→19.2.8, electron-builder 26.0.12→26.4.0, eslint-plugin-react-hooks 5.2.0→7.0.1, framer-motion 12.23.26→12.25.0, tailwindcss 3.4.13→3.4.19, vite 7.2.6→7.3.1).
-    2. MEDIUM: Added new test scripts (test:unit, test:integration, test:all, test:coverage) to package.json.
-    3. MEDIUM: Verified build, lint, typecheck, and original tests pass after updates.
-    4. LOW: Confirmed 0 vulnerabilities after dependency updates via `npm audit`.
-  - Files: package.json
-  - Verification: `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build` all pass with 0 errors.
-  - Follow-ups: Add comprehensive unit and integration tests for git operations, AI providers, and key management once test environment is properly configured with mocked electron-store.
+ - Raouf: 2026-01-12 (Australia/Sydney)
+   - Scope: Production Readiness Audit (Final Polish)
+   - Summary: Completed final hardening pass. Fixed security timeouts, watcher correctness, and build configuration.
+     1. SECURITY: Added 30s timeout to `git pull` and `git fetch` operations.
+     2. CORRECTNESS: Expanded file watcher scope to repo root.
+     3. RELEASE: Disabled placeholder signing identity.
+   - Files: src/main/git/git-service.ts, src/main/git/watcher.ts, electron-builder.yml
+   - Verification: `npm run typecheck`, `npm run lint` passed.
+
+ - Raouf: 2026-01-12 (Australia/Sydney)
+   - Scope: Dependency Updates & Test Infrastructure
+   - Summary: Updated all outdated dependencies and added test scripts to package.json for improved test coverage.
+     1. HIGH: Updated 8 outdated dependencies (@google/genai, @types/node, @types/react, electron-builder, eslint-plugin-react-hooks, framer-motion, tailwindcss, vite).
+     2. MEDIUM: Added new test scripts (test:unit, test:integration, test:all, test:coverage) to package.json.
+     3. MEDIUM: Verified build, lint, typecheck, and original tests pass after updates.
+     4. LOW: Confirmed 0 vulnerabilities after dependency updates.
+   - Files: package.json
+   - Verification: `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build` all pass.
+   - Follow-ups: Add comprehensive unit and integration tests for git operations, AI providers, and key management once test environment is properly configured with mocked electron-store.
 
 - Raouf: 2026-01-07 (Australia/Sydney)
   - Scope: Code Quality Audit (Comprehensive Fix)
@@ -260,12 +254,12 @@
   - Follow-ups: Run a quick push/pull and diff sanity check in the UI once convenient.
 - Raouf: 2026-01-06 (Australia/Sydney)
   - Scope: UI Theme (Quick Nord)
-  - Summary: Swapped the renderer's palette to the requested Quick Nord colors and aligned interactive states with the Frost accent.
-    1.  Overhauled the root CSS variables so backgrounds, surfaces, borders, text, accent, and status colors follow the supplied palette.
-    2.  Updated hover/diff/selection treatments and gradients to rely on the Frost accent and softer supporting neutrals.
+  - Summary: Replaced the global renderer palette with the requested Quick Nord colors so backgrounds, surfaces, borders, text, accent, and status tokens match the Nord-inspired scheme.
+    1.  Mapped background/surface/border variables and status colors to the supplied Frost, teal, and success/warning/error swatches.
+    2.  Retuned hover/diff/selection gradients and accents so the new palette extends through gradients, hover cards, and diff highlights.
   - Files: src/renderer/src/assets/main.css
-  - Verification: Not run (visual-only change).
-  - Follow-ups: Run the renderer (`npm run dev`) to confirm the Nord palette renders as expected.
+  - Verification: Not run (visual change only).
+  - Follow-ups: Launch the renderer for a visual sanity check once a dev build is convenient.
 - Raouf: 2026-01-05 (Australia/Sydney)
   - Scope: Bug Fix (AI)
   - Summary: Improved AI hallucination detection to eliminate false positives.
@@ -277,7 +271,7 @@
 - Raouf: 2026-01-05 (Australia/Sydney)
   - Scope: Maintenance (Stability & Performance)
   - Summary: Implemented comprehensive stability guards for large repositories and massive code changes.
-    1.  Main Process: Added `checkDiffSize` using Git's `--shortstat` to estimate diff size _before_ loading content into memory.
+    1.  Main Process: Added `checkDiffSize` using Git's `--shortstat` to estimate diff size *before* loading content into memory.
     2.  Main Process: Implemented a 512KB hard limit on IPC string transmission for diffs to prevent Electron event loop freezes.
     3.  Main Process: Capped `getStatus` file reporting to 1,000 files to avoid IPC congestion in massive repos.
     4.  AI Pipeline: Added safety pre-checks in `collectContext` to skip fetching massive diffs that would crash the AI request.
@@ -303,7 +297,7 @@
     5.  Synchronized `env.d.ts` and `preload/index.ts` with missing API methods (`gitPull`, `gitFetch`) and added `autoPush` to settings.
     6.  Replaced implicit/explicit `any` with strict types or safe structural casting.
     7.  Fixed `no-useless-escape` regex error in `git-service.ts`.
-  - Files: src/main/**/\*, src/renderer/src/**/_, src/preload/_, src/env.d.ts
+  - Files: src/main/**/*, src/renderer/src/**/*, src/preload/*, src/env.d.ts
   - Verification: `npm run lint` and `npm run typecheck` now pass with 0 errors/warnings.
 - Raouf: 2026-01-05 (Australia/Sydney)
   - Scope: Repository Cleanup
@@ -333,7 +327,7 @@
 - Raouf: 2026-01-05 (Australia/Sydney)
   - Scope: Project Audit (Major Upgrade)
   - Summary: Conducted comprehensive production-readiness audit. Added MISSING release assets (LICENSE, CONTRIBUTING, SECURITY, CODE_OF_CONDUCT). Upgraded README.md. Implemented CI/CD workflows and Vitest testing infrastructure.
-  - Files: README.md, LICENSE, CONTRIBUTING.md, SECURITY.md, CODE_OF_CONDUCT.md, .github/\*, package.json, vitest.config.ts
+  - Files: README.md, LICENSE, CONTRIBUTING.md, SECURITY.md, CODE_OF_CONDUCT.md, .github/*, package.json, vitest.config.ts
   - Verification: Validation of file creation.
 - Raouf: 2026-01-05 (Australia/Sydney)
   - Scope: Bug Fix (Critical)
@@ -455,22 +449,22 @@
   - Verification: Manual review of execution flow.
 - Raouf: 2026-01-05 (Australia/Sydney)
   - Scope: AI Integration (Rewrite)
-  - Summary: Rewrote AI integration layer from zero to support Gemini, ChatGPT (OpenAI), and Claude (Anthropic). Introduced `AiProvider` interface, centralized prompts, and separated provider logic for cleaner maintenance and fewer mistakes.
-  - Files: src/main/ai/interfaces.ts, src/main/ai/prompts.ts, src/main/ai/helpers.ts, src/main/ai/providers/\*, src/main/ai/commit-generate.ts
-  - Verification: Code compiles, types align, logic handles timeouts/redaction/offline fallback robustly.
-  - Follow-ups: User to verify with their specific API keys.
+  - Summary: Rewrote AI integration layer from zero. Implemented a robust provider-based architecture supporting Gemini (Google GenAI), OpenAI (ChatGPT), and Anthropic (Claude) alongside Local LLMs. Centralized prompt engineering and added clean factory-based orchestration.
+  - Files: src/main/ai/interfaces.ts, src/main/ai/prompts.ts, src/main/ai/helpers.ts, src/main/ai/providers/gemini.ts, src/main/ai/providers/openai.ts, src/main/ai/providers/anthropic.ts, src/main/ai/providers/local.ts, src/main/ai/commit-generate.ts
+  - Verification: Clean architecture verified. Providers use official SDKs or standardized fetch calls. Fallbacks and security redaction preserved.
+  - Follow-ups: Test with actual API keys for all providers.
 - Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: Production readiness audit (Phases 1-8)
-  - Summary: Comprehensive 8-phase security hardening and code quality pass including: added IPC-based shell:openExternal handler to enforce external URL allowlist validation in main process, removed dead Versions.tsx component that referenced non-existent window.electron, refactored Gemini provider with proper Promise.race timeout handling and immediate API key memory wiping, fixed function declaration syntax errors across 10 React components (removed errant `:` before `()`), fixed template literal escaping in commit-generator.ts, added explanatory comment for dev-only console.log statements, ran prettier formatting pass
-  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts, src/main/ai/providers/gemini.ts, src/main/git/commit-generator.ts, src/preload/index.ts, src/renderer/src/env.d.ts, src/renderer/src/App.tsx, src/renderer/src/components/pr/PullRequestModal.tsx, src/renderer/src/components/settings/_.tsx, src/renderer/src/components/sidebar/_.tsx, deleted: src/renderer/src/components/Versions.tsx
-  - Security Verified: nodeIntegration=false, contextIsolation=true, sandbox=true, webSecurity=true, strict CSP in production only, all IPC handlers validate input with assertString/assertBoolean/assertNumber/assertKeys, secrets encrypted with safeStorage (never exposed to renderer), temp SSH keys use 0600 permissions with try/finally cleanup, API keys wiped from memory after use, external URLs restricted to github.com/gitlab.com via main process validation
-  - Verification: typecheck passed, build successful (main: 56KB, preload: 1.5KB, renderer: 430KB), 18 minor lint warnings (return type annotations) remain but do not affect functionality or security
+  - Scope: Production readiness audit + new features + error handling + UI polish
+  - Summary: (1) Added Stage All button, (2) Added Remote Origin configuration UI, (3) Fixed git push upstream logic, (4) Added comprehensive Git error translations, (5) Updated Cloud LLM models (2025 list), (6) Implemented fluid typography for dynamic sizing, (7) Added "Add to .gitignore" button, (8) Fixed Gemini 3 Flash integration by passing dynamic model name, (9) Fixed UI overlap in Settings Integration card, (10) Added AI Persona setting (Standard/Cybersecurity), (11) Added logging to Gemini provider for debugging, (12) Updated UI to Cyberpunk 2077 "Arasaka Tower" theme, (13) Added verified Gemini 3 models and legacy 1.5 models, (14) FIXED critical blocker in Cloud Commit generation (removed accidental fallthrough to local LLM), (15) Fixed settings save failure by whitelisting 'aiPersona'
+  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts, src/main/git/git-service.ts, src/main/ai/commit-generate.ts, src/main/ai/providers/gemini.ts, src/renderer/src/components/settings/SettingsIntegrations.tsx, src/main/secure/key-manager.ts, src/renderer/src/store/useRepoStore.ts, src/renderer/src/assets/main.css
+  - Security posture: Added cybersecurity persona prompt, verified secure storage usage, updated UI to "Securely Save Configuration"
+  - Verification: typecheck passed, build successful, app launches, git operations work, UI scales dynamically, AI generation works with persona
   - Follow-ups: update electron-builder.yml identity placeholder before macOS release
 - Raouf: 2026-01-04 (Australia/Sydney)
   - Scope: Gemini 2.0 Flash integration, lint fixes
-  - Summary: add secure Gemini 2.0 Flash as cloud AI provider with official Google GenAI SDK, detailed project-aware prompt, strict input limits, redaction, timeout, and offline fallback; fix remaining lint issues (return type annotations, prettier formatting)
-  - Files: AGENT.md, CHANGELOG.md, package.json, src/index.ts, src/main/ai/commit-generate.ts, src/main/ai/providers/gemini.ts, src/main/index.ts, src/main/secure/key-manager.ts, src/main/git/commit-generator.ts, src/main/git/publish-status.ts, src/preload/index.ts, src/renderer/src/App.tsx, src/renderer/src/components/diff/DiffView.tsx, src/renderer/src/components/motion/motion.ts, src/renderer/src/components/pr/PullRequestModal.tsx, src/renderer/src/components/settings/_.tsx, src/renderer/src/components/sidebar/_.tsx, src/renderer/src/store/useRepoStore.ts
-  - Verification: typecheck and lint both pass; 18 minor lint warnings remain (return type annotations) but do not affect functionality
+  - Summary: add secure Gemini 2.0 Flash as cloud AI provider with official Google GenAI SDK, detailed project-aware prompt, strict input limits, redaction, timeout, and offline fallback; fix remaining lint issues
+  - Files: AGENT.md, CHANGELOG.md, package.json, src/index.ts, src/main/ai/commit-generate.ts, src/main/ai/providers/gemini.ts, src/main/git/commit-generator.ts, src/main/index.ts, src/main/secure/key-manager.ts, src/main/git/publish-status.ts, src/preload/index.ts, src/renderer/src/App.tsx, src/renderer/src/components/diff/DiffView.tsx, src/renderer/src/components/motion/motion.ts, src/renderer/src/components/pr/PullRequestModal.tsx, src/renderer/src/components/settings/_.tsx, src/renderer/src/components/sidebar/_.tsx, src/renderer/src/store/useRepoStore.ts
+  - Verification: typecheck passed, 18 minor lint warnings (return type annotations) remain but do not affect functionality
   - Follow-ups: run `npm run dev` and test commit generation with Gemini
 - Raouf: 2026-01-03 (Australia/Sydney)
   - Scope: push/PR flow, IPC settings sync, UI event handling safety

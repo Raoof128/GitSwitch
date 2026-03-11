@@ -41,12 +41,14 @@ import {
 } from './secure/key-manager'
 import { createPullRequest } from './git/pull-request'
 import { generateCommitMessage } from './ai/commit-generate'
-import type { DiffMode, PullRequestOptions } from '../index'
+import type { DiffMode, PullRequestOptions, SecretsResult, SettingsUpdateInput } from '../index'
+import { isAllowedExternalUrl } from './security/url-policy'
 
 let mainWindow: BrowserWindow | null = null
 const watchers = new Map<string, ReturnType<typeof createRepoWatcher>>()
 const allowedRepoPaths = new Set<string>()
 const isDev = !app.isPackaged || is.dev
+const shouldLogPreloadResolution = isDev && process.env['GITSWITCH_DEBUG_PRELOAD'] === '1'
 
 const resolvePreloadPath = (): string => {
   const envPreload = process.env['ELECTRON_PRELOAD']
@@ -58,8 +60,7 @@ const resolvePreloadPath = (): string => {
 
 function createWindow(): void {
   const preloadPath = resolvePreloadPath()
-  // Dev-only logging - these lines will not execute in production builds
-  if (isDev) {
+  if (shouldLogPreloadResolution) {
     console.log('[dev] preload path:', preloadPath)
     console.log('[dev] ELECTRON_PRELOAD:', process.env['ELECTRON_PRELOAD'] || '(unset)')
   }
@@ -143,18 +144,6 @@ const assertKeys = (input: Record<string, unknown>, allowed: string[], label: st
   }
 }
 
-const isAllowedExternalUrl = (value: string): boolean => {
-  try {
-    const url = new URL(value)
-    if (url.protocol !== 'https:') {
-      return false
-    }
-    return url.hostname.endsWith('github.com') || url.hostname.endsWith('gitlab.com')
-  } catch {
-    return false
-  }
-}
-
 const MAX_PATH_LENGTH = 4096
 
 const expandHome = (input: string): string => {
@@ -221,6 +210,13 @@ async function ensureAllowedRepo(repoPath: string): Promise<string> {
 }
 
 async function registerIpcHandlers(): Promise<void> {
+  const getSecretsSnapshot = async (): Promise<SecretsResult['secrets']> => ({
+    accounts: listAccounts(),
+    hasAiKey: await hasAiKey(),
+    hasGitHubToken: await hasGitHubToken(),
+    hasGitLabToken: await hasGitLabToken()
+  })
+
   ipcMain.handle('dialog:openDirectory', async () => {
     const result = await dialog.showOpenDialog({
       properties: ['openDirectory']
@@ -371,7 +367,7 @@ async function registerIpcHandlers(): Promise<void> {
   ipcMain.handle('settings:get', async () => getSettingsPublic())
   ipcMain.handle(
     'settings:update',
-    async (_event: IpcMainInvokeEvent, input: Partial<ReturnType<typeof getSettings>>) => {
+    async (_event: IpcMainInvokeEvent, input: SettingsUpdateInput) => {
       if (!isRecord(input)) {
         throw new Error('Invalid settings payload.')
       }
@@ -465,17 +461,7 @@ async function registerIpcHandlers(): Promise<void> {
       return getSettingsPublic()
     }
   )
-  ipcMain.handle('secrets:list', async () => {
-    return {
-      ok: true,
-      secrets: {
-        accounts: listAccounts(),
-        hasAiKey: await hasAiKey(),
-        hasGitHubToken: await hasGitHubToken(),
-        hasGitLabToken: await hasGitLabToken()
-      }
-    }
-  })
+  ipcMain.handle('secrets:list', async () => ({ ok: true, secrets: await getSecretsSnapshot() }))
 
   ipcMain.handle('secrets:save', async (_event: IpcMainInvokeEvent, input: unknown) => {
     try {
@@ -522,22 +508,14 @@ async function registerIpcHandlers(): Promise<void> {
 
       return {
         ok: true,
-        secrets: {
-          accounts: listAccounts(),
-          hasAiKey: await hasAiKey(),
-          hasGitHubToken: await hasGitHubToken(),
-          hasGitLabToken: await hasGitLabToken()
-        }
+        secrets: await getSecretsSnapshot()
       }
-    } catch {
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to save secret.'
       return {
         ok: false,
-        secrets: {
-          accounts: listAccounts(),
-          hasAiKey: await hasAiKey(),
-          hasGitHubToken: await hasGitHubToken(),
-          hasGitLabToken: await hasGitLabToken()
-        }
+        error: message,
+        secrets: await getSecretsSnapshot()
       }
     }
   })
@@ -564,22 +542,14 @@ async function registerIpcHandlers(): Promise<void> {
 
       return {
         ok: true,
-        secrets: {
-          accounts: listAccounts(),
-          hasAiKey: await hasAiKey(),
-          hasGitHubToken: await hasGitHubToken(),
-          hasGitLabToken: await hasGitLabToken()
-        }
+        secrets: await getSecretsSnapshot()
       }
-    } catch {
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to delete secret.'
       return {
         ok: false,
-        secrets: {
-          accounts: listAccounts(),
-          hasAiKey: await hasAiKey(),
-          hasGitHubToken: await hasGitHubToken(),
-          hasGitLabToken: await hasGitLabToken()
-        }
+        error: message,
+        secrets: await getSecretsSnapshot()
       }
     }
   })

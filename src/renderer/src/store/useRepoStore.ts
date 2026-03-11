@@ -5,8 +5,11 @@ import type {
   GitStatus,
   PublishStatus,
   PullRequestOptions,
-  RepoSummary
+  RepoSummary,
+  SecretsResult,
+  SettingsUpdateInput
 } from '../../../index'
+import { getEffectiveAccountId } from './account-selection'
 
 type RepoState = {
   accounts: Account[]
@@ -92,26 +95,7 @@ type RepoState = {
   setRemoteOrigin: (url: string) => Promise<{ ok: boolean; error?: string }>
   addToIgnore: (filePath: string) => Promise<{ ok: boolean; error?: string }>
   updatePrForm: (input: Partial<PullRequestOptions>) => void
-  updateSettings: (
-    input: Partial<{
-      aiCloudModel: string
-      aiLocalModel: string
-      aiLocalUrl: string
-      aiProvider: 'offline' | 'local' | 'cloud'
-      aiPersona: 'standard' | 'cybersecurity'
-      aiRedactionEnabled: boolean
-      aiTimeoutSec: number
-      autoPush: boolean
-      defaultAccountId: string | null
-      defaultBaseBranch: 'main' | 'master'
-      diffLimitKb: number
-      diffLimitLines: number
-      likeApp: boolean
-      reducedMotion: boolean
-      strictHostKeyChecking: boolean
-      theme: 'dark'
-    }>
-  ) => Promise<void>
+  updateSettings: (input: SettingsUpdateInput) => Promise<void>
 }
 
 const getRepoName = (path: string): string => {
@@ -125,6 +109,16 @@ const clearCommitTimer = (): void => {
     clearTimeout(commitResetTimer)
     commitResetTimer = null
   }
+}
+
+const assertSecretResult = (
+  result: SecretsResult,
+  fallbackMessage: string
+): SecretsResult['secrets'] => {
+  if (!result.ok) {
+    throw new Error(result.error ?? fallbackMessage)
+  }
+  return result.secrets
 }
 
 export const useRepoStore = create<RepoState>((set, get) => ({
@@ -146,13 +140,13 @@ export const useRepoStore = create<RepoState>((set, get) => ({
   commitStatus: 'idle',
   generateStatus: 'idle',
   lastUpdatedAt: null,
-  aiCloudModel: 'gpt-4o-mini',
+  aiCloudModel: 'gemini-3-flash',
   aiLocalModel: 'qwen2.5-coder:7b',
   aiLocalUrl: 'http://localhost:11434/api/generate',
   aiProvider: 'offline',
   aiPersona: 'standard',
   aiRedactionEnabled: true,
-  aiTimeoutSec: 20,
+  aiTimeoutSec: 30,
   autoPush: false,
   defaultAccountId: null,
   defaultBaseBranch: 'main',
@@ -444,7 +438,7 @@ export const useRepoStore = create<RepoState>((set, get) => ({
   },
   push: async () => {
     const repoPath = get().activeRepoPath
-    const accountId = get().selectedAccountId ?? get().defaultAccountId
+    const accountId = getEffectiveAccountId(get().selectedAccountId, get().defaultAccountId)
     if (!repoPath || !accountId) {
       return false
     }
@@ -471,7 +465,7 @@ export const useRepoStore = create<RepoState>((set, get) => ({
   },
   pull: async () => {
     const repoPath = get().activeRepoPath
-    const accountId = get().selectedAccountId
+    const accountId = getEffectiveAccountId(get().selectedAccountId, get().defaultAccountId)
     if (!repoPath || !accountId) {
       return false
     }
@@ -501,7 +495,7 @@ export const useRepoStore = create<RepoState>((set, get) => ({
   },
   fetch: async () => {
     const repoPath = get().activeRepoPath
-    const accountId = get().selectedAccountId
+    const accountId = getEffectiveAccountId(get().selectedAccountId, get().defaultAccountId)
     if (!repoPath || !accountId) {
       return
     }
@@ -560,6 +554,7 @@ export const useRepoStore = create<RepoState>((set, get) => ({
       aiLocalModel: settings.aiLocalModel,
       aiLocalUrl: settings.aiLocalUrl,
       aiProvider: settings.aiProvider,
+      aiPersona: settings.aiPersona,
       aiRedactionEnabled: settings.aiRedactionEnabled,
       aiTimeoutSec: settings.aiTimeoutSec,
       autoPush: settings.autoPush,
@@ -578,64 +573,46 @@ export const useRepoStore = create<RepoState>((set, get) => ({
     })
   },
   saveAiKey: async (key: string) => {
-    try {
-      const result = await window.api.saveSecret({ type: 'ai', value: key })
-      if (result.ok) {
-        set({ hasAiKey: result.secrets.hasAiKey })
-      }
-    } catch {
-      // Ignore secret save failures to keep UI responsive.
-    }
+    const secrets = assertSecretResult(
+      await window.api.saveSecret({ type: 'ai', value: key }),
+      'Failed to save the AI API key.'
+    )
+    set({ hasAiKey: secrets.hasAiKey })
   },
   clearAiKey: async () => {
-    try {
-      const result = await window.api.deleteSecret({ type: 'ai' })
-      if (result.ok) {
-        set({ hasAiKey: result.secrets.hasAiKey })
-      }
-    } catch {
-      // Ignore secret delete failures to keep UI responsive.
-    }
+    const secrets = assertSecretResult(
+      await window.api.deleteSecret({ type: 'ai' }),
+      'Failed to remove the AI API key.'
+    )
+    set({ hasAiKey: secrets.hasAiKey })
   },
   saveGitHubToken: async (token: string) => {
-    try {
-      const result = await window.api.saveSecret({ type: 'github', value: token })
-      if (result.ok) {
-        set({ hasGitHubToken: result.secrets.hasGitHubToken })
-      }
-    } catch {
-      // Ignore secret save failures to keep UI responsive.
-    }
+    const secrets = assertSecretResult(
+      await window.api.saveSecret({ type: 'github', value: token }),
+      'Failed to save the GitHub token.'
+    )
+    set({ hasGitHubToken: secrets.hasGitHubToken })
   },
   clearGitHubToken: async () => {
-    try {
-      const result = await window.api.deleteSecret({ type: 'github' })
-      if (result.ok) {
-        set({ hasGitHubToken: result.secrets.hasGitHubToken })
-      }
-    } catch {
-      // Ignore secret delete failures to keep UI responsive.
-    }
+    const secrets = assertSecretResult(
+      await window.api.deleteSecret({ type: 'github' }),
+      'Failed to remove the GitHub token.'
+    )
+    set({ hasGitHubToken: secrets.hasGitHubToken })
   },
   saveGitLabToken: async (token: string) => {
-    try {
-      const result = await window.api.saveSecret({ type: 'gitlab', value: token })
-      if (result.ok) {
-        set({ hasGitLabToken: result.secrets.hasGitLabToken })
-      }
-    } catch {
-      // Ignore secret save failures to keep UI responsive.
-    }
+    const secrets = assertSecretResult(
+      await window.api.saveSecret({ type: 'gitlab', value: token }),
+      'Failed to save the GitLab token.'
+    )
+    set({ hasGitLabToken: secrets.hasGitLabToken })
   },
   clearGitLabToken: async () => {
-    try {
-      const result = await window.api.deleteSecret({ type: 'gitlab' })
-      if (result.ok) {
-        set({ hasGitLabToken: result.secrets.hasGitLabToken })
-      }
-    } catch {
-      // Ignore secret delete failures to keep UI responsive.
-    }
+    const secrets = assertSecretResult(
+      await window.api.deleteSecret({ type: 'gitlab' }),
+      'Failed to remove the GitLab token.'
+    )
+    set({ hasGitLabToken: secrets.hasGitLabToken })
   },
   setSettingsOpen: (open) => set({ settingsOpen: open }),
   openPrModal: async (title, body) => {
@@ -709,45 +686,35 @@ export const useRepoStore = create<RepoState>((set, get) => ({
     }
   },
   addAccount: async (name: string, privateKey: string) => {
-    try {
-      const result = await window.api.saveSecret({ type: 'ssh', action: 'add', name, privateKey })
-      if (!result.ok) {
-        return
-      }
-      const account = result.secrets.accounts[result.secrets.accounts.length - 1]
-      set((state) => ({
-        accounts: result.secrets.accounts,
-        selectedAccountId: account?.id ?? state.selectedAccountId
-      }))
-    } catch {
-      // Ignore secret save failures to keep UI responsive.
-    }
+    const secrets = assertSecretResult(
+      await window.api.saveSecret({ type: 'ssh', action: 'add', name, privateKey }),
+      'Failed to save the SSH account.'
+    )
+    const account = secrets.accounts[secrets.accounts.length - 1]
+    set((state) => ({
+      accounts: secrets.accounts,
+      selectedAccountId: account?.id ?? state.selectedAccountId
+    }))
   },
   deleteAccount: async (id: string) => {
-    try {
-      const result = await window.api.deleteSecret({ type: 'ssh', id })
-      if (get().defaultAccountId === id) {
-        await get().updateSettings({ defaultAccountId: null })
-      }
-      if (result.ok) {
-        set((state) => ({
-          accounts: result.secrets.accounts,
-          selectedAccountId: state.selectedAccountId === id ? null : state.selectedAccountId
-        }))
-      }
-    } catch {
-      // Ignore secret delete failures to keep UI responsive.
+    const secrets = assertSecretResult(
+      await window.api.deleteSecret({ type: 'ssh', id }),
+      'Failed to remove the SSH account.'
+    )
+    if (get().defaultAccountId === id) {
+      await get().updateSettings({ defaultAccountId: null })
     }
+    set((state) => ({
+      accounts: secrets.accounts,
+      selectedAccountId: state.selectedAccountId === id ? null : state.selectedAccountId
+    }))
   },
   renameAccount: async (id: string, name: string) => {
-    try {
-      const result = await window.api.saveSecret({ type: 'ssh', action: 'rename', id, name })
-      if (result.ok) {
-        set({ accounts: result.secrets.accounts })
-      }
-    } catch {
-      // Ignore secret rename failures to keep UI responsive.
-    }
+    const secrets = assertSecretResult(
+      await window.api.saveSecret({ type: 'ssh', action: 'rename', id, name }),
+      'Failed to rename the SSH account.'
+    )
+    set({ accounts: secrets.accounts })
   },
   setSelectedAccountId: (id) => set({ selectedAccountId: id }),
   applyStatusUpdate: (repoPath, status) => {

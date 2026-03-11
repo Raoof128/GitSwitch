@@ -28,6 +28,9 @@ export function SettingsIntegrations(): JSX.Element {
   const [cloudKey, setCloudKey] = useState('')
   const [githubToken, setGithubToken] = useState('')
   const [gitlabToken, setGitlabToken] = useState('')
+  const [feedback, setFeedback] = useState<{ tone: 'success' | 'error'; message: string } | null>(
+    null
+  )
 
   useEffect(() => {
     setProvider(aiProvider)
@@ -56,42 +59,109 @@ export function SettingsIntegrations(): JSX.Element {
   }, [provider])
 
   const handleSaveAi = async (): Promise<void> => {
-    await updateSettings({
-      aiCloudModel: cloudModel,
-      aiLocalModel: localModel,
-      aiLocalUrl: localUrl,
-      aiProvider: provider,
-      aiPersona: persona
-    })
+    try {
+      await updateSettings({
+        aiCloudModel: cloudModel,
+        aiLocalModel: localModel,
+        aiLocalUrl: localUrl,
+        aiProvider: provider,
+        aiPersona: persona
+      })
+      setFeedback({ tone: 'success', message: 'AI integration settings saved.' })
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to save AI integration settings.'
+      setFeedback({ tone: 'error', message })
+    }
   }
 
   const handleSaveCloudKey = async (): Promise<void> => {
     if (!cloudKey.trim()) {
       return
     }
-    await saveAiKey(cloudKey.trim())
-    setCloudKey('')
+    try {
+      await saveAiKey(cloudKey.trim())
+      setCloudKey('')
+      setFeedback({ tone: 'success', message: 'AI API key saved securely.' })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to save the AI API key.'
+      setFeedback({ tone: 'error', message })
+    }
   }
 
   const handleSaveGitHub = async (): Promise<void> => {
     if (!githubToken.trim()) {
       return
     }
-    await saveGitHubToken(githubToken.trim())
-    setGithubToken('')
+    try {
+      await saveGitHubToken(githubToken.trim())
+      setGithubToken('')
+      setFeedback({ tone: 'success', message: 'GitHub token saved securely.' })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to save the GitHub token.'
+      setFeedback({ tone: 'error', message })
+    }
   }
 
   const handleSaveGitLab = async (): Promise<void> => {
     if (!gitlabToken.trim()) {
       return
     }
-    await saveGitLabToken(gitlabToken.trim())
-    setGitlabToken('')
+    try {
+      await saveGitLabToken(gitlabToken.trim())
+      setGitlabToken('')
+      setFeedback({ tone: 'success', message: 'GitLab token saved securely.' })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to save the GitLab token.'
+      setFeedback({ tone: 'error', message })
+    }
+  }
+
+  const handleClearAi = async (): Promise<void> => {
+    try {
+      await clearAiKey()
+      setFeedback({ tone: 'success', message: 'AI API key removed.' })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to remove the AI API key.'
+      setFeedback({ tone: 'error', message })
+    }
+  }
+
+  const handleClearGitHub = async (): Promise<void> => {
+    try {
+      await clearGitHubToken()
+      setFeedback({ tone: 'success', message: 'GitHub token removed.' })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to remove the GitHub token.'
+      setFeedback({ tone: 'error', message })
+    }
+  }
+
+  const handleClearGitLab = async (): Promise<void> => {
+    try {
+      await clearGitLabToken()
+      setFeedback({ tone: 'success', message: 'GitLab token removed.' })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to remove the GitLab token.'
+      setFeedback({ tone: 'error', message })
+    }
   }
 
   return (
     <section className="space-y-6">
       <div className="text-sm font-semibold">Integrations</div>
+
+      {feedback && (
+        <div
+          className={`rounded-md border px-3 py-2 text-xs ${
+            feedback.tone === 'success'
+              ? 'border-[var(--ui-status-added-border)] bg-[var(--ui-status-added-bg)] text-[var(--ui-status-added)]'
+              : 'border-[var(--ui-status-deleted-border)] bg-[var(--ui-status-deleted-bg)] text-[var(--ui-status-deleted)]'
+          }`}
+        >
+          {feedback.message}
+        </div>
+      )}
 
       <div className="glass-card rounded-md p-4 text-xs">
         <div className="mb-3 text-[11px] uppercase tracking-[0.2em] text-[var(--ui-text-muted)]">
@@ -205,7 +275,7 @@ export function SettingsIntegrations(): JSX.Element {
             </button>
             <button
               type="button"
-              onClick={clearAiKey}
+              onClick={() => void handleClearAi()}
               className="rounded-md border border-[var(--glass-border)] px-2 py-1 text-xs hover:bg-[var(--ui-hover)]"
             >
               Remove key
@@ -254,7 +324,7 @@ export function SettingsIntegrations(): JSX.Element {
               </button>
               <button
                 type="button"
-                onClick={clearGitHubToken}
+                onClick={() => void handleClearGitHub()}
                 className="flex-1 rounded-md border border-[var(--glass-border)] px-2 py-1 text-xs hover:bg-[var(--ui-hover)]"
               >
                 Remove
@@ -296,7 +366,7 @@ export function SettingsIntegrations(): JSX.Element {
               </button>
               <button
                 type="button"
-                onClick={clearGitLabToken}
+                onClick={() => void handleClearGitLab()}
                 className="flex-1 rounded-md border border-[var(--glass-border)] px-2 py-1 text-xs hover:bg-[var(--ui-hover)]"
               >
                 Remove

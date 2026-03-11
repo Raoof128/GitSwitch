@@ -1,5 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import type {
+  SettingsPublic,
+  SettingsUpdateInput,
   CommitMessage,
   CommitResult,
   DiffMode,
@@ -40,45 +42,9 @@ const api = {
     ipcRenderer.invoke('git:fetch', repoPath, accountId),
   createPullRequest: (repoPath: string, options: PullRequestOptions): Promise<PullRequestResult> =>
     ipcRenderer.invoke('git:createPullRequest', repoPath, options),
-  getSettings: (): Promise<{
-    aiCloudModel: string
-    aiLocalModel: string
-    aiLocalUrl: string
-    aiProvider: 'offline' | 'local' | 'cloud'
-    aiRedactionEnabled: boolean
-    aiTimeoutSec: number
-    autoPush: boolean
-    defaultAccountId?: string | null
-    defaultBaseBranch: 'main' | 'master'
-    diffLimitKb: number
-    diffLimitLines: number
-    hasAiKey: boolean
-    hasGitHubToken: boolean
-    hasGitLabToken: boolean
-    likeApp: boolean
-    reducedMotion: boolean
-    strictHostKeyChecking: boolean
-    theme: 'dark'
-  }> => ipcRenderer.invoke('settings:get'),
-  updateSettings: (
-    input: Partial<{
-      aiCloudModel: string
-      aiLocalModel: string
-      aiLocalUrl: string
-      aiProvider: 'offline' | 'local' | 'cloud'
-      aiRedactionEnabled: boolean
-      aiTimeoutSec: number
-      autoPush: boolean
-      defaultAccountId?: string | null
-      defaultBaseBranch: 'main' | 'master'
-      diffLimitKb: number
-      diffLimitLines: number
-      likeApp: boolean
-      reducedMotion: boolean
-      strictHostKeyChecking: boolean
-      theme: 'dark'
-    }>
-  ) => ipcRenderer.invoke('settings:update', input),
+  getSettings: (): Promise<SettingsPublic> => ipcRenderer.invoke('settings:get'),
+  updateSettings: (input: SettingsUpdateInput): Promise<SettingsPublic> =>
+    ipcRenderer.invoke('settings:update', input),
   listSecrets: (): Promise<SecretsResult> => ipcRenderer.invoke('secrets:list'),
   saveSecret: (input: SecretsSaveInput): Promise<SecretsResult> =>
     ipcRenderer.invoke('secrets:save', input),

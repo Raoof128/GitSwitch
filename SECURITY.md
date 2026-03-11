@@ -2,23 +2,38 @@
 
 ## Supported Versions
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.0.x   | :white_check_mark: |
-| < 1.0   | :x:                |
+Security fixes are applied to the current `main` branch and the latest published release line.
+
+| Version | Supported |
+| --- | --- |
+| `main` | Yes |
+| Latest release | Yes |
+| Older releases | Best effort only |
 
 ## Reporting a Vulnerability
 
-We take security seriously. If you discover a security vulnerability, please do NOT open a public issue.
+Do not open a public issue for a suspected vulnerability.
 
-1.  **Email**: Send details to `security@example.com` (Replace with actual if available).
-2.  **Encryption**: Please use our PGP key if available.
-3.  **Response**: We will acknowledge your report within 48 hours.
+1. Email `raoof.r12@gmail.com` with the subject `GitSwitch security report`.
+2. Include a clear description, affected version or commit, reproduction steps, impact, and any suggested mitigation.
+3. If you have a proof of concept, share the smallest safe reproduction possible.
 
-## Security Best Practices
+## Response Targets
 
-*   **Secure Storage**: API keys and tokens (Gemini, GitHub, GitLab) are encrypted at rest using the OS keychain (`safeStorage`) and never exposed to the renderer process.
-*   **Memory Hygiene**: Sensitive credentials are scrubbed from memory immediately after use.
-*   **Network Security**: All Git operations enforce strict timeouts to prevent denial-of-service via hanging connections.
-*   **Input Validation**: All IPC handlers and Git commands are strictly typed and sanitized to prevent injection attacks.
-*   **Content Security Policy**: A strict CSP is enforced in production builds.
+- Initial acknowledgement within 2 business days
+- Triage status within 5 business days
+- Remediation plan or workaround after validation
+
+## Disclosure Expectations
+
+- Please allow a reasonable remediation window before public disclosure.
+- Coordinate with the maintainer before publishing advisories, blog posts, or exploit details.
+
+## Security Controls in This Repository
+
+- Sandboxed Electron renderer with a typed preload bridge
+- Main-process-only secret handling and repository operations
+- `safeStorage` encryption for tokens and private keys
+- IPC payload validation and repository access approval prompts
+- Trusted-host validation for external links
+- Diff-size limits and timeout guards around git and network operations

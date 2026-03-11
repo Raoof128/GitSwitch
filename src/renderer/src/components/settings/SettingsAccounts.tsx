@@ -17,14 +17,23 @@ export function SettingsAccounts(): JSX.Element {
   const [privateKey, setPrivateKey] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingName, setEditingName] = useState('')
+  const [feedback, setFeedback] = useState<{ tone: 'success' | 'error'; message: string } | null>(
+    null
+  )
 
   const handleAdd = async (): Promise<void> => {
     if (!accountName.trim() || !privateKey.trim()) {
       return
     }
-    await addAccount(accountName.trim(), privateKey)
-    setAccountName('')
-    setPrivateKey('')
+    try {
+      await addAccount(accountName.trim(), privateKey)
+      setAccountName('')
+      setPrivateKey('')
+      setFeedback({ tone: 'success', message: 'SSH account saved securely.' })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to save the SSH account.'
+      setFeedback({ tone: 'error', message })
+    }
   }
 
   const startRename = (id: string, name: string): void => {
@@ -37,17 +46,52 @@ export function SettingsAccounts(): JSX.Element {
       setEditingId(null)
       return
     }
-    await renameAccount(editingId, editingName.trim())
-    setEditingId(null)
+    try {
+      await renameAccount(editingId, editingName.trim())
+      setEditingId(null)
+      setFeedback({ tone: 'success', message: 'SSH account renamed.' })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to rename the SSH account.'
+      setFeedback({ tone: 'error', message })
+    }
   }
 
   const handleDefaultChange = async (value: string): Promise<void> => {
-    await updateSettings({ defaultAccountId: value || null })
+    try {
+      await updateSettings({ defaultAccountId: value || null })
+      setFeedback({ tone: 'success', message: 'Default account updated.' })
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to update the default account.'
+      setFeedback({ tone: 'error', message })
+    }
+  }
+
+  const handleDelete = async (id: string): Promise<void> => {
+    try {
+      await deleteAccount(id)
+      setFeedback({ tone: 'success', message: 'SSH account removed.' })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to remove the SSH account.'
+      setFeedback({ tone: 'error', message })
+    }
   }
 
   return (
     <section className="space-y-4">
       <div className="text-sm font-semibold">Accounts (SSH identities)</div>
+
+      {feedback && (
+        <div
+          className={`rounded-md border px-3 py-2 text-xs ${
+            feedback.tone === 'success'
+              ? 'border-[var(--ui-status-added-border)] bg-[var(--ui-status-added-bg)] text-[var(--ui-status-added)]'
+              : 'border-[var(--ui-status-deleted-border)] bg-[var(--ui-status-deleted-bg)] text-[var(--ui-status-deleted)]'
+          }`}
+        >
+          {feedback.message}
+        </div>
+      )}
 
       <div className="glass-card rounded-md p-4 text-xs">
         <div className="mb-3">
@@ -111,7 +155,7 @@ export function SettingsAccounts(): JSX.Element {
               )}
               <button
                 type="button"
-                onClick={() => deleteAccount(account.id)}
+                onClick={() => void handleDelete(account.id)}
                 className="rounded-md border border-[var(--glass-border)] px-2 py-1 text-[10px] hover:bg-[var(--ui-hover)]"
               >
                 Remove

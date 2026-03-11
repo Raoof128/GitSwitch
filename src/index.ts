@@ -24,6 +24,10 @@ export type GitStatusPayload = {
 
 export type DiffMode = 'staged' | 'unstaged'
 
+export type AiProvider = 'offline' | 'local' | 'cloud'
+export type AiPersona = 'standard' | 'cybersecurity'
+export type AppTheme = 'dark'
+
 export type PushResult = {
   stdout: string
   stderr: string
@@ -91,6 +95,32 @@ export type SecretsSnapshot = {
   hasGitLabToken: boolean
 }
 
+export type SettingsPublic = {
+  aiCloudModel: string
+  aiLocalModel: string
+  aiLocalUrl: string
+  aiProvider: AiProvider
+  aiPersona: AiPersona
+  aiRedactionEnabled: boolean
+  aiTimeoutSec: number
+  autoPush: boolean
+  defaultAccountId?: string | null
+  defaultBaseBranch: 'main' | 'master'
+  diffLimitKb: number
+  diffLimitLines: number
+  hasAiKey: boolean
+  hasGitHubToken: boolean
+  hasGitLabToken: boolean
+  likeApp: boolean
+  reducedMotion: boolean
+  strictHostKeyChecking: boolean
+  theme: AppTheme
+}
+
+export type SettingsUpdateInput = Partial<
+  Omit<SettingsPublic, 'hasAiKey' | 'hasGitHubToken' | 'hasGitLabToken'>
+>
+
 export type SecretsSaveInput =
   | { type: 'ai' | 'github' | 'gitlab'; value: string }
   | { type: 'ssh'; action: 'add'; name: string; privateKey: string }
@@ -100,5 +130,6 @@ export type SecretsDeleteInput = { type: 'ai' | 'github' | 'gitlab' } | { type: 
 
 export type SecretsResult = {
   ok: boolean
+  error?: string
   secrets: SecretsSnapshot
 }

@@ -1,87 +1,97 @@
-# Gitswitch
+# GitSwitch
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
-![Electron](https://img.shields.io/badge/Electron-33.0-blue)
-![React](https://img.shields.io/badge/React-19-blue)
+GitSwitch is a desktop Git client for developers who work across multiple repositories and identities. It combines a sandboxed Electron shell, a React renderer, secure secret storage, repository-aware diff tooling, and AI-assisted commit generation for Gemini or local models.
 
-**Gitswitch** is a modern, AI-powered Git client designed for developers who manage multiple accounts and repositories. Built with Electron and React, it offers a seamless experience or switching identities, managing diffs, and generating semantic commit messages using Google Gemini AI.
+## Highlights
 
-## 🚀 Features
+- Sandboxed Electron architecture with `contextIsolation`, disabled `nodeIntegration`, and IPC-only privileged operations.
+- Multi-account SSH workflow with encrypted private-key storage via Electron `safeStorage`.
+- Staged and unstaged diff views with large-diff guards to keep the renderer responsive.
+- AI-assisted commit generation with offline, local, and cloud modes.
+- GitHub and GitLab pull-request support with secure token handling.
+- Cross-platform packaging through `electron-builder`.
 
-*   **Multi-Account Management**: Easily switch between GitHub/GitLab accounts (Personal, Work, etc.).
-*   **AI Commit Generation**: Automatically generate semantic commit titles and detailed descriptions using the latest **Gemini 3** models.
-*   **Smart Diff Viewer**: View staged and unstaged changes with syntax highlighting and large-diff protection.
-*   **Security Hardened**: Enforced timeouts, input sanitization, and secure OS-keychain storage for all secrets.
-*   **Drag & Drop**: Add repositories by simply dragging folders.
-*   **Privacy First**: API keys are redacted from logs and wiped from memory immediately after use.
-*   **Dark Mode**: Sleek, modern URL-inspired interface with Cyberpunk aesthetics.
+## Requirements
 
-## 🛠️ Tech Stack
+- Node.js 20 or newer
+- npm 10 or newer
+- Git 2.40 or newer
+- macOS, Windows, or Linux
 
-*   **Core**: [Electron](https://www.electronjs.org/), [TypeScript](https://www.typescriptlang.org/)
-*   **Frontend**: [React 19](https://react.dev/), [Vite](https://vitejs.dev/), [TailwindCSS](https://tailwindcss.com/)
-*   **State Management**: [Zustand](https://github.com/pmndrs/zustand)
-*   **AI**: [Google Generative AI SDK](https://github.com/google/google-genai)
-*   **Git**: [Simple-Git](https://github.com/steveukx/git-js)
+## Quick Start
 
-## 📦 Installation
+```bash
+git clone https://github.com/Raoof128/GitSwitch.git
+cd GitSwitch
+npm install
+npm run dev
+```
 
-1.  **Clone the repository**:
-    ```bash
-    git clone https://github.com/raoof/gitswitch.git
-    cd gitswitch
-    ```
+## Verification
 
-2.  **Install dependencies**:
-    ```bash
-    npm install
-    ```
+```bash
+npm run lint
+npm run typecheck
+npm test
+npm run test:coverage
+npm run build
+```
 
-3.  **Start the development app**:
-    ```bash
-    npm run dev
-    ```
-
-## 🏗️ Building
-
-To create a production-ready installer for your current OS:
+## Packaging
 
 ```bash
 npm run dist
 ```
 
-Alternatively, build specifically for a target platform:
+Platform-specific packaging commands are also available:
 
 ```bash
-# macOS (.dmg)
 npm run build:mac
-
-# Windows (.exe)
 npm run build:win
-
-# Linux (.AppImage, .deb)
 npm run build:linux
 ```
 
-All build commands automatically run type-checking and linting to ensure production quality. Built artifacts are located in the `dist/` directory.
+## Core Workflows
 
-## 📐 Architecture & Security
+1. Add a repository from the sidebar or with `Cmd/Ctrl+O`.
+2. Configure a default SSH identity in Settings if you work across multiple accounts.
+3. Review unstaged or staged diffs before generating or writing a commit message.
+4. Push, pull, and open a pull request from the main workspace once tokens are configured.
 
-For a high-level overview of the application's structure, security model, and data flow, please read our [Architecture Guide](ARCHITECTURE.md).
+Detailed walkthroughs live in [docs/usage-examples.md](docs/usage-examples.md).
 
-## 🤖 AI Configuration
+## Documentation
 
-1.  Get a generic API Key from [Google AI Studio](https://aistudio.google.com/).
-2.  Open **Settings** in Gitswitch.
-3.  Select **Cloud (Gemini)** provider.
-4.  Enter your API Key.
-5.  (Optional) Customize the "Persona" to adjust the tone of commit messages.
+- [Architecture overview](ARCHITECTURE.md)
+- [Preload and IPC API reference](docs/api-reference.md)
+- [Usage examples](docs/usage-examples.md)
+- [Troubleshooting guide](docs/troubleshooting.md)
+- [Contributing guide](CONTRIBUTING.md)
+- [Security policy](SECURITY.md)
+- [Code of conduct](CODE_OF_CONDUCT.md)
 
-## 🤝 Contributing
+## Repository Layout
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to submit Pull Requests and report issues.
+```text
+.
+├── .devcontainer/          # Reproducible contributor environment
+├── .github/                # CI, security, ownership, and automation config
+├── docs/                   # API reference, workflow examples, troubleshooting
+├── resources/              # Icons and packaging assets
+├── src/
+│   ├── main/               # Main-process IPC, git, AI, security, and watchers
+│   ├── preload/            # Typed context bridge for the renderer
+│   ├── renderer/           # React application and UI tests
+│   └── index.ts            # Shared application types
+├── electron-builder.yml    # Packaging and release metadata
+├── electron.vite.config.ts # Electron/Vite build configuration
+└── vitest.config.ts        # Test runner and coverage configuration
+```
 
-## 📄 License
+## Security Notes
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+- Secrets are stored only in the main process and encrypted with `safeStorage`.
+- Repository access is gated through explicit approval and validated IPC handlers.
+- External links are restricted to trusted GitHub and GitLab HTTPS hosts.
+
+Report vulnerabilities privately via [SECURITY.md](SECURITY.md).

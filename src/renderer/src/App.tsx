@@ -8,6 +8,7 @@ import { useReducedMotionSafe } from './components/motion/motion'
 import { FileList } from './components/sidebar/FileList'
 import { PullRequestModal } from './components/pr/PullRequestModal'
 import { SettingsView } from './components/settings/SettingsView'
+import { getEffectiveAccountId } from './store/account-selection'
 
 function App(): JSX.Element {
   const {
@@ -35,6 +36,7 @@ function App(): JSX.Element {
     openPrModal,
     clearCommitResetTimer,
     setSettingsOpen,
+    defaultAccountId,
     refreshSettings,
     refreshAccounts
   } = useRepoStore()
@@ -66,6 +68,7 @@ function App(): JSX.Element {
   }, [push])
 
   const canCreatePr = hasGitHubToken || hasGitLabToken
+  const activeAccountId = getEffectiveAccountId(selectedAccountId, defaultAccountId)
 
   const toggleSettings = useCallback(() => {
     setSettingsOpen(!settingsOpen)
@@ -191,7 +194,7 @@ function App(): JSX.Element {
   // Reduced polling frequency from 1s to 30s to avoid excessive network/CPU usage
   // Real-time updates are handled by the file watcher in the main process
   useEffect(() => {
-    if (!activeRepoPath || !selectedAccountId) return
+    if (!activeRepoPath || !activeAccountId) return
 
     // Initial fetch on mount/change
     useRepoStore.getState().fetch()
@@ -203,7 +206,7 @@ function App(): JSX.Element {
     }, FETCH_INTERVAL_MS)
 
     return () => clearInterval(intervalId)
-  }, [activeRepoPath, selectedAccountId])
+  }, [activeAccountId, activeRepoPath])
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[var(--ui-bg)] text-[var(--ui-text)]">
@@ -332,7 +335,7 @@ function App(): JSX.Element {
                   onClick={async () => {
                     await useRepoStore.getState().pull()
                   }}
-                  disabled={!activeRepoPath || !selectedAccountId}
+                  disabled={!activeRepoPath || !activeAccountId}
                   title="Pull changes"
                   className="rounded-md border border-[var(--glass-border)] px-3 py-1 text-xs font-semibold text-slate-200 hover:bg-[var(--ui-hover)] disabled:cursor-not-allowed disabled:opacity-40"
                 >
@@ -341,7 +344,7 @@ function App(): JSX.Element {
                 <button
                   type="button"
                   onClick={handlePush}
-                  disabled={!activeRepoPath || !selectedAccountId}
+                  disabled={!activeRepoPath || !activeAccountId}
                   title="Push changes"
                   className="rounded-md border border-[var(--glass-border)] px-3 py-1 text-xs font-semibold text-slate-200 hover:bg-[var(--ui-hover)] disabled:cursor-not-allowed disabled:opacity-40"
                 >

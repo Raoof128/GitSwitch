@@ -3,7 +3,7 @@ import { promises as fs } from 'fs'
 import { join } from 'path'
 import { randomUUID } from 'crypto'
 import ElectronStore from 'electron-store'
-import type { Account } from '../../index'
+import type { Account, AiPersona, AiProvider, AppTheme, SettingsPublic } from '../../index'
 
 type StoreSchema = {
   accounts: Account[]
@@ -11,8 +11,8 @@ type StoreSchema = {
     aiCloudModel: string
     aiLocalModel: string
     aiLocalUrl: string
-    aiProvider: 'offline' | 'local' | 'cloud'
-    aiPersona: 'standard' | 'cybersecurity'
+    aiProvider: AiProvider
+    aiPersona: AiPersona
     aiRedactionEnabled: boolean
     aiTimeoutSec: number
     autoPush: boolean
@@ -24,7 +24,7 @@ type StoreSchema = {
     prToken?: string
     reducedMotion: boolean
     strictHostKeyChecking: boolean
-    theme: 'dark'
+    theme: AppTheme
   }
 }
 
@@ -185,27 +185,7 @@ export function getSettings(): StoreSchema['settings'] {
   return { ...DEFAULT_SETTINGS, ...stored }
 }
 
-export async function getSettingsPublic(): Promise<{
-  aiCloudModel: string
-  aiLocalModel: string
-  aiLocalUrl: string
-  aiProvider: 'offline' | 'local' | 'cloud'
-  aiPersona: 'standard' | 'cybersecurity'
-  aiRedactionEnabled: boolean
-  aiTimeoutSec: number
-  autoPush: boolean
-  defaultAccountId?: string
-  defaultBaseBranch: 'main' | 'master'
-  diffLimitKb: number
-  diffLimitLines: number
-  hasAiKey: boolean
-  hasGitHubToken: boolean
-  hasGitLabToken: boolean
-  likeApp: boolean
-  reducedMotion: boolean
-  strictHostKeyChecking: boolean
-  theme: 'dark'
-}> {
+export async function getSettingsPublic(): Promise<SettingsPublic> {
   await migratePlainTokenIfNeeded()
   const settings = getSettings()
   return {

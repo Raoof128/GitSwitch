@@ -251,9 +251,7 @@ export function CommandPalette({
                 </div>
                 <div className="mt-1 text-sm font-semibold text-[#e0e0e0]">{item.label}</div>
                 {item.subtitle && (
-                  <div className="mt-1 break-all text-xs text-[#666666]">
-                    {item.subtitle}
-                  </div>
+                  <div className="mt-1 break-all text-xs text-[#666666]">{item.subtitle}</div>
                 )}
               </div>
               <span className="mt-1 text-xs font-bold uppercase text-[#00ffaa]">RUN</span>

@@ -118,9 +118,7 @@ export function SettingsAdvanced(): JSX.Element {
           >
             Save Advanced
           </button>
-          <div className="text-[10px] text-[#666666]">
-            Reset disabled in hardened mode.
-          </div>
+          <div className="text-[10px] text-[#666666]">Reset disabled in hardened mode.</div>
         </div>
       </div>
     </section>

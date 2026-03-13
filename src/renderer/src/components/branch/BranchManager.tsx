@@ -45,9 +45,7 @@ export function BranchManager({
     <section className="border border-[#2a2a2a] bg-[#141414] p-5">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
         <div>
-          <div className="label-brutal label-accent">
-            Branch Workflow
-          </div>
+          <div className="label-brutal label-accent">Branch Workflow</div>
           <div className="mt-2 text-lg font-semibold text-[#e0e0e0]">
             {currentBranch ? `Currently on ${currentBranch}` : 'No named branch checked out'}
           </div>
@@ -56,11 +54,7 @@ export function BranchManager({
             current HEAD.
           </div>
         </div>
-        <button
-          type="button"
-          onClick={onOpenCommandPalette}
-          className="btn-neon"
-        >
+        <button type="button" onClick={onOpenCommandPalette} className="btn-neon">
           Open Palette
         </button>
       </div>
@@ -68,9 +62,7 @@ export function BranchManager({
       <div className="mt-5 grid gap-4 overflow-hidden xl:grid-cols-[minmax(0,1.2fr),minmax(20rem,0.8fr)]">
         <div className="border border-[#2a2a2a] bg-[#0e0e0e] p-4">
           <div className="flex items-center justify-between gap-3">
-            <div className="label-brutal">
-              Search Branches
-            </div>
+            <div className="label-brutal">Search Branches</div>
             {status === 'loading' && (
               <div
                 className="label-brutal text-[#00ffaa]"
@@ -122,9 +114,7 @@ export function BranchManager({
                 </div>
                 <span
                   className={`rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] ${
-                    branch.current
-                      ? 'neon-badge neon-badge-green'
-                      : 'neon-badge neon-badge-pink'
+                    branch.current ? 'neon-badge neon-badge-green' : 'neon-badge neon-badge-pink'
                   }`}
                 >
                   {branch.current ? 'Active' : 'Switch'}
@@ -136,9 +126,7 @@ export function BranchManager({
 
         <div className="space-y-4">
           <div className="border border-[#2a2a2a] bg-[#0e0e0e] p-4">
-            <div className="label-brutal">
-              Create Branch
-            </div>
+            <div className="label-brutal">Create Branch</div>
             <div className="mt-2 text-xs leading-5 text-[#666666]">
               New branches are created from the current branch unless you switch first.
             </div>
@@ -153,19 +141,13 @@ export function BranchManager({
                 }
               }}
             />
-            <button
-              type="button"
-              onClick={handleCreateBranch}
-              className="btn-neon mt-3"
-            >
+            <button type="button" onClick={handleCreateBranch} className="btn-neon mt-3">
               Create from {currentBranch ?? 'HEAD'}
             </button>
           </div>
 
           <div className="border border-[#2a2a2a] bg-[#0e0e0e] p-4">
-            <div className="label-brutal">
-              Recent Branches
-            </div>
+            <div className="label-brutal">Recent Branches</div>
             <div className="mt-3 flex flex-wrap gap-2">
               {recentBranches.length === 0 && (
                 <div className="text-xs text-[#666666]">

@@ -120,9 +120,7 @@ export function SettingsAccounts(): JSX.Element {
         </div>
 
         <div className="mb-3 space-y-2">
-          {accounts.length === 0 && (
-            <div className="text-[#666666]">No accounts configured.</div>
-          )}
+          {accounts.length === 0 && <div className="text-[#666666]">No accounts configured.</div>}
           {accounts.map((account) => (
             <div
               key={account.id}

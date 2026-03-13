@@ -125,7 +125,10 @@ export function RepoList(): JSX.Element {
                           {repo.name}
                         </span>
                         {isActive && (
-                          <span className="rounded-full bg-[#00ffaa]/10 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#00ffaa]" style={{ textShadow: '0 0 8px rgba(0, 255, 170, 0.6)' }}>
+                          <span
+                            className="rounded-full bg-[#00ffaa]/10 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#00ffaa]"
+                            style={{ textShadow: '0 0 8px rgba(0, 255, 170, 0.6)' }}
+                          >
                             Active
                           </span>
                         )}

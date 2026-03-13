@@ -169,7 +169,10 @@ export function PullRequestModal(): JSX.Element | null {
         </div>
 
         {prResult.status === 'error' && (
-          <div className="mt-3 text-xs text-[#ff3366]" style={{ textShadow: '0 0 8px rgba(255,51,102,0.4)' }}>
+          <div
+            className="mt-3 text-xs text-[#ff3366]"
+            style={{ textShadow: '0 0 8px rgba(255,51,102,0.4)' }}
+          >
             {prResult.message}
           </div>
         )}

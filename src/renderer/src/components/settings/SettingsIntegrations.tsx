@@ -188,9 +188,7 @@ export function SettingsIntegrations(): JSX.Element {
               <option value="local">Local LLM</option>
               <option value="cloud">Cloud LLM</option>
             </select>
-            <div className="mt-1 text-[10px] text-[#666666]">
-              Active: {providerLabel}
-            </div>
+            <div className="mt-1 text-[10px] text-[#666666]">Active: {providerLabel}</div>
           </div>
           <div>
             <label className="mb-1 block text-[10px] font-bold uppercase tracking-[0.18em] text-[#666666]">
@@ -204,9 +202,7 @@ export function SettingsIntegrations(): JSX.Element {
               <option value="standard">Standard Developer</option>
               <option value="cybersecurity">Cybersecurity Expert</option>
             </select>
-            <div className="mt-1 text-[10px] text-[#666666]">
-              Determines commit style
-            </div>
+            <div className="mt-1 text-[10px] text-[#666666]">Determines commit style</div>
           </div>
         </div>
 

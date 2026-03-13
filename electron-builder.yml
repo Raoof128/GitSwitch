@@ -27,7 +27,9 @@ nsis:
 mac:
   entitlements: resources/entitlements.mac.plist
   entitlementsInherit: resources/entitlements.mac.plist
-  notarize: false
+  # Set APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD, and APPLE_TEAM_ID env vars to enable notarization.
+  # See: https://www.electron.build/code-signing.html
+  notarize: true
   category: public.app-category.developer-tools
 
 dmg:

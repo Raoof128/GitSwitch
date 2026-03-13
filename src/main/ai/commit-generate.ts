@@ -34,12 +34,16 @@ const requestTimestamps: number[] = []
 
 const checkRateLimit = (): boolean => {
   const now = Date.now()
-  const recentRequests = requestTimestamps.filter(
-    (timestamp) => now - timestamp < RATE_LIMIT_WINDOW
-  )
-  requestTimestamps.length = 0
-  requestTimestamps.push(...recentRequests, now)
-  return recentRequests.length < MAX_REQUESTS_PER_WINDOW
+  const cutoff = now - RATE_LIMIT_WINDOW
+  // Remove expired timestamps from the front (array is insertion-ordered)
+  while (requestTimestamps.length > 0 && requestTimestamps[0] < cutoff) {
+    requestTimestamps.shift()
+  }
+  if (requestTimestamps.length >= MAX_REQUESTS_PER_WINDOW) {
+    return false
+  }
+  requestTimestamps.push(now)
+  return true
 }
 
 const truncateDiff = (input: string, maxLines: number, maxBytes: number): string => {

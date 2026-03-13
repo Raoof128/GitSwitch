@@ -249,23 +249,24 @@ function App(): JSX.Element {
   }, [activeAccountId, activeRepoPath, aiProvider, hasAiKey, remotes, status])
 
   /* ── Sync settingsOpen with activeTab ── */
-  useEffect(() => {
-    if (settingsOpen) {
-      setActiveTab('settings')
-    }
-  }, [settingsOpen])
-
-  useEffect(() => {
-    if (activeTab === 'settings') {
-      if (!settingsOpen) {
+  const switchTab = useCallback(
+    (tab: RailTab) => {
+      setActiveTab(tab)
+      if (tab === 'settings' && !settingsOpen) {
         openSettings('general')
-      }
-    } else {
-      if (settingsOpen) {
+      } else if (tab !== 'settings' && settingsOpen) {
         setSettingsOpen(false)
       }
+    },
+    [openSettings, setSettingsOpen, settingsOpen]
+  )
+
+  useEffect(() => {
+    if (settingsOpen && activeTab !== 'settings') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sync store-driven tab switch
+      setActiveTab('settings')
     }
-  }, [activeTab, openSettings, setSettingsOpen, settingsOpen])
+  }, [settingsOpen, activeTab])
 
   const refreshWorkspace = useCallback(async () => {
     await Promise.all([refreshStatus(), refreshRemotes(), refreshBranches()])
@@ -348,8 +349,7 @@ function App(): JSX.Element {
 
       if (settingsOpen) {
         if (event.key === 'Escape') {
-          setSettingsOpen(false)
-          setActiveTab('changes')
+          switchTab('changes')
         }
         return
       }
@@ -399,8 +399,8 @@ function App(): JSX.Element {
     confirmAction,
     generateCommitMessage,
     refreshWorkspace,
-    setSettingsOpen,
-    settingsOpen
+    settingsOpen,
+    switchTab
   ])
 
   /* ── Auto-fetch interval ── */
@@ -424,19 +424,19 @@ function App(): JSX.Element {
       {/* ══════════ ACTIVITY RAIL ══════════ */}
       <nav className="activity-rail" role="tablist">
         <div className="flex flex-col items-center gap-1">
-          {([
+          {[
             { tab: 'changes' as RailTab, icon: IconChanges, label: 'Changes' },
             { tab: 'branches' as RailTab, icon: IconBranches, label: 'Branches' },
             { tab: 'repos' as RailTab, icon: IconRepos, label: 'Repos' },
             { tab: 'settings' as RailTab, icon: IconSettings, label: 'Settings' }
-          ]).map(({ tab, icon: Icon, label }) => (
+          ].map(({ tab, icon: Icon, label }) => (
             <button
               key={tab}
               type="button"
               title={label}
               role="tab"
               aria-selected={activeTab === tab}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => switchTab(tab)}
               className={`rail-btn ${activeTab === tab ? 'active' : ''}`}
             >
               <Icon active={activeTab === tab} />
@@ -451,9 +451,7 @@ function App(): JSX.Element {
         <header className="top-bar justify-between">
           {/* Left: repo name + branch chip */}
           <div className="flex items-center gap-3 overflow-hidden">
-            <span className="label-brutal label-accent truncate text-sm">
-              {repoName}
-            </span>
+            <span className="label-brutal label-accent truncate text-sm">{repoName}</span>
 
             {status?.current && (
               <span className="neon-badge neon-badge-green truncate" style={{ maxWidth: 180 }}>
@@ -477,9 +475,7 @@ function App(): JSX.Element {
             </AnimatePresence>
 
             {syncStatus === 'loading' && (
-              <span className="neon-badge neon-badge-yellow">
-                {syncAction ?? 'sync'}...
-              </span>
+              <span className="neon-badge neon-badge-yellow">{syncAction ?? 'sync'}...</span>
             )}
 
             {commitError && (
@@ -589,9 +585,7 @@ function App(): JSX.Element {
 
                   {!hasRepos && onboardingDismissed && (
                     <div className="border border-dashed border-[var(--ui-border-soft)] bg-[var(--ui-panel)] px-6 py-10 text-center">
-                      <div className="label-brutal label-accent">
-                        No Repository Selected
-                      </div>
+                      <div className="label-brutal label-accent">No Repository Selected</div>
                       <div className="mt-3 text-2xl font-semibold text-[var(--ui-text)]">
                         Add a Git repository to start the real workflow.
                       </div>
@@ -635,23 +629,19 @@ function App(): JSX.Element {
                         }}
                       />
 
-                      <div
-                        className={`flex min-h-0 gap-4 ${wideLayout ? 'flex-row' : 'flex-col'}`}
-                      >
+                      <div className={`flex min-h-0 gap-4 ${wideLayout ? 'flex-row' : 'flex-col'}`}>
                         {/* Left column: files + commit */}
                         <div
                           className="flex shrink-0 flex-col overflow-hidden"
                           style={{
-                            width: wideLayout ? 'min(360px, 100%)' : '100%',
+                            width: wideLayout ? 'min(360px, 100%)' : '100%'
                           }}
                         >
                           {/* File list section */}
                           <section className="shrink-0 overflow-hidden border border-[var(--ui-border)] bg-[var(--ui-panel)]">
                             <div className="flex flex-col gap-3 border-b border-[var(--ui-border)] bg-[var(--ui-panel-muted)] px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
                               <div>
-                                <div className="label-brutal">
-                                  Changed Files
-                                </div>
+                                <div className="label-brutal">Changed Files</div>
                               </div>
                               <div className="flex gap-1">
                                 <button
@@ -680,9 +670,7 @@ function App(): JSX.Element {
                           {/* Commit section — always visible below files */}
                           <section className="mt-0 shrink-0 overflow-y-auto border border-[var(--ui-border)] border-t-0 bg-[var(--ui-panel-muted)]">
                             <div className="border-b border-[var(--ui-border)] px-3 py-2">
-                              <span className="label-brutal label-accent">
-                                Commit
-                              </span>
+                              <span className="label-brutal label-accent">Commit</span>
                             </div>
                             <div className="px-1 py-1">
                               <CommitPanel />
@@ -741,14 +729,8 @@ function App(): JSX.Element {
                 className="h-full w-full overflow-y-auto bg-[var(--ui-bg)]"
               >
                 <div className="flex items-center justify-between border-b border-[var(--ui-border)] bg-[var(--ui-panel)] px-4 py-3">
-                  <span className="label-brutal">
-                    Repositories
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => void addRepo()}
-                    className="btn-neon"
-                  >
+                  <span className="label-brutal">Repositories</span>
+                  <button type="button" onClick={() => void addRepo()} className="btn-neon">
                     Add Repo
                   </button>
                 </div>
@@ -770,16 +752,14 @@ function App(): JSX.Element {
               >
                 <div className="flex items-center justify-between border-b border-[var(--ui-border)] bg-[var(--ui-panel)] px-4 py-3">
                   <div>
-                    <span className="label-brutal">
-                      Settings
-                    </span>
+                    <span className="label-brutal">Settings</span>
                     <div className="mt-0.5 text-[0.625rem] text-[var(--ui-text-muted)]">
                       General preferences, accounts, integrations, and advanced controls.
                     </div>
                   </div>
                   <button
                     type="button"
-                    onClick={() => setActiveTab('changes')}
+                    onClick={() => switchTab('changes')}
                     className="flex h-8 items-center border border-[var(--ui-border-soft)] bg-[var(--ui-panel)] px-3 text-[0.625rem] font-bold uppercase tracking-widest text-[var(--ui-text-muted)]"
                   >
                     Back to Repo

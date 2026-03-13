@@ -142,6 +142,11 @@ async function writeTempKeyFile(privateKey: string): Promise<string> {
     throw new Error('Temp file path too long.')
   }
 
+  // Validate temp path contains only safe characters before use in shell commands
+  if (!/^[a-zA-Z0-9/_.-]+$/.test(tempPath)) {
+    throw new Error('Temp key path contains unsafe characters.')
+  }
+
   await fs.writeFile(tempPath, privateKey, { mode: 0o600 })
   activeTempKeys.add(tempPath)
   return tempPath

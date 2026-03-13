@@ -77,6 +77,8 @@ const api = {
     ipcRenderer.on('git:status-changed', listener)
     return () => ipcRenderer.removeListener('git:status-changed', listener)
   },
+  gitUnwatchRepo: (repoPath: string): Promise<{ ok: boolean }> =>
+    ipcRenderer.invoke('git:unwatchRepo', repoPath),
   openExternal: (url: string): Promise<{ ok: boolean }> =>
     ipcRenderer.invoke('shell:openExternal', url)
 }

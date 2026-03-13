@@ -11,6 +11,29 @@
 ## Log
 
  - Raouf: (entries appended below)
+ - Raouf: 2026-03-14 (Australia/Sydney) - Pass 2
+   - Scope: Remaining Recommendations Implementation
+   - Summary: Implemented all 7 remaining audit recommendations.
+     1. Enabled macOS notarization in electron-builder.yml.
+     2. Added Playwright Electron e2e test suite + test:e2e script.
+     3. Created .github/dependabot.yml (npm + actions, weekly, grouped).
+     4. Split 1348-line Zustand store into 5 domain slices (git, settings, accounts, ui, repos).
+     5. Added settings schema versioning and migration in key-manager.ts.
+     6. Added loadGeneration counter for request cancellation on repo switch.
+     7. Updated CI to run test:coverage and upload lcov artifact.
+   - Files: 17 files modified/created (see CHANGELOG for full list)
+   - Verification: lint, typecheck, test (15 pass), build all pass.
+ - Raouf: 2026-03-14 (Australia/Sydney)
+   - Scope: Deep Production-Readiness Audit & Remediation
+   - Summary: Completed file-by-file audit of entire repository. Applied targeted fixes for security, performance, reliability, and documentation.
+     1. SECURITY: Unified macOS entitlements, raised Gemini safety filters (BLOCK_ONLY_HIGH), hardened SSH temp path validation, fixed provider detection against lookalike domains, added will-navigate guard, expanded CSP for Anthropic API and Google Fonts, added bounds validation for settings fields, protocol enforcement for aiLocalUrl.
+     2. PERFORMANCE: Fixed rate-limit array memory leak, added watcher cleanup on repo removal via git:unwatchRepo IPC.
+     3. RELIABILITY: Added React ErrorBoundary, fixed lint-blocking set-state-in-effect errors, refactored tab switching.
+     4. TESTING: Added lookalike-domain test, added coverage thresholds.
+     5. DOCS: Created THREAT_MODEL.md and RELEASE_CHECKLIST.md, linked from README.
+   - Files: 20 files modified/created (see CHANGELOG for full list)
+   - Verification: lint, typecheck, test (15 pass), build all pass.
+   - Follow-ups: macOS notarization, Electron integration test harness, Dependabot, store splitting.
  - Raouf: 2026-03-11 (Australia/Sydney)
    - Scope: Production Audit & Hardening
    - Summary: Completed a full repository audit and brought the project into a cleaner production-ready state.

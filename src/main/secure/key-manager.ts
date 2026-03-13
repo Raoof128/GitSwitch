@@ -5,8 +5,12 @@ import { randomUUID } from 'crypto'
 import ElectronStore from 'electron-store'
 import type { Account, AiPersona, AiProvider, AppTheme, SettingsPublic } from '../../index'
 
+/** Current settings schema version. Bump when adding/removing/renaming fields. */
+const SETTINGS_SCHEMA_VERSION = 2
+
 type StoreSchema = {
   accounts: Account[]
+  settingsVersion?: number
   settings: {
     aiCloudModel: string
     aiLocalModel: string
@@ -55,6 +59,36 @@ const store = new ElectronStore<StoreSchema>({
     settings: DEFAULT_SETTINGS
   }
 })
+
+/**
+ * Migrate settings schema forward when the version changes.
+ * Each migration step handles one version bump. New fields get DEFAULT_SETTINGS values.
+ */
+function migrateSettingsIfNeeded(): void {
+  const currentVersion = store.get('settingsVersion', 1)
+  if (currentVersion >= SETTINGS_SCHEMA_VERSION) {
+    return
+  }
+
+  const settings = store.get('settings') as Record<string, unknown>
+
+  // v1 -> v2: Ensure all DEFAULT_SETTINGS keys exist (covers fields added after initial release)
+  if (currentVersion < 2) {
+    for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) {
+      if (!(key in settings)) {
+        settings[key] = value
+      }
+    }
+  }
+
+  // Future migrations: if (currentVersion < 3) { ... }
+
+  store.set('settings', settings as StoreSchema['settings'])
+  store.set('settingsVersion', SETTINGS_SCHEMA_VERSION)
+}
+
+// Run migration on module load (app startup)
+migrateSettingsIfNeeded()
 
 const getKeysDir = (): string => join(app.getPath('home'), '.gitswitch', 'keys')
 const getAiKeyPath = (): string => join(getKeysDir(), 'ai-key.enc')

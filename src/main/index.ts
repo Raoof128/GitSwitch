@@ -103,6 +103,16 @@ function createWindow(): void {
     return { action: 'deny' }
   })
 
+  // Prevent the renderer from navigating away from the app origin
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    const appOrigin = isDev
+      ? process.env['ELECTRON_RENDERER_URL'] || 'http://127.0.0.1:5174'
+      : `file://${join(__dirname, '../renderer')}`
+    if (!url.startsWith(appOrigin)) {
+      event.preventDefault()
+    }
+  })
+
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (isDev) {
@@ -122,6 +132,14 @@ function ensureWatcher(repoPath: string): void {
     mainWindow?.webContents.send('git:status-changed', payload)
   })
   watchers.set(repoPath, watcher)
+}
+
+function removeWatcher(repoPath: string): void {
+  const watcher = watchers.get(repoPath)
+  if (watcher) {
+    watcher.close()
+    watchers.delete(repoPath)
+  }
 }
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -493,7 +511,14 @@ async function registerIpcHandlers(): Promise<void> {
         safeInput.aiCloudModel = assertString(input.aiCloudModel, 'aiCloudModel')
       if ('aiLocalModel' in input)
         safeInput.aiLocalModel = assertString(input.aiLocalModel, 'aiLocalModel')
-      if ('aiLocalUrl' in input) safeInput.aiLocalUrl = assertString(input.aiLocalUrl, 'aiLocalUrl')
+      if ('aiLocalUrl' in input) {
+        const url = assertString(input.aiLocalUrl, 'aiLocalUrl').trim()
+        // Only allow http:// and https:// to localhost/127.0.0.1 or LAN addresses for local LLM
+        if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+          throw new Error('aiLocalUrl must use http:// or https:// protocol.')
+        }
+        safeInput.aiLocalUrl = url
+      }
       if ('aiPersona' in input) {
         const persona = assertString(input.aiPersona, 'aiPersona')
         if (persona !== 'standard' && persona !== 'cybersecurity') {
@@ -512,7 +537,11 @@ async function registerIpcHandlers(): Promise<void> {
         safeInput.aiRedactionEnabled = assertBoolean(input.aiRedactionEnabled, 'aiRedactionEnabled')
       }
       if ('aiTimeoutSec' in input) {
-        safeInput.aiTimeoutSec = assertNumber(input.aiTimeoutSec, 'aiTimeoutSec')
+        const timeout = assertNumber(input.aiTimeoutSec, 'aiTimeoutSec')
+        if (timeout < 5 || timeout > 120) {
+          throw new Error('aiTimeoutSec must be between 5 and 120.')
+        }
+        safeInput.aiTimeoutSec = timeout
       }
       if ('autoPush' in input) {
         safeInput.autoPush = assertBoolean(input.autoPush, 'autoPush')
@@ -532,10 +561,20 @@ async function registerIpcHandlers(): Promise<void> {
         }
         safeInput.defaultBaseBranch = value as 'main' | 'master'
       }
-      if ('diffLimitKb' in input)
-        safeInput.diffLimitKb = assertNumber(input.diffLimitKb, 'diffLimitKb')
-      if ('diffLimitLines' in input)
-        safeInput.diffLimitLines = assertNumber(input.diffLimitLines, 'diffLimitLines')
+      if ('diffLimitKb' in input) {
+        const kb = assertNumber(input.diffLimitKb, 'diffLimitKb')
+        if (kb < 1 || kb > 2048) {
+          throw new Error('diffLimitKb must be between 1 and 2048.')
+        }
+        safeInput.diffLimitKb = kb
+      }
+      if ('diffLimitLines' in input) {
+        const lines = assertNumber(input.diffLimitLines, 'diffLimitLines')
+        if (lines < 50 || lines > 10000) {
+          throw new Error('diffLimitLines must be between 50 and 10000.')
+        }
+        safeInput.diffLimitLines = lines
+      }
       if ('likeApp' in input) safeInput.likeApp = assertBoolean(input.likeApp, 'likeApp')
       if ('reducedMotion' in input)
         safeInput.reducedMotion = assertBoolean(input.reducedMotion, 'reducedMotion')
@@ -649,6 +688,13 @@ async function registerIpcHandlers(): Promise<void> {
     }
   })
 
+  ipcMain.handle('git:unwatchRepo', async (_event: IpcMainInvokeEvent, repoPath: string) => {
+    const safe = assertString(repoPath, 'repoPath')
+    removeWatcher(safe)
+    allowedRepoPaths.delete(safe)
+    return { ok: true }
+  })
+
   ipcMain.handle('shell:openExternal', async (_event: IpcMainInvokeEvent, url: string) => {
     const safeUrl = assertString(url, 'url')
     if (!isAllowedExternalUrl(safeUrl)) {
@@ -674,7 +720,7 @@ app.whenReady().then(() => {
       delete headers['Content-Security-Policy']
       delete headers['content-security-policy']
       const csp =
-        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://api.openai.com https://generativelanguage.googleapis.com https://api.github.com https://gitlab.com https://github.com; font-src 'self'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'none';"
+        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:; connect-src 'self' https://api.openai.com https://api.anthropic.com https://generativelanguage.googleapis.com https://api.github.com https://gitlab.com https://github.com; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'none';"
       callback({
         responseHeaders: {
           ...headers,

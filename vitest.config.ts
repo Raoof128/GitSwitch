@@ -4,6 +4,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
+    exclude: ['e2e/**', 'node_modules/**'],
     setupFiles: ['./src/renderer/src/setupTests.ts'],
     coverage: {
       provider: 'v8',
@@ -14,7 +15,13 @@ export default defineConfig({
         'src/**/*.test.ts',
         'src/**/*.test.tsx',
         'src/renderer/src/main.tsx'
-      ]
+      ],
+      thresholds: {
+        statements: 10,
+        branches: 10,
+        functions: 10,
+        lines: 10
+      }
     }
   }
 })

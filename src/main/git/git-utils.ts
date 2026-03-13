@@ -39,8 +39,9 @@ export const fetchWithTimeout = async (
  * @returns The detected provider type
  */
 export const detectGitProvider = (remoteUrl: string): GitProvider => {
-  if (remoteUrl.includes('github.com')) return 'github'
-  if (remoteUrl.includes('gitlab.com')) return 'gitlab'
+  // Match exact hostname boundaries to prevent false positives (e.g. github.com.evil.com)
+  if (/(?:^|[@/])github\.com(?:[:/]|$)/i.test(remoteUrl)) return 'github'
+  if (/(?:^|[@/])gitlab\.com(?:[:/]|$)/i.test(remoteUrl)) return 'gitlab'
   return 'unknown'
 }
 

@@ -10,6 +10,13 @@ describe('git-utils', () => {
     expect(detectGitProvider('https://example.com/group/project.git')).toBe('unknown')
   })
 
+  it('rejects lookalike provider domains', () => {
+    expect(detectGitProvider('https://github.com.evil.com/owner/repo.git')).toBe('unknown')
+    expect(detectGitProvider('https://notgithub.com/owner/repo.git')).toBe('unknown')
+    expect(detectGitProvider('https://gitlab.com.attacker.io/group/project.git')).toBe('unknown')
+    expect(detectGitProvider('https://mygitlab.com/group/project.git')).toBe('unknown')
+  })
+
   it('parses GitHub SSH and HTTPS remotes', () => {
     expect(parseGitHubRepo('git@github.com:Raoof128/GitSwitch.git')).toEqual({
       owner: 'Raoof128',

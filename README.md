@@ -63,6 +63,8 @@ Detailed walkthroughs live in [docs/usage-examples.md](docs/usage-examples.md).
 ## Documentation
 
 - [Architecture overview](ARCHITECTURE.md)
+- [Threat model](THREAT_MODEL.md)
+- [Release checklist](RELEASE_CHECKLIST.md)
 - [Preload and IPC API reference](docs/api-reference.md)
 - [Usage examples](docs/usage-examples.md)
 - [Troubleshooting guide](docs/troubleshooting.md)

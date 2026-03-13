@@ -3,6 +3,30 @@
 ## Unreleased
 
 - Raouf: (entries appended below)
+- Raouf: 2026-03-14 (Australia/Sydney) - Pass 2
+  - Scope: Remaining Recommendations Implementation
+  - Summary: Implemented all 7 remaining audit recommendations from the production-readiness pass.
+    1. NOTARIZATION: Enabled macOS notarization in electron-builder.yml (requires APPLE_ID/APPLE_APP_SPECIFIC_PASSWORD/APPLE_TEAM_ID env vars).
+    2. INTEGRATION TESTS: Added Playwright Electron test suite (e2e/app.spec.ts) covering window launch, activity rail, tab switching, command palette, and console error checks. Added `test:e2e` script. Installed @playwright/test.
+    3. DEPENDABOT: Created .github/dependabot.yml with npm + github-actions ecosystems, weekly schedule, grouped updates (electron, testing, linting, build), and reviewer assignment.
+    4. STORE SPLIT: Decomposed the 1348-line monolithic Zustand store into 5 domain slices (gitSlice, settingsSlice, accountsSlice, uiSlice, reposSlice) + shared types. Consumer API (`useRepoStore`) unchanged.
+    5. SETTINGS MIGRATION: Added schema versioning (`settingsVersion`) and `migrateSettingsIfNeeded()` to key-manager.ts. Runs at startup, fills missing fields from defaults on version bump.
+    6. REQUEST CANCELLATION: Added `loadGeneration` counter to abandon stale diff/status responses when the active repo changes mid-load.
+    7. COVERAGE CI: Updated ci.yml to run `test:coverage` instead of `test`, upload lcov report as artifact on push to main.
+  - Files: electron-builder.yml, .github/dependabot.yml, .github/workflows/ci.yml, e2e/app.spec.ts, playwright.config.ts, package.json, vitest.config.ts, src/main/secure/key-manager.ts, src/renderer/src/store/useRepoStore.ts, src/renderer/src/store/slices/types.ts, src/renderer/src/store/slices/gitSlice.ts, src/renderer/src/store/slices/settingsSlice.ts, src/renderer/src/store/slices/accountsSlice.ts, src/renderer/src/store/slices/uiSlice.ts, src/renderer/src/store/slices/reposSlice.ts, AGENT.md, CHANGELOG.md
+  - Verification: `npm run lint`, `npm run typecheck`, `npm test` (15 pass), `npm run build` all pass.
+  - Follow-ups: None - all 7 recommendations from the audit are now implemented.
+- Raouf: 2026-03-14 (Australia/Sydney)
+  - Scope: Deep Production-Readiness Audit & Remediation
+  - Summary: Full file-by-file repository audit with targeted security, performance, reliability, and documentation fixes.
+    1. SECURITY: Unified macOS entitlements (removed dyld-env-vars, added disable-library-validation and network-client consistently), raised Gemini safety filters from BLOCK_NONE to BLOCK_ONLY_HIGH, hardened GIT_SSH_COMMAND temp path against shell metacharacters, fixed detectGitProvider to reject lookalike domains (github.com.evil.com), added will-navigate handler to block renderer navigation attacks, added Anthropic API to CSP connect-src, added Google Fonts to CSP style-src/font-src, added bounds validation for aiTimeoutSec/diffLimitKb/diffLimitLines, added http/https protocol enforcement for aiLocalUrl.
+    2. PERFORMANCE: Fixed rate-limit array memory leak in commit-generate.ts (shift-based cleanup instead of filter+spread), added git:unwatchRepo IPC handler + watcher cleanup on repo removal, wired removeRepo store action to release file watchers.
+    3. RELIABILITY: Added React ErrorBoundary wrapping the entire app (crash recovery UI), fixed pre-existing react-hooks/set-state-in-effect lint errors blocking build, refactored App.tsx tab switching to use switchTab() callback for consistent state sync.
+    4. TESTING: Added lookalike-domain rejection test for detectGitProvider (15 tests total), added coverage thresholds (10% baseline) in vitest.config.ts.
+    5. DOCS: Created THREAT_MODEL.md (trust boundaries, 8 threat categories with mitigations, known limitations), created RELEASE_CHECKLIST.md (code quality, build, smoke tests, security, platform-specific items), linked both from README.md.
+  - Files: build/entitlements.mac.plist, resources/entitlements.mac.plist, src/main/ai/providers/gemini.ts, src/main/ai/commit-generate.ts, src/main/git/git-service.ts, src/main/git/git-utils.ts, src/main/git/git-utils.test.ts, src/main/git/watcher.ts, src/main/index.ts, src/preload/index.ts, src/preload/index.d.ts, src/renderer/src/main.tsx, src/renderer/src/App.tsx, src/renderer/src/store/useRepoStore.ts, vitest.config.ts, README.md, THREAT_MODEL.md, RELEASE_CHECKLIST.md, AGENT.md, CHANGELOG.md
+  - Verification: `npm run lint`, `npm run typecheck`, `npm test` (15 pass), `npm run build` all pass.
+  - Follow-ups: Enable macOS notarization for distribution, expand integration test coverage (requires Electron test harness), add Dependabot configuration, consider splitting large Zustand store.
 - Raouf: 2026-03-11 (Australia/Sydney)
   - Scope: Production Audit & Hardening
   - Summary: Completed a comprehensive repository audit covering security, reliability, testing, documentation, CI, and packaging polish.

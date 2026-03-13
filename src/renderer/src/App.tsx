@@ -435,6 +435,7 @@ function App(): JSX.Element {
               type="button"
               title={label}
               role="tab"
+              aria-label={label}
               aria-selected={activeTab === tab}
               onClick={() => switchTab(tab)}
               className={`rail-btn ${activeTab === tab ? 'active' : ''}`}
@@ -544,10 +545,11 @@ function App(): JSX.Element {
             <button
               type="button"
               onClick={() => setCommandPaletteOpen(true)}
-              title="Command Palette (Ctrl/⌘+K)"
+              title="Command Palette"
+              aria-label="Open command palette"
               className="flex h-8 items-center justify-center border border-[var(--ui-border-soft)] bg-[var(--ui-panel)] px-2.5 text-[0.625rem] font-bold uppercase tracking-widest text-[var(--ui-text-muted)]"
             >
-              ⌘K
+              {navigator.platform?.includes('Mac') ? '⌘K' : 'Ctrl+K'}
             </button>
           </div>
         </header>
@@ -617,7 +619,6 @@ function App(): JSX.Element {
                         onHardReset={() => setConfirmAction('reset')}
                         onOpenCommandPalette={() => setCommandPaletteOpen(true)}
                         onOpenSettingsAccounts={() => openSettings('accounts')}
-                        onOpenSettingsIntegrations={() => openSettings('integrations')}
                         repoName={repoName}
                         repoPath={activeRepoPath}
                         stats={{

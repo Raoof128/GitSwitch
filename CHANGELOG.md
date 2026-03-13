@@ -3,6 +3,16 @@
 ## Unreleased
 
 - Raouf: (entries appended below)
+- Raouf: 2026-03-14 (Australia/Sydney) - UI/UX Audit
+  - Scope: UI/UX Production-Readiness Audit & Remediation
+  - Summary: Full renderer audit targeting accessibility, contrast, interaction feedback, microcopy, and desktop usability.
+    1. ACCESSIBILITY: Bumped muted text from #666 to #888 (4.6:1 contrast ratio), placeholder from #444 to #555 (3.6:1), disabled button from #333 to #555, rail inactive icons from #444 to #777, diff gutter from #333 to #555. Added focus-visible outline rings (2px solid accent) to all buttons, selects, and links. Added aria-label to activity rail tabs. Added role="status" and aria-live to OperationBanner. Added status code tooltips (M=Modified, A=Added, etc.) to file list indicators with aria-label.
+    2. UX CLARITY: Added character counter (72/200) to commit title with yellow warning color at 72+. Platform-aware keyboard shortcut display (⌘K on Mac, Ctrl+K elsewhere). Improved empty state messages with actionable hints. Added step numbers to onboarding panel. Added tooltips to git jargon (Ahead/Behind, Working Tree). Changed "Hide" to "Dismiss" on onboarding. Replaced misplaced "Review AI setup" link in Last Fetch card with contextual "Fetch now" link.
+    3. INTERACTION FEEDBACK: Added elapsed time counter to OperationBanner (shows "3s", "5s" etc. during operations). Improved confirmation dialog detail text contrast (#666 to #c0c0). Improved dangerous actions copy for clarity.
+    4. MICROCOPY: Better remote URL placeholder showing both SSH and HTTPS formats. Cleaner dangerous actions explanation. More actionable empty states in file list.
+  - Files: src/renderer/src/assets/main.css, src/renderer/src/App.tsx, src/renderer/src/components/sidebar/CommitPanel.tsx, src/renderer/src/components/sidebar/FileList.tsx, src/renderer/src/components/sidebar/RemoteConfig.tsx, src/renderer/src/components/dashboard/OnboardingPanel.tsx, src/renderer/src/components/dashboard/OperationBanner.tsx, src/renderer/src/components/dashboard/RepoOverview.tsx, src/renderer/src/components/ui/ConfirmActionModal.tsx, AGENT.md, CHANGELOG.md
+  - Verification: `npm run lint`, `npm run typecheck`, `npm test` (15 pass), `npm run build` all pass.
+  - Follow-ups: Add focus trap to CommandPalette, form validation states, syntax highlighting in diff view, branch autocomplete in PR modal.
 - Raouf: 2026-03-14 (Australia/Sydney) - Pass 2
   - Scope: Remaining Recommendations Implementation
   - Summary: Implemented all 7 remaining audit recommendations from the production-readiness pass.

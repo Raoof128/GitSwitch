@@ -51,9 +51,7 @@ export function OnboardingPanel({
     <section className="border border-[#2a2a2a] bg-[#141414] p-5 sm:p-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="max-w-2xl">
-          <div className="label-brutal label-accent">
-            First-Run Flow
-          </div>
+          <div className="label-brutal label-accent">First-Run Flow</div>
           <h2
             className="mt-3 font-mono text-2xl font-bold uppercase leading-tight text-[#e0e0e0] sm:text-3xl"
             style={{ textShadow: '0 0 10px rgba(224, 224, 224, 0.15)' }}
@@ -70,13 +68,14 @@ export function OnboardingPanel({
           type="button"
           onClick={onDismiss}
           className="btn-neon self-start px-3 py-1 text-[10px]"
+          title="Dismiss this panel permanently"
         >
-          Hide
+          Dismiss
         </button>
       </div>
 
       <div className="mt-6 grid gap-3 xl:grid-cols-3">
-        {steps.map((step) => (
+        {steps.map((step, index) => (
           <div
             key={step.title}
             className="border border-[#2a2a2a] bg-[#0e0e0e] p-4"
@@ -87,23 +86,22 @@ export function OnboardingPanel({
             }}
           >
             <div className="flex items-center justify-between gap-3">
-              <div className="text-sm font-semibold text-[#e0e0e0]">{step.title}</div>
+              <div className="flex items-center gap-2 text-sm font-semibold text-[#e0e0e0]">
+                <span className="flex h-5 w-5 items-center justify-center border border-[#2a2a2a] text-[10px] text-[#888888]">
+                  {index + 1}
+                </span>
+                {step.title}
+              </div>
               <span
                 className={`rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] ${
-                  step.done
-                    ? 'neon-badge neon-badge-green'
-                    : 'neon-badge neon-badge-yellow'
+                  step.done ? 'neon-badge neon-badge-green' : 'neon-badge neon-badge-yellow'
                 }`}
               >
                 {step.done ? 'Ready' : 'Pending'}
               </span>
             </div>
             <div className="mt-2 text-xs leading-5 text-[#666666]">{step.detail}</div>
-            <button
-              type="button"
-              onClick={step.onAction}
-              className="btn-neon mt-4"
-            >
+            <button type="button" onClick={step.onAction} className="btn-neon mt-4">
               {step.done ? 'Review' : step.actionLabel}
             </button>
           </div>

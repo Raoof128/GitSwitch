@@ -18,7 +18,6 @@ type RepoOverviewProps = {
   onHardReset: () => void
   onOpenCommandPalette: () => void
   onOpenSettingsAccounts: () => void
-  onOpenSettingsIntegrations: () => void
   repoName: string
   repoPath: string
   stats: {
@@ -73,7 +72,6 @@ export function RepoOverview({
   onHardReset,
   onOpenCommandPalette,
   onOpenSettingsAccounts,
-  onOpenSettingsIntegrations,
   repoName,
   repoPath,
   stats
@@ -83,27 +81,17 @@ export function RepoOverview({
       <div className="border border-[#2a2a2a] bg-[#141414] p-5">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
-            <div className="label-brutal label-accent">
-              Repository Overview
+            <div className="label-brutal label-accent">Repository Overview</div>
+            <div className="mt-2 text-2xl font-bold uppercase tracking-[0.04em] text-[#e0e0e0]">
+              {repoName}
             </div>
-            <div className="mt-2 text-2xl font-bold uppercase tracking-[0.04em] text-[#e0e0e0]">{repoName}</div>
-            <div className="mt-1 break-all text-xs leading-5 text-[#666666]">
-              {repoPath}
-            </div>
+            <div className="mt-1 break-all text-xs leading-5 text-[#666666]">{repoPath}</div>
           </div>
           <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={onFetch}
-              className="btn-neon"
-            >
+            <button type="button" onClick={onFetch} className="btn-neon">
               {isFetching ? 'Fetching…' : 'Fetch'}
             </button>
-            <button
-              type="button"
-              onClick={onOpenCommandPalette}
-              className="btn-neon"
-            >
+            <button type="button" onClick={onOpenCommandPalette} className="btn-neon">
               Command Palette
             </button>
           </div>
@@ -111,9 +99,7 @@ export function RepoOverview({
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
           <div className="border border-[#2a2a2a] bg-[#0e0e0e] p-4">
-            <div className="label-brutal">
-              Current Branch
-            </div>
+            <div className="label-brutal">Current Branch</div>
             <div
               className="mt-2 font-mono text-lg font-semibold text-[#00ffaa]"
               style={{ textShadow: '0 0 8px rgba(0, 255, 170, 0.5)' }}
@@ -122,7 +108,7 @@ export function RepoOverview({
             </div>
           </div>
           <div className="border border-[#2a2a2a] bg-[#0e0e0e] p-4">
-            <div className="label-brutal">
+            <div className="label-brutal" title="Commits ahead of / behind remote origin">
               Ahead / Behind
             </div>
             <div className="mt-2 font-mono text-lg font-semibold">
@@ -131,8 +117,7 @@ export function RepoOverview({
                 style={{ textShadow: '0 0 8px rgba(0, 255, 170, 0.4)' }}
               >
                 ↑{stats.ahead}
-              </span>
-              {' '}
+              </span>{' '}
               <span
                 className="text-[#ff3366]"
                 style={{ textShadow: '0 0 8px rgba(255, 51, 102, 0.4)' }}
@@ -142,7 +127,7 @@ export function RepoOverview({
             </div>
           </div>
           <div className="border border-[#2a2a2a] bg-[#0e0e0e] p-4">
-            <div className="label-brutal">
+            <div className="label-brutal" title="Files modified in your local working directory">
               Working Tree
             </div>
             <div
@@ -151,14 +136,10 @@ export function RepoOverview({
             >
               {stats.changedFiles} changed
             </div>
-            <div className="mt-1 text-[11px] text-[#666666]">
-              {stats.stagedFiles} staged
-            </div>
+            <div className="mt-1 text-[11px] text-[#666666]">{stats.stagedFiles} staged</div>
           </div>
           <div className="border border-[#2a2a2a] bg-[#0e0e0e] p-4">
-            <div className="label-brutal">
-              Active Account
-            </div>
+            <div className="label-brutal">Active Account</div>
             <div
               className="mt-2 font-mono text-lg font-semibold text-[#e0e0e0]"
               style={{ textShadow: '0 0 6px rgba(224, 224, 224, 0.3)' }}
@@ -176,22 +157,23 @@ export function RepoOverview({
             )}
           </div>
           <div className="border border-[#2a2a2a] bg-[#0e0e0e] p-4">
-            <div className="label-brutal">
-              Last Fetch
-            </div>
+            <div className="label-brutal">Last Fetch</div>
             <div
               className="mt-2 font-mono text-lg font-semibold text-[#e0e0e0]"
               style={{ textShadow: '0 0 6px rgba(224, 224, 224, 0.3)' }}
             >
               {formatLastFetch(lastFetchAt)}
             </div>
-            <button
-              type="button"
-              onClick={onOpenSettingsIntegrations}
-              className="mt-2 text-[11px] font-semibold text-[#00ffaa] hover:underline"
-            >
-              Review AI setup
-            </button>
+            {!lastFetchAt && (
+              <button
+                type="button"
+                onClick={onFetch}
+                disabled={!canSync}
+                className="mt-2 text-[11px] font-semibold text-[#00ffaa] hover:underline disabled:opacity-50 disabled:no-underline"
+              >
+                Fetch now
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -203,8 +185,12 @@ export function RepoOverview({
               key={`${warning.title}-${warning.detail}`}
               className={warningCardClasses[warning.tone]}
             >
-              <div className={`text-sm font-semibold ${warningTextClasses[warning.tone]}`}>{warning.title}</div>
-              <div className="mt-1 text-xs leading-5 text-[#e0e0e0] opacity-90">{warning.detail}</div>
+              <div className={`text-sm font-semibold ${warningTextClasses[warning.tone]}`}>
+                {warning.title}
+              </div>
+              <div className="mt-1 text-xs leading-5 text-[#e0e0e0] opacity-90">
+                {warning.detail}
+              </div>
             </div>
           ))}
         </div>
@@ -220,24 +206,16 @@ export function RepoOverview({
               >
                 Dangerous Actions
               </div>
-              <div className="mt-2 text-sm leading-6 text-[#666666]">
-                Destructive Git operations should never be one-click casual. GitSwitch will show a
-                confirmation preview before applying them.
+              <div className="mt-2 text-sm leading-6 text-[#888888]">
+                These operations cannot be undone. A confirmation dialog will appear before any
+                changes are applied.
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={onDiscardChanges}
-                className="btn-neon btn-neon-yellow"
-              >
+              <button type="button" onClick={onDiscardChanges} className="btn-neon btn-neon-yellow">
                 Discard Unstaged
               </button>
-              <button
-                type="button"
-                onClick={onHardReset}
-                className="btn-neon btn-neon-pink"
-              >
+              <button type="button" onClick={onHardReset} className="btn-neon btn-neon-pink">
                 Hard Reset to HEAD
               </button>
             </div>

@@ -14,6 +14,17 @@ const getStatusCode = (index: string, workingDir: string): string => {
   return '?'
 }
 
+const STATUS_LABELS: Record<string, string> = {
+  M: 'Modified',
+  A: 'Added',
+  D: 'Deleted',
+  R: 'Renamed',
+  C: 'Copied',
+  U: 'Unmerged',
+  '?': 'Untracked',
+  '!': 'Ignored'
+}
+
 /** Simple confirmation dialog state */
 type ConfirmDialogState = {
   isOpen: boolean
@@ -123,8 +134,10 @@ export function FileList({ mode }: FileListProps): JSX.Element {
       </AnimatePresence>
 
       {files.length === 0 && (
-        <div className="border border-dashed border-[#2a2a2a] bg-[#0a0a0a] px-3 py-5 text-center text-xs text-[#666666]">
-          {mode === 'staged' ? 'No staged files.' : 'No modified files.'}
+        <div className="border border-dashed border-[#2a2a2a] bg-[#0a0a0a] px-3 py-5 text-center text-xs text-[#888888]">
+          {mode === 'staged'
+            ? 'No staged files. Use "Stage All" or click files to stage them.'
+            : 'No modified files. Edit files or fetch changes to see diffs here.'}
         </div>
       )}
       <div className="space-y-1">
@@ -179,6 +192,8 @@ export function FileList({ mode }: FileListProps): JSX.Element {
                   <span
                     data-status={code}
                     className="status-indicator w-4 text-center font-bold"
+                    title={STATUS_LABELS[code] ?? code}
+                    aria-label={STATUS_LABELS[code] ?? code}
                   >
                     {code}
                   </span>

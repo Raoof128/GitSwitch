@@ -50,13 +50,16 @@ export function RemoteConfig(): JSX.Element | null {
 
       {hasOrigin ? (
         <div className="mb-2 text-[11px]">
-          <span className="text-[#00ffaa]" style={{ textShadow: '0 0 8px rgba(0, 255, 170, 0.6)' }}>✓</span>{' '}
-          <span className="break-all font-mono text-[#666666]">
-            {originRemote?.url || 'Set'}
-          </span>
+          <span className="text-[#00ffaa]" style={{ textShadow: '0 0 8px rgba(0, 255, 170, 0.6)' }}>
+            ✓
+          </span>{' '}
+          <span className="break-all font-mono text-[#666666]">{originRemote?.url || 'Set'}</span>
         </div>
       ) : (
-        <div className="mb-2 text-[11px] font-bold text-[#ffcc00]" style={{ textShadow: '0 0 8px rgba(255, 204, 0, 0.4)' }}>
+        <div
+          className="mb-2 text-[11px] font-bold text-[#ffcc00]"
+          style={{ textShadow: '0 0 8px rgba(255, 204, 0, 0.4)' }}
+        >
           WARNING: No remote origin configured
         </div>
       )}
@@ -68,18 +71,24 @@ export function RemoteConfig(): JSX.Element | null {
             setRemoteUrl(e.target.value)
             setError(null)
           }}
-          placeholder={hasOrigin ? 'Update remote URL...' : 'git@github.com:user/repo.git'}
+          placeholder={hasOrigin ? 'Update remote URL...' : 'git@host:user/repo.git or https://...'}
           className="w-full border border-[#2a2a2a] bg-[#0a0a0a] px-2 py-1 text-xs text-[#e0e0e0] placeholder-[#666666] focus:border-[#00ffaa] focus:shadow-[0_0_12px_rgba(0,255,170,0.15)] focus:outline-none"
         />
 
         {error && (
-          <div className="border border-[#ff3366]/30 bg-[#ff3366]/5 px-2 py-1 text-[10px] font-bold text-[#ff3366]" style={{ textShadow: '0 0 8px rgba(255, 51, 102, 0.4)' }}>
+          <div
+            className="border border-[#ff3366]/30 bg-[#ff3366]/5 px-2 py-1 text-[10px] font-bold text-[#ff3366]"
+            style={{ textShadow: '0 0 8px rgba(255, 51, 102, 0.4)' }}
+          >
             {error}
           </div>
         )}
 
         {success && (
-          <div className="border border-[#00ffaa]/30 bg-[#00ffaa]/5 px-2 py-1 text-[10px] font-bold text-[#00ffaa]" style={{ textShadow: '0 0 8px rgba(0, 255, 170, 0.6)' }}>
+          <div
+            className="border border-[#00ffaa]/30 bg-[#00ffaa]/5 px-2 py-1 text-[10px] font-bold text-[#00ffaa]"
+            style={{ textShadow: '0 0 8px rgba(0, 255, 170, 0.6)' }}
+          >
             ORIGIN SAVED
           </div>
         )}

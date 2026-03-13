@@ -41,7 +41,9 @@ export function CommitPanel(): JSX.Element {
   return (
     <div className="mt-6 border border-[#2a2a2a] bg-[#141414] p-3">
       <div className="mb-2">
-        <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#666666]">Commit</div>
+        <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#666666]">
+          Commit
+        </div>
       </div>
       <div className="space-y-2">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -77,22 +79,29 @@ export function CommitPanel(): JSX.Element {
           disabled={isGenerating}
           className="w-full resize-none border border-[#2a2a2a] bg-[#0a0a0a] px-2 py-1 text-xs text-[#e0e0e0] placeholder-[#666666] focus:border-[#00ffaa] focus:shadow-[0_0_12px_rgba(0,255,170,0.15)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
         />
-        <div className="text-[11px] text-[#666666]">
-          Staged files: {stagedSummary.count}
-          {stagedSummary.files.length > 0 && (
-            <span className="block text-[#666666]">
-              {stagedSummary.files.join(', ')}
-              {stagedSummary.count > stagedSummary.files.length ? '...' : ''}
-            </span>
-          )}
+        <div className="flex items-center justify-between text-[11px] text-[#888888]">
+          <span>Staged files: {stagedSummary.count}</span>
+          <span className={titleLength > 72 ? 'text-[#ffcc00]' : ''}>{titleLength}/200</span>
         </div>
+        {stagedSummary.files.length > 0 && (
+          <div className="text-[11px] text-[#888888]">
+            {stagedSummary.files.join(', ')}
+            {stagedSummary.count > stagedSummary.files.length ? '...' : ''}
+          </div>
+        )}
         {titleLength > 72 && (
-          <div className="border border-[#ffcc00]/30 bg-[#ffcc00]/5 px-2 py-1 text-[11px] font-bold text-[#ffcc00]" style={{ textShadow: '0 0 8px rgba(255, 204, 0, 0.4)' }}>
+          <div
+            className="border border-[#ffcc00]/30 bg-[#ffcc00]/5 px-2 py-1 text-[11px] font-bold text-[#ffcc00]"
+            style={{ textShadow: '0 0 8px rgba(255, 204, 0, 0.4)' }}
+          >
             WARNING: Title exceeds 72 characters (may be truncated)
           </div>
         )}
         {commitError && (
-          <div className="border border-[#ff3366]/30 bg-[#ff3366]/5 px-2 py-1 text-[11px] font-bold text-[#ff3366]" style={{ textShadow: '0 0 8px rgba(255, 51, 102, 0.4)' }}>
+          <div
+            className="border border-[#ff3366]/30 bg-[#ff3366]/5 px-2 py-1 text-[11px] font-bold text-[#ff3366]"
+            style={{ textShadow: '0 0 8px rgba(255, 51, 102, 0.4)' }}
+          >
             ERROR: {commitError}
           </div>
         )}
@@ -164,7 +173,11 @@ export function CommitPanel(): JSX.Element {
           title="Commit (Ctrl/⌘+Enter)"
           className="relative w-full bg-[#00ffaa] px-2 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#0a0a0a] transition-shadow hover:shadow-[0_0_20px_rgba(0,255,170,0.3)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <span className={commitStatus === 'loading' ? 'opacity-0' : 'opacity-100'}>
+          <span
+            className={
+              commitStatus === 'loading' || commitStatus === 'success' ? 'opacity-0' : 'opacity-100'
+            }
+          >
             {branchLabel}
           </span>
           <AnimatePresence>

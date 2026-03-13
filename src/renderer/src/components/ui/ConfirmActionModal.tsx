@@ -24,9 +24,7 @@ export function ConfirmActionModal({
   }
 
   const badgeColor =
-    tone === 'danger'
-      ? 'border-[#ff3366] text-[#ff3366]'
-      : 'border-[#ffcc00] text-[#ffcc00]'
+    tone === 'danger' ? 'border-[#ff3366] text-[#ff3366]' : 'border-[#ffcc00] text-[#ffcc00]'
 
   const confirmBtnClass =
     tone === 'danger'
@@ -56,7 +54,7 @@ export function ConfirmActionModal({
         >
           {title}
         </h2>
-        <div className="mt-3 text-sm leading-6 text-[#666666]">{detail}</div>
+        <div className="mt-3 text-sm leading-6 text-[#c0c0c0]">{detail}</div>
         <div className="mt-6 flex flex-wrap justify-end gap-2">
           <button
             type="button"
@@ -65,11 +63,7 @@ export function ConfirmActionModal({
           >
             Cancel
           </button>
-          <button
-            type="button"
-            onClick={onConfirm}
-            className={confirmBtnClass}
-          >
+          <button type="button" onClick={onConfirm} className={confirmBtnClass}>
             {confirmLabel}
           </button>
         </div>

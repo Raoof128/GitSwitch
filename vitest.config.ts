@@ -4,7 +4,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
-    exclude: ['e2e/**', 'node_modules/**'],
+    exclude: ['e2e/**', 'node_modules/**', '.worktrees/**', '**/node_modules/**'],
     setupFiles: ['./src/renderer/src/setupTests.ts'],
     coverage: {
       provider: 'v8',

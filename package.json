@@ -48,6 +48,7 @@
     "chokidar": "^5.0.0",
     "clsx": "^2.1.1",
     "electron-store": "^11.0.2",
+    "electron-updater": "^6.8.3",
     "framer-motion": "^12.25.0",
     "react-diff-view": "^3.3.2",
     "simple-git": "^3.33.0",

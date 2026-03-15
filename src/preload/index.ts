@@ -81,18 +81,14 @@ const api = {
     ipcRenderer.invoke('git:unwatchRepo', repoPath),
   openExternal: (url: string): Promise<{ ok: boolean }> =>
     ipcRenderer.invoke('shell:openExternal', url),
-  onUpdateAvailable: (
-    callback: (info: { version: string }) => void
-  ): (() => void) => {
+  onUpdateAvailable: (callback: (info: { version: string }) => void): (() => void) => {
     const listener = (_event: unknown, info: unknown): void => {
       callback(info as { version: string })
     }
     ipcRenderer.on('update:available', listener)
     return () => ipcRenderer.removeListener('update:available', listener)
   },
-  onUpdateDownloaded: (
-    callback: (info: { version: string }) => void
-  ): (() => void) => {
+  onUpdateDownloaded: (callback: (info: { version: string }) => void): (() => void) => {
     const listener = (_event: unknown, info: unknown): void => {
       callback(info as { version: string })
     }

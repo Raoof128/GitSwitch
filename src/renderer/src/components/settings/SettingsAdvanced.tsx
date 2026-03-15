@@ -16,6 +16,7 @@ export function SettingsAdvanced(): JSX.Element {
   const [timeout, setTimeoutValue] = useState(aiTimeoutSec)
   const [redaction, setRedaction] = useState(aiRedactionEnabled)
   const [strictHost, setStrictHost] = useState(strictHostKeyChecking)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   useEffect(() => {
     setLimitLines(diffLimitLines)
@@ -36,6 +37,26 @@ export function SettingsAdvanced(): JSX.Element {
   useEffect(() => {
     setStrictHost(strictHostKeyChecking)
   }, [strictHostKeyChecking])
+
+  const handleExport = async (): Promise<void> => {
+    if (!window.api?.exportData) return
+    const result = await window.api.exportData()
+    const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `gitswitch-export-${new Date().toISOString().slice(0, 10)}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const handleDeleteAll = async (): Promise<void> => {
+    if (!window.api?.deleteAllData) return
+    await window.api.deleteAllData()
+    setShowDeleteConfirm(false)
+    // Reload the app to reset state
+    window.location.reload()
+  }
 
   const handleSave = async (): Promise<void> => {
     await updateSettings({
@@ -120,6 +141,55 @@ export function SettingsAdvanced(): JSX.Element {
           </button>
           <div className="text-[10px] text-[#666666]">Reset disabled in hardened mode.</div>
         </div>
+      </div>
+      <div className="mt-4 rounded-none border border-[#2a2a2a] bg-[#141414] p-4 text-xs">
+        <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#00ffaa]">
+          Data Management
+        </div>
+        <div className="mb-3 text-[10px] text-[#666666]">
+          Export all settings and account metadata as JSON, or permanently delete all local data
+          including encrypted keys and tokens.
+        </div>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => void handleExport()}
+            className="btn-neon rounded-none px-3 py-1 text-xs"
+          >
+            Export Data
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowDeleteConfirm(true)}
+            className="rounded-none border border-[#ff3366] px-3 py-1 text-xs font-bold text-[#ff3366] hover:bg-[#ff3366]/10"
+          >
+            Delete All Data
+          </button>
+        </div>
+        {showDeleteConfirm && (
+          <div className="mt-3 border border-[#ff3366]/30 bg-[#ff3366]/5 p-3">
+            <div className="mb-2 text-[10px] font-bold text-[#ff3366]">
+              This will permanently delete all SSH keys, API tokens, settings, and audit logs. This
+              cannot be undone.
+            </div>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => void handleDeleteAll()}
+                className="rounded-none border border-[#ff3366] bg-[#ff3366] px-3 py-1 text-xs font-bold text-[#0a0a0a]"
+              >
+                Confirm Delete
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(false)}
+                className="btn-neon rounded-none px-3 py-1 text-xs"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   )

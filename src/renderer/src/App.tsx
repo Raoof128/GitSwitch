@@ -163,6 +163,7 @@ function App(): JSX.Element {
     hardResetToHead
   } = useRepoStore()
 
+  const [updateReady, setUpdateReady] = useState<string | null>(null)
   const [diffMode, setDiffMode] = useState<DiffMode>('unstaged')
   const [wideLayout, setWideLayout] = useState(() => window.innerWidth >= 1360)
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false)
@@ -439,9 +440,30 @@ function App(): JSX.Element {
     return () => clearInterval(intervalId)
   }, [activeAccountId, activeRepoPath])
 
+  /* ── Auto-update listener ── */
+  useEffect(() => {
+    if (!window.api?.onUpdateDownloaded) return
+    const unsub = window.api.onUpdateDownloaded((info) => {
+      setUpdateReady(info.version)
+    })
+    return () => unsub()
+  }, [])
+
   /* ── Render ── */
   return (
     <div className="flex h-screen w-screen flex-col-reverse overflow-hidden bg-[var(--ui-bg)] text-[var(--ui-text)] sm:flex-row">
+      {updateReady && (
+        <div className="flex items-center justify-between border-b border-[#00ffaa]/30 bg-[#00ffaa]/5 px-4 py-2 text-xs text-[#00ffaa]">
+          <span>Update v{updateReady} ready — restart to apply</span>
+          <button
+            type="button"
+            onClick={() => void window.api.installUpdate()}
+            className="btn-neon px-2 py-1 text-[10px]"
+          >
+            Restart Now
+          </button>
+        </div>
+      )}
       {/* ══════════ ACTIVITY RAIL ══════════ */}
       <nav className="activity-rail" role="tablist">
         <div className="flex flex-col items-center gap-1">

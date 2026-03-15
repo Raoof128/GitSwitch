@@ -23,6 +23,12 @@ This document describes the preload API exposed to the renderer as `window.api`.
 | `gitPush(repoPath, accountId)` | Pushes using the selected or default SSH identity. |
 | `gitPull(repoPath, accountId)` | Pulls using the selected or default SSH identity. |
 | `gitFetch(repoPath, accountId)` | Fetches remote updates without mutating the working tree. |
+| `gitListBranches(repoPath)` | Returns local branches (capped at 500). |
+| `gitCheckoutBranch(repoPath, branchName)` | Switches to the specified branch. |
+| `gitCreateBranch(repoPath, branchName, fromBranch?)` | Creates and checks out a new branch. |
+| `gitDiscardChanges(repoPath)` | Discards unstaged tracked changes. |
+| `gitHardReset(repoPath)` | Hard-resets the repo to HEAD (staged + unstaged). |
+| `gitUnwatchRepo(repoPath)` | Stops file watching and revokes repo access. |
 
 ## AI and Pull Requests
 
@@ -31,6 +37,17 @@ This document describes the preload API exposed to the renderer as `window.api`.
 | `generateCommitMessage(repoPath)` | Produces a commit title/body using offline, local, or cloud AI. |
 | `createPullRequest(repoPath, options)` | Creates a GitHub or GitLab pull request from the current branch context. |
 | `openExternal(url)` | Opens a trusted GitHub or GitLab HTTPS URL through the main process allowlist. |
+
+## Audit, Updates & Data
+
+| Method | Purpose |
+| --- | --- |
+| `exportAuditLog()` | Returns the structured audit log as a string. |
+| `exportData()` | Returns all settings and account metadata as JSON. |
+| `deleteAllData()` | Permanently deletes all keys, tokens, settings, and audit log. |
+| `installUpdate()` | Quits the app and installs the downloaded update. |
+| `onUpdateAvailable(callback)` | Subscribes to update-available notifications. Returns unsubscribe function. |
+| `onUpdateDownloaded(callback)` | Subscribes to update-downloaded notifications. Returns unsubscribe function. |
 
 ## Settings
 
@@ -44,6 +61,7 @@ type SettingsPublic = {
   aiLocalModel: string
   aiLocalUrl: string
   aiProvider: 'offline' | 'local' | 'cloud'
+  aiCloudConsented: boolean
   aiPersona: 'standard' | 'cybersecurity'
   aiRedactionEnabled: boolean
   aiTimeoutSec: number

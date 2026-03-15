@@ -25,6 +25,8 @@ npm run dev
 - Add or update tests with every non-trivial change.
 - Update documentation when behavior, workflows, or configuration changes.
 - Do not commit secrets, personal keys, or generated build artifacts.
+- Cloud AI changes must preserve the consent gate — never bypass `aiCloudConsented`.
+- Sensitive operations (key access, push, pull, PR creation) must include audit log calls.
 
 ## Branch and Commit Guidance
 
@@ -41,6 +43,8 @@ npm test
 npm run test:coverage
 npm run build
 ```
+
+Ensure coverage thresholds are met (currently 12/8/8/12 for statements/branches/functions/lines).
 
 ## Pull Requests
 

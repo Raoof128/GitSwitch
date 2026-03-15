@@ -18,3 +18,6 @@ Please include a summary of the change and which issue is fixed. Please also inc
 - [ ] My changes generate no new warnings
 - [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] New and existing unit tests pass locally with my changes
+- [ ] Security and privacy impact has been considered
+- [ ] Cloud AI consent gate is not bypassed
+- [ ] Audit log calls added for any new sensitive operations

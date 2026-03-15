@@ -44,3 +44,27 @@ Tokens are stored encrypted in the main process and never returned to the render
 ## Large Diff Workflow
 
 If the diff is too large to render safely, GitSwitch returns a guard message instead of sending an oversized payload to the renderer. Reduce the diff size or increase limits in **Settings → Advanced** when appropriate.
+
+## Enable Cloud AI with Consent
+
+1. Open **Settings > Integrations**.
+2. Select **Cloud LLM** as the AI provider.
+3. Enter your API key and select a model.
+4. Read the data disclosure and check the consent box.
+5. Cloud AI generation is now enabled. Uncheck to revoke consent at any time.
+
+## Export Your Data
+
+1. Open **Settings > Advanced**.
+2. Click **Export Data**.
+3. A JSON file downloads containing all settings and account metadata (no private keys).
+
+## Delete All Data
+
+1. Open **Settings > Advanced**.
+2. Click **Delete All Data**.
+3. Confirm the action. All SSH keys, API tokens, settings, and audit logs are permanently removed.
+
+## Auto-Updates
+
+GitSwitch checks for updates on startup and every 4 hours. When a new version is ready, a banner appears at the top of the window. Click **Restart Now** to apply.

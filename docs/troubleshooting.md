@@ -73,3 +73,38 @@ Actions:
 
 - Reinstall dependencies with `npm install`
 - Confirm `@vitest/coverage-v8` exists in `devDependencies`
+
+## Cloud AI Generation Blocked
+
+Symptoms:
+
+- AI commit generation returns "Cloud AI consent required"
+
+Actions:
+
+- Open Settings > Integrations and check the consent box under the Cloud LLM section
+- Ensure an API key is saved and a model is selected
+
+## Auto-Update Not Working
+
+Symptoms:
+
+- No update banner appears after a new release
+
+Actions:
+
+- Auto-update only works in production builds (not `npm run dev`)
+- Ensure `electron-builder.yml` has the correct `publish` configuration
+- Check that GitHub Releases has a newer version published
+
+## File Watcher Stopped Updating
+
+Symptoms:
+
+- Changed files not appearing in the sidebar
+
+Actions:
+
+- The watcher pauses for 30 seconds after 5 consecutive errors
+- Check the terminal/console for watcher error messages
+- Remove and re-add the repository to reset the watcher

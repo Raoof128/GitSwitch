@@ -58,4 +58,32 @@ describe('redactSecrets', () => {
     expect(redactSecrets(input)).toContain('password=[REDACTED]')
     expect(redactSecrets(input)).toContain('secret=[REDACTED]')
   })
+
+  it('redacts email addresses', () => {
+    const input = 'Author: user@example.com committed a change'
+    const result = redactSecrets(input)
+    expect(result).not.toContain('user@example.com')
+    expect(result).toContain('[EMAIL-REDACTED]')
+  })
+
+  it('redacts URLs', () => {
+    const input = 'Fetching from https://internal.company.com/api/v2/resource'
+    const result = redactSecrets(input)
+    expect(result).not.toContain('https://internal.company.com')
+    expect(result).toContain('[URL-REDACTED]')
+  })
+
+  it('redacts AWS access keys', () => {
+    const input = 'aws_access_key_id = AKIAIOSFODNN7EXAMPLE'
+    const result = redactSecrets(input)
+    expect(result).not.toContain('AKIAIOSFODNN7EXAMPLE')
+    expect(result).toContain('[REDACTED]')
+  })
+
+  it('redacts token="value" patterns', () => {
+    const input = 'token="abc123secret"'
+    const result = redactSecrets(input)
+    expect(result).not.toContain('abc123secret')
+    expect(result).toContain('token=[REDACTED]')
+  })
 })

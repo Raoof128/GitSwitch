@@ -59,6 +59,7 @@ let mainWindow: BrowserWindow | null = null
 const watchers = new Map<string, ReturnType<typeof createRepoWatcher>>()
 const allowedRepoPaths = new Set<string>()
 const isDev = !app.isPackaged || is.dev
+let shuttingDown = false
 const shouldLogPreloadResolution = isDev && process.env['GITSWITCH_DEBUG_PRELOAD'] === '1'
 
 const resolvePreloadPath = (): string => {
@@ -440,6 +441,7 @@ async function registerIpcHandlers(): Promise<void> {
   ipcMain.handle(
     'git:push',
     async (_event: IpcMainInvokeEvent, repoPath: string, accountId: string) => {
+      if (shuttingDown) throw new Error('Application is shutting down.')
       const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
       const safeAccountId = assertString(accountId, 'accountId')
       const settings = getSettings()
@@ -450,6 +452,7 @@ async function registerIpcHandlers(): Promise<void> {
   ipcMain.handle(
     'git:pull',
     async (_event: IpcMainInvokeEvent, repoPath: string, accountId: string) => {
+      if (shuttingDown) throw new Error('Application is shutting down.')
       const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
       const safeAccountId = assertString(accountId, 'accountId')
       const settings = getSettings()
@@ -460,6 +463,7 @@ async function registerIpcHandlers(): Promise<void> {
   ipcMain.handle(
     'git:fetch',
     async (_event: IpcMainInvokeEvent, repoPath: string, accountId: string) => {
+      if (shuttingDown) throw new Error('Application is shutting down.')
       const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
       const safeAccountId = assertString(accountId, 'accountId')
       const settings = getSettings()
@@ -471,6 +475,7 @@ async function registerIpcHandlers(): Promise<void> {
   ipcMain.handle(
     'git:createPullRequest',
     async (_event: IpcMainInvokeEvent, repoPath: string, options: PullRequestOptions) => {
+      if (shuttingDown) throw new Error('Application is shutting down.')
       const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
       if (!isRecord(options)) {
         throw new Error('Invalid pull request options.')
@@ -806,9 +811,11 @@ app.on('window-all-closed', () => {
 })
 
 app.on('before-quit', () => {
+  shuttingDown = true
   for (const watcher of watchers.values()) {
     watcher.close()
   }
+  watchers.clear()
 })
 
 // In this file you can include the rest of your app's specific main process

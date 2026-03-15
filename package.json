@@ -5,6 +5,17 @@
   "main": "./out/main/index.js",
   "author": "Raouf <raoof.r12@gmail.com>",
   "homepage": "https://gitswitch.app",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Raoof128/GitSwitch.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Raoof128/GitSwitch/issues"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache .",

@@ -3,6 +3,11 @@
 ## Unreleased
 
 - Raouf: (entries appended below)
+- Raouf: 2026-03-15 (Australia/Sydney) - Full Documentation Audit & Upgrade
+  - Scope: Audit and upgrade all 12 project docs to reflect current codebase
+  - Summary: Updated README (highlights, security notes, privacy link), ARCHITECTURE (audit logger, auto-updater, watcher, security model), SECURITY (branch fix, 8 new controls), THREAT_MODEL (T8 updates, new T9 SSRF + T10 prototype pollution, notarization fix), RELEASE_CHECKLIST (privacy/compliance + auto-update sections), api-reference (12 missing methods, aiCloudConsented type), usage-examples (4 new workflows), troubleshooting (3 new sections), CONTRIBUTING (consent/audit requirements, coverage thresholds), PR template (3 new checklist items).
+  - Files: 10 documentation files updated
+  - Verification: typecheck, lint, test (57 pass), build pass.
 - Raouf: 2026-03-15 (Australia/Sydney) - Enterprise Production Readiness
   - Scope: Enterprise-grade hardening — 3 parallel tracks, 15 tasks
   - Summary:

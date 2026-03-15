@@ -11,6 +11,21 @@
 ## Log
 
  - Raouf: (entries appended below)
+ - Raouf: 2026-03-15 (Australia/Sydney) - Full Documentation Audit & Upgrade
+   - Scope: Audit and upgrade all 12 project documentation files to reflect current codebase state
+   - Summary: Every doc was outdated after 3 audit rounds and enterprise hardening. Upgraded all to match current features, security controls, and compliance state.
+     1. README.md: Added auto-update, audit log, GDPR highlights. Updated security notes with SSRF, consent, graceful shutdown. Added PRIVACY.md link.
+     2. ARCHITECTURE.md: Added audit logging and auto-update subsystems. Updated watcher (500ms debounce, depth 4). Updated security model (frame-ancestors, SSRF, consent, prototype pollution).
+     3. SECURITY.md: Fixed branch (main→master). Added 8 new security controls.
+     4. THREAT_MODEL.md: Updated T8 mitigations. Added T9 (SSRF) and T10 (prototype pollution). Updated T4/T7 mitigations. Fixed notarization status.
+     5. RELEASE_CHECKLIST.md: Added Privacy & Compliance section (6 items) and Auto-Update section (4 items).
+     6. docs/api-reference.md: Added 12 missing API methods. Added aiCloudConsented to SettingsPublic type. New Audit/Updates/Data section.
+     7. docs/usage-examples.md: Added 4 workflows (consent, export, delete-all, auto-update).
+     8. docs/troubleshooting.md: Added 3 new sections (consent blocking, auto-update, watcher pause).
+     9. CONTRIBUTING.md: Added consent gate and audit log requirements. Added coverage threshold note.
+     10. .github/pull_request_template.md: Added security/privacy/consent/audit checklist items.
+   - Files: README.md, ARCHITECTURE.md, SECURITY.md, THREAT_MODEL.md, RELEASE_CHECKLIST.md, CONTRIBUTING.md, docs/api-reference.md, docs/usage-examples.md, docs/troubleshooting.md, .github/pull_request_template.md
+   - Verification: typecheck, lint, test (57 pass), build pass.
  - Raouf: 2026-03-15 (Australia/Sydney) - Enterprise Production Readiness
    - Scope: Full enterprise-grade hardening across 3 parallel tracks (15 tasks)
    - Summary: Closed all remaining production gaps for enterprise deployment.

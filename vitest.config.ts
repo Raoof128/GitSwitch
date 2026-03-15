@@ -17,10 +17,10 @@ export default defineConfig({
         'src/renderer/src/main.tsx'
       ],
       thresholds: {
-        statements: 0,
-        branches: 0,
-        functions: 0,
-        lines: 0
+        statements: 12,
+        branches: 8,
+        functions: 8,
+        lines: 12
       }
     }
   }

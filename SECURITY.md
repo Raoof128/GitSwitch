@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-Security fixes are applied to the current `main` branch and the latest published release line.
+Security fixes are applied to the current `master` branch and the latest published release line.
 
 | Version | Supported |
 | --- | --- |
@@ -37,3 +37,11 @@ Do not open a public issue for a suspected vulnerability.
 - IPC payload validation and repository access approval prompts
 - Trusted-host validation for external links
 - Diff-size limits and timeout guards around git and network operations
+- SSRF protection on local LLM URLs — endpoint addresses are validated before any network call
+- Prototype pollution blocking in IPC input validation via `assertKeys`
+- Cloud AI consent gate — no data is sent to cloud AI providers without explicit user approval
+- Structured audit logging of security-relevant events in JSONL format
+- Auto-updater for security patches via `electron-updater` and GitHub Releases
+- Graceful shutdown on quit ensures secrets and temporary files are cleaned up
+- Commit body size limits to prevent oversized payloads
+- `frame-ancestors 'none'` CSP directive to prevent framing attacks

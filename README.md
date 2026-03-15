@@ -10,6 +10,9 @@ GitSwitch is a desktop Git client for developers who work across multiple reposi
 - AI-assisted commit generation with offline, local, and cloud modes.
 - GitHub and GitLab pull-request support with secure token handling.
 - Cross-platform packaging through `electron-builder`.
+- Automatic updates via GitHub Releases.
+- Structured audit logging for enterprise compliance.
+- GDPR-compliant data export and deletion.
 
 ## Requirements
 
@@ -70,6 +73,7 @@ Detailed walkthroughs live in [docs/usage-examples.md](docs/usage-examples.md).
 - [Troubleshooting guide](docs/troubleshooting.md)
 - [Contributing guide](CONTRIBUTING.md)
 - [Security policy](SECURITY.md)
+- [Privacy policy](PRIVACY.md)
 - [Code of conduct](CODE_OF_CONDUCT.md)
 
 ## Repository Layout
@@ -95,5 +99,10 @@ Detailed walkthroughs live in [docs/usage-examples.md](docs/usage-examples.md).
 - Secrets are stored only in the main process and encrypted with `safeStorage`.
 - Repository access is gated through explicit approval and validated IPC handlers.
 - External links are restricted to trusted GitHub and GitLab HTTPS hosts.
+- Cloud AI features require explicit consent. See [PRIVACY.md](PRIVACY.md).
+- Structured audit logging records security-relevant events for enterprise compliance.
+- SSRF protections validate local LLM endpoint URLs before any network call.
+- Prototype pollution is blocked on all IPC input via `assertKeys` validation.
+- Graceful shutdown guards ensure secrets and temp files are cleaned up on quit.
 
 Report vulnerabilities privately via [SECURITY.md](SECURITY.md).

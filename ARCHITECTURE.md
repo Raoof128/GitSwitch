@@ -52,19 +52,37 @@ flowchart LR
 
 - AI orchestration lives under `src/main/ai`.
 - The current product surface supports offline generation, local LLM endpoints, and cloud Gemini models.
-- Prompt input is redacted before it leaves the machine when redaction is enabled.
+- Prompt input is redacted before it leaves the machine when redaction is enabled. The redaction pass covers emails, URLs, and AWS key patterns.
+- Cloud AI modes require explicit user consent before any data is sent off-device.
 
 ### Repository Watching
 
 - `src/main/git/watcher.ts` emits repo status updates to the active window.
+- File-system events are debounced at 500ms to avoid overwhelming the renderer.
+- The watcher enforces a directory depth limit of 4 and an expanded ignore list to skip `node_modules`, `.git`, build artifacts, and other noisy paths.
 - The renderer combines those events with an interval-based fetch loop for remote reconciliation.
+
+### Audit Logging
+
+- `src/main/audit/audit-logger.ts` writes structured JSONL entries for security-relevant events.
+- Log files rotate automatically at 5MB to bound disk usage.
+- Audit hooks are wired into key-manager operations, commit generation, push, pull, and pull-request flows.
+
+### Auto-Update
+
+- `src/main/auto-update.ts` uses `electron-updater` to check GitHub Releases for new versions.
+- Update checks run on a 4-hour interval after application startup.
+- When an update is available, an IPC notification is sent to the renderer so the user can review and apply the update.
 
 ## Security Model
 
 - `sandbox: true`, `contextIsolation: true`, `nodeIntegration: false`
-- Strict production CSP and hardened external link allowlist
-- Input validation on every IPC route
+- Strict production CSP with `frame-ancestors 'none'` and hardened external link allowlist
+- SSRF validation on `aiLocalUrl` before any request is issued to a local LLM endpoint
+- Input validation on every IPC route; prototype pollution blocked via `assertKeys`
 - No direct secret exposure to the renderer
+- Cloud AI consent gate prevents off-device data transmission without explicit approval
+- Graceful shutdown guard ensures secrets and temporary files are cleaned up on quit
 - Repository access approval before operating on a path
 
 ## Data Flow Example

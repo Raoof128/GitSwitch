@@ -11,6 +11,11 @@
 ## Log
 
  - Raouf: (entries appended below)
+ - Raouf: 2026-03-15 (Australia/Sydney) - Repo Cleanup & Professionalization
+   - Scope: Remove dead code, tracked build artifacts, duplicate dirs, reorganize .gitignore
+   - Summary: Removed tsconfig.web.tsbuildinfo from git, removed duplicate build/ dir (resources/ is authoritative per electron-builder.yml), deleted 3 dead files (publish-status.ts, electron.svg, wavy-lines.svg), fixed stale comment in git-utils.ts, reorganized .gitignore with category headers.
+   - Files: .gitignore, src/main/git/git-utils.ts, removed: build/*, tsconfig.web.tsbuildinfo, src/main/git/publish-status.ts, src/renderer/src/assets/electron.svg, src/renderer/src/assets/wavy-lines.svg
+   - Verification: typecheck, lint, test (57 pass), build pass.
  - Raouf: 2026-03-15 (Australia/Sydney) - Full Documentation Audit & Upgrade
    - Scope: Audit and upgrade all 12 project documentation files to reflect current codebase state
    - Summary: Every doc was outdated after 3 audit rounds and enterprise hardening. Upgraded all to match current features, security controls, and compliance state.

@@ -11,6 +11,23 @@
 ## Log
 
  - Raouf: (entries appended below)
+ - Raouf: 2026-03-15 (Australia/Sydney) - Swiss-Cheese Security/Reliability/Compliance Audit
+   - Scope: Three-agent audit (Alpha: security, Beta: reliability, Gamma: compliance)
+   - Summary: Fixed 12 blocker-level findings across security, reliability, and data privacy.
+     1. SECURITY: Blocked SSRF via aiLocalUrl (metadata endpoints, enforce HTTPS for non-localhost).
+     2. SECURITY: Added path-traversal validation to git:ignore filePath parameter.
+     3. SECURITY: Blocked __proto__/constructor/prototype in assertKeys().
+     4. SECURITY: Capped commit body at 5000 chars to prevent IPC abuse.
+     5. SECURITY: Added frame-ancestors 'none' to CSP header.
+     6. RELIABILITY: Added statusInFlight guard to prevent concurrent getStatus() in watcher.
+     7. RELIABILITY: Capped watchers at 50 with LRU eviction to prevent FD exhaustion.
+     8. RELIABILITY: Fixed setTimeout memory leak in RemoteConfig (useRef + cleanup).
+     9. RELIABILITY: Added refreshChainInFlight deduplication guard to gitSlice.
+     10. COMPLIANCE: Added aiCloudConsented setting — cloud AI blocked until user opts in.
+     11. COMPLIANCE: Expanded redaction patterns (AWS keys, emails, URLs, token= patterns).
+     12. COMPLIANCE: Sanitized console.error in all AI providers — no more response body logging.
+   - Files: 14 files modified (src/index.ts, src/main/index.ts, src/main/git/watcher.ts, src/main/secure/key-manager.ts, src/main/ai/commit-generate.ts, src/main/ai/helpers.ts, src/main/ai/providers/{openai,anthropic,local,gemini}.ts, src/renderer/src/store/slices/gitSlice.ts, src/renderer/src/components/sidebar/RemoteConfig.tsx, AGENT.md, CHANGELOG.md)
+   - Verification: lint, typecheck, test (15 pass), build all pass.
  - Raouf: 2026-03-15 (Australia/Sydney) - Large Repo Crash Audit
    - Scope: Performance & Stability Audit for Huge Repositories
    - Summary: Full audit of crash vectors when opening large repos. Fixed 10 issues across 6 files.

@@ -22,6 +22,19 @@ let commitResetTimer: ReturnType<typeof setTimeout> | null = null
  */
 let loadGeneration = 0
 
+/** Guard to prevent overlapping refresh chains from rapid user clicks */
+let refreshChainInFlight = false
+
+const refreshAfterAction = async (get: () => RepoState): Promise<void> => {
+  if (refreshChainInFlight) return
+  refreshChainInFlight = true
+  try {
+    await Promise.all([get().refreshStatus(), get().loadDiff('unstaged'), get().loadStagedDiff()])
+  } finally {
+    refreshChainInFlight = false
+  }
+}
+
 const clearCommitTimer = (): void => {
   if (commitResetTimer) {
     clearTimeout(commitResetTimer)
@@ -288,7 +301,7 @@ export const createGitSlice: SliceCreator<GitSliceState> = (set, get) => ({
       beginTask(set, 'Staging all changes', 'Adding tracked worktree changes to the next commit.')
       set({ stageStatus: 'loading' })
       await window.api.gitStageAll(repoPath)
-      await Promise.all([get().refreshStatus(), get().loadDiff('unstaged'), get().loadStagedDiff()])
+      await refreshAfterAction(get)
       set({ stageStatus: 'idle' })
       setFeedback(
         set,
@@ -322,7 +335,7 @@ export const createGitSlice: SliceCreator<GitSliceState> = (set, get) => ({
         'Tracked worktree edits will be restored to HEAD.'
       )
       await window.api.gitDiscardChanges(repoPath)
-      await Promise.all([get().refreshStatus(), get().loadDiff('unstaged'), get().loadStagedDiff()])
+      await refreshAfterAction(get)
       set({ focusedDiffFile: null })
       setFeedback(
         set,
@@ -356,7 +369,7 @@ export const createGitSlice: SliceCreator<GitSliceState> = (set, get) => ({
         'Staged and unstaged tracked changes will be lost.'
       )
       await window.api.gitHardReset(repoPath)
-      await Promise.all([get().refreshStatus(), get().loadDiff('unstaged'), get().loadStagedDiff()])
+      await refreshAfterAction(get)
       set({ focusedDiffFile: null })
       setFeedback(
         set,
@@ -516,7 +529,7 @@ export const createGitSlice: SliceCreator<GitSliceState> = (set, get) => ({
       beginTask(set, 'Creating commit', title)
       set({ commitError: null, commitStatus: 'loading' })
       const result = await window.api.gitCommit(repoPath, title, body || undefined)
-      await Promise.all([get().refreshStatus(), get().loadDiff('unstaged'), get().loadStagedDiff()])
+      await refreshAfterAction(get)
       set({ commitTitle: '', commitBody: '', commitStatus: 'success' })
       clearCommitTimer()
 
@@ -630,7 +643,7 @@ export const createGitSlice: SliceCreator<GitSliceState> = (set, get) => ({
       set({ syncStatus: 'loading', syncAction: 'pull', commitStatus: 'loading' })
       const result = await window.api.gitPull(repoPath, accountId)
 
-      await Promise.all([get().refreshStatus(), get().loadDiff('unstaged'), get().loadStagedDiff()])
+      await refreshAfterAction(get)
 
       set({ commitStatus: 'idle', lastFetchAt: Date.now() })
       setFeedback(

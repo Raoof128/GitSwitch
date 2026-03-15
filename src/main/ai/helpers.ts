@@ -107,16 +107,27 @@ function validateAndReturn(parsed: unknown): CommitMessage | null {
 
 export function redactSecrets(input: string): string {
   const patterns: Array<[RegExp, string]> = [
+    // SSH / PEM private keys
     [/-----BEGIN[\s\S]*?PRIVATE KEY-----[\s\S]*?-----END[\s\S]*?PRIVATE KEY-----/gi, '[REDACTED]'],
+    // Platform tokens
     [/\bghp_[A-Za-z0-9]{10,}\b/g, '[REDACTED]'],
     [/\bgithub_pat_[A-Za-z0-9_]{10,}\b/g, '[REDACTED]'],
     [/\bglpat-[A-Za-z0-9_-]{20,}\b/g, '[REDACTED]'],
     [/\bsk-[A-Za-z0-9]{10,}\b/g, '[REDACTED]'],
     [/\bxoxb-[A-Za-z0-9]{10,}\b/g, '[REDACTED]'],
     [/\bAIza[0-9A-Za-z_-]{10,}\b/g, '[REDACTED]'],
+    // AWS / Azure / GCP keys
+    [/\bAKIA[0-9A-Z]{16}\b/g, '[REDACTED]'],
+    [/\baz[a-z0-9]{30,}\b/g, '[REDACTED]'],
+    // Key=value patterns
     [/\bpassword\s*=\s*[^\s]+/gi, 'password=[REDACTED]'],
     [/\bsecret\s*=\s*[^\s]+/gi, 'secret=[REDACTED]'],
-    [/\bapiKey\s*=\s*[^\s]+/gi, 'apiKey=[REDACTED]']
+    [/\bapiKey\s*=\s*[^\s]+/gi, 'apiKey=[REDACTED]'],
+    [/\btoken\s*=\s*['"][^'"]+['"]/gi, 'token=[REDACTED]'],
+    // Email addresses
+    [/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g, '[EMAIL-REDACTED]'],
+    // Inline URLs (may contain tokens, internal hostnames)
+    [/\bhttps?:\/\/[^\s"'`)\]}>]{10,}/g, '[URL-REDACTED]']
   ]
 
   return patterns.reduce((acc, [regex, replacement]) => acc.replace(regex, replacement), input)

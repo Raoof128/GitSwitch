@@ -108,6 +108,7 @@ export type SecretsSnapshot = {
 }
 
 export type SettingsPublic = {
+  aiCloudConsented: boolean
   aiCloudModel: string
   aiLocalModel: string
   aiLocalUrl: string

@@ -1,4 +1,4 @@
-import { useState, JSX } from 'react'
+import { useEffect, useRef, useState, JSX } from 'react'
 import { motion } from 'framer-motion'
 import { useRepoStore } from '../../store/useRepoStore'
 import { scaleTap, useReducedMotionSafe } from '../motion/motion'
@@ -9,7 +9,14 @@ export function RemoteConfig(): JSX.Element | null {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [saving, setSaving] = useState(false)
+  const successTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const reduceMotion = useReducedMotionSafe(reducedMotion)
+
+  useEffect(() => {
+    return () => {
+      if (successTimer.current) clearTimeout(successTimer.current)
+    }
+  }, [])
 
   const originRemote = remotes.find((r) => r.name === 'origin')
   const hasOrigin = Boolean(originRemote)
@@ -30,7 +37,8 @@ export function RemoteConfig(): JSX.Element | null {
     if (result.ok) {
       setSuccess(true)
       setRemoteUrl('')
-      setTimeout(() => setSuccess(false), 3000)
+      if (successTimer.current) clearTimeout(successTimer.current)
+      successTimer.current = setTimeout(() => setSuccess(false), 3000)
     } else {
       setError(result.error || 'Failed to set remote origin.')
     }

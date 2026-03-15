@@ -17,6 +17,7 @@ type StoreSchema = {
     aiLocalUrl: string
     aiProvider: AiProvider
     aiPersona: AiPersona
+    aiCloudConsented: boolean
     aiRedactionEnabled: boolean
     aiTimeoutSec: number
     autoPush: boolean
@@ -38,6 +39,7 @@ const DEFAULT_SETTINGS: StoreSchema['settings'] = {
   aiLocalUrl: 'http://localhost:11434/api/generate',
   aiProvider: 'offline',
   aiPersona: 'standard',
+  aiCloudConsented: false,
   aiRedactionEnabled: true,
   aiTimeoutSec: 30,
   autoPush: false,
@@ -223,6 +225,7 @@ export async function getSettingsPublic(): Promise<SettingsPublic> {
   await migratePlainTokenIfNeeded()
   const settings = getSettings()
   return {
+    aiCloudConsented: settings.aiCloudConsented ?? false,
     aiCloudModel: settings.aiCloudModel,
     aiLocalModel: settings.aiLocalModel,
     aiLocalUrl: settings.aiLocalUrl,

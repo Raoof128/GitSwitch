@@ -34,7 +34,7 @@ export class AnthropicProvider implements AiProvider {
       })
 
       if (!response.ok) {
-        console.error('Anthropic API error:', response.status, await response.text())
+        console.error('Anthropic API error:', response.status)
         return null
       }
 
@@ -44,7 +44,7 @@ export class AnthropicProvider implements AiProvider {
       return parseAiResponse(text)
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
-      console.error(`Anthropic generation failed: ${message}`, error)
+      console.error(`Anthropic generation failed: ${message}`)
       return null
     } finally {
       clearTimeout(timer)

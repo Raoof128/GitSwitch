@@ -17,6 +17,7 @@ export function createRepoWatcher(repoPath: string, onStatus: StatusHandler): FS
   let timer: NodeJS.Timeout | null = null
   let consecutiveErrors = 0
   let errorBackoffTimer: NodeJS.Timeout | null = null
+  let statusInFlight = false
 
   const scheduleStatus = (): void => {
     // Skip scheduling if we're in error backoff mode
@@ -29,6 +30,9 @@ export function createRepoWatcher(repoPath: string, onStatus: StatusHandler): FS
     }
 
     timer = setTimeout(async () => {
+      // Prevent overlapping getStatus calls racing on the git index
+      if (statusInFlight) return
+      statusInFlight = true
       try {
         const status = await getStatus(repoPath)
         onStatus({ repoPath, status })
@@ -54,6 +58,8 @@ export function createRepoWatcher(repoPath: string, onStatus: StatusHandler): FS
             scheduleStatus()
           }, ERROR_BACKOFF_MS)
         }
+      } finally {
+        statusInFlight = false
       }
     }, 500) // 500ms debounce to absorb rapid multi-file changes in large repos
   }

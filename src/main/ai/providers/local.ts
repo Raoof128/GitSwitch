@@ -68,8 +68,8 @@ export class LocalProvider implements AiProvider {
       let data: { response?: string; choices?: Array<{ message?: { content?: string } }> }
       try {
         data = (await response.json()) as typeof data
-      } catch (parseError) {
-        console.error('Failed to parse local AI response as JSON:', parseError)
+      } catch {
+        console.error('Failed to parse local AI response as JSON')
         return null
       }
 
@@ -87,7 +87,8 @@ export class LocalProvider implements AiProvider {
       if (error instanceof Error && error.name === 'AbortError') {
         console.error(`Local AI request timed out after ${timeoutMs}ms`)
       } else {
-        console.error('Local generation failed:', error)
+        const msg = error instanceof Error ? error.message : 'unknown'
+        console.error(`Local generation failed: ${msg}`)
       }
       return null
     } finally {

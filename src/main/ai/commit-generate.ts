@@ -219,7 +219,7 @@ export async function generateCommitMessage(repoPath: string): Promise<CommitMes
     // Add persona to context
     context.persona = settings.aiPersona
   } catch (error) {
-    console.error('Context collection failed:', error)
+    console.error('Context collection failed:', error instanceof Error ? error.message : 'unknown')
     // Fallback context
     context = {
       branch: null,
@@ -253,6 +253,14 @@ export async function generateCommitMessage(repoPath: string): Promise<CommitMes
   // 3. Early Exit if Offline
   if (settings.aiProvider === 'offline') {
     return offlineFallback
+  }
+
+  // 3b. Consent check for cloud AI — diffs contain potentially sensitive code
+  if (settings.aiProvider === 'cloud' && !settings.aiCloudConsented) {
+    return {
+      title: 'Error: Cloud AI consent required',
+      body: 'Enable "I consent to sending diffs to cloud AI" in Settings > Integrations before using cloud generation.'
+    }
   }
 
   // 4. Rate Limit
@@ -310,7 +318,7 @@ export async function generateCommitMessage(repoPath: string): Promise<CommitMes
 
     return result
   } catch (error) {
-    console.error('Generation failed:', error)
+    console.error('Generation failed:', error instanceof Error ? error.message : 'unknown')
     return {
       title: 'Error: Generation Exception',
       body: error instanceof Error ? error.message : String(error)

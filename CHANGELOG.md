@@ -3,6 +3,23 @@
 ## Unreleased
 
 - Raouf: (entries appended below)
+- Raouf: 2026-03-15 (Australia/Sydney) - Swiss-Cheese Security/Reliability/Compliance Audit
+  - Scope: Three-agent audit (security, reliability, compliance)
+  - Summary: Fixed 12 blocker-level findings.
+    1. SSRF blocked on aiLocalUrl — metadata endpoints rejected, HTTPS enforced for non-localhost.
+    2. Path-traversal blocked on git:ignore filePath (no `..`, no absolute paths).
+    3. Prototype pollution blocked — assertKeys now rejects __proto__/constructor/prototype.
+    4. Commit body capped at 5000 chars.
+    5. CSP header now includes frame-ancestors 'none'.
+    6. Watcher getStatus() calls serialized with statusInFlight guard (no concurrent git index access).
+    7. Watcher count capped at 50 with LRU eviction (prevents FD exhaustion).
+    8. RemoteConfig setTimeout leak fixed (useRef + useEffect cleanup).
+    9. gitSlice refresh chains deduplicated with refreshChainInFlight guard.
+    10. Cloud AI requires explicit consent (aiCloudConsented setting, defaults to false).
+    11. Redaction expanded: AWS keys, emails, URLs, token= patterns.
+    12. AI provider console.error calls sanitized — response bodies no longer logged.
+  - Files: 14 files modified
+  - Verification: lint, typecheck, test (15 pass), build all pass.
 - Raouf: 2026-03-15 (Australia/Sydney) - Large Repo Crash Audit
   - Scope: Performance & Stability Audit for Huge Repositories
   - Summary: Full audit of crash vectors when opening large repos (10k+ files, hundreds of branches, large diffs). Fixed 10 issues across 6 files.

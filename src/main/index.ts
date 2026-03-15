@@ -123,9 +123,20 @@ function createWindow(): void {
   }
 }
 
+const MAX_WATCHERS = 50
+
 function ensureWatcher(repoPath: string): void {
   if (watchers.has(repoPath)) {
     return
+  }
+
+  // Evict oldest watcher if at capacity to prevent file-descriptor exhaustion
+  if (watchers.size >= MAX_WATCHERS) {
+    const oldest = watchers.keys().next().value
+    if (oldest) {
+      watchers.get(oldest)?.close()
+      watchers.delete(oldest)
+    }
   }
 
   const watcher = createRepoWatcher(repoPath, (payload) => {
@@ -166,8 +177,11 @@ const assertNumber = (value: unknown, field: string): number => {
   return value
 }
 
+const DANGEROUS_KEYS = new Set(['__proto__', 'constructor', 'prototype'])
 const assertKeys = (input: Record<string, unknown>, allowed: string[], label: string): void => {
-  const unknown = Object.keys(input).filter((key) => !allowed.includes(key))
+  const unknown = Object.keys(input).filter(
+    (key) => !allowed.includes(key) || DANGEROUS_KEYS.has(key)
+  )
   if (unknown.length) {
     throw new Error(`Invalid ${label}.`)
   }
@@ -366,6 +380,9 @@ async function registerIpcHandlers(): Promise<void> {
         throw new Error('Invalid commit title.')
       }
       const safeBody = body === undefined ? undefined : assertString(body, 'body')
+      if (safeBody && safeBody.length > 5000) {
+        throw new Error('Commit body too long (max 5 000 characters).')
+      }
       return commit(normalized, safeTitle, safeBody)
     }
   )
@@ -411,7 +428,10 @@ async function registerIpcHandlers(): Promise<void> {
     'git:ignore',
     async (_event: IpcMainInvokeEvent, repoPath: string, filePath: string) => {
       const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
-      const safeFilePath = assertString(filePath, 'filePath')
+      const safeFilePath = assertString(filePath, 'filePath').trim()
+      if (!safeFilePath || safeFilePath.includes('..') || safeFilePath.startsWith('/')) {
+        throw new Error('Invalid file path for .gitignore.')
+      }
       await addToGitignore(normalized, safeFilePath)
       return { ok: true }
     }
@@ -487,6 +507,7 @@ async function registerIpcHandlers(): Promise<void> {
       assertKeys(
         input,
         [
+          'aiCloudConsented',
           'aiCloudModel',
           'aiLocalModel',
           'aiLocalUrl',
@@ -507,15 +528,36 @@ async function registerIpcHandlers(): Promise<void> {
         'settings payload'
       )
       const safeInput: Partial<ReturnType<typeof getSettings>> = {}
+      if ('aiCloudConsented' in input)
+        safeInput.aiCloudConsented = assertBoolean(input.aiCloudConsented, 'aiCloudConsented')
       if ('aiCloudModel' in input)
         safeInput.aiCloudModel = assertString(input.aiCloudModel, 'aiCloudModel')
       if ('aiLocalModel' in input)
         safeInput.aiLocalModel = assertString(input.aiLocalModel, 'aiLocalModel')
       if ('aiLocalUrl' in input) {
         const url = assertString(input.aiLocalUrl, 'aiLocalUrl').trim()
-        // Only allow http:// and https:// to localhost/127.0.0.1 or LAN addresses for local LLM
-        if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
-          throw new Error('aiLocalUrl must use http:// or https:// protocol.')
+        if (url) {
+          // Enforce protocol
+          if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            throw new Error('aiLocalUrl must use http:// or https:// protocol.')
+          }
+          // Block SSRF to cloud metadata endpoints and non-localhost HTTP
+          try {
+            const parsed = new URL(url)
+            const host = parsed.hostname
+            const blockedHosts = ['169.254.169.254', '[fd00:ec2::254]', 'metadata.google.internal']
+            if (blockedHosts.includes(host)) {
+              throw new Error('aiLocalUrl points to a blocked metadata endpoint.')
+            }
+            // Require HTTPS for non-localhost targets
+            const isLocalhost = host === 'localhost' || host === '127.0.0.1' || host === '::1'
+            if (!isLocalhost && parsed.protocol === 'http:') {
+              throw new Error('aiLocalUrl must use HTTPS for non-localhost endpoints.')
+            }
+          } catch (e) {
+            if (e instanceof Error && e.message.startsWith('aiLocalUrl')) throw e
+            throw new Error('aiLocalUrl is not a valid URL.')
+          }
         }
         safeInput.aiLocalUrl = url
       }
@@ -720,7 +762,7 @@ app.whenReady().then(() => {
       delete headers['Content-Security-Policy']
       delete headers['content-security-policy']
       const csp =
-        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:; connect-src 'self' https://api.openai.com https://api.anthropic.com https://generativelanguage.googleapis.com https://api.github.com https://gitlab.com https://github.com; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'none';"
+        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:; connect-src 'self' https://api.openai.com https://api.anthropic.com https://generativelanguage.googleapis.com https://api.github.com https://gitlab.com https://github.com; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none';"
       callback({
         responseHeaders: {
           ...headers,

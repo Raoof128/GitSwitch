@@ -15,6 +15,8 @@ export type GitStatus = {
   behind: number
   files: GitStatusFile[]
   staged: string[]
+  /** True when the file list was capped at the internal limit (1 000 files). */
+  truncated?: boolean
 }
 
 export type GitStatusPayload = {

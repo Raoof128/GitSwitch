@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useCallback, useEffect, useMemo, useState, type JSX } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type JSX } from 'react'
 import type { DiffMode, GitStatus } from '../../index'
 import { BranchManager } from './components/branch/BranchManager'
 import { CommandPalette } from './components/command/CommandPalette'
@@ -221,6 +221,15 @@ function App(): JSX.Element {
       })
     }
 
+    if (status?.truncated) {
+      nextWarnings.push({
+        tone: 'warning',
+        title: 'File list truncated',
+        detail:
+          'This repository has too many changed files to display. Only the first 1 000 are shown. Use the terminal for the full list.'
+      })
+    }
+
     if (status && status.behind > 0) {
       nextWarnings.push({
         tone: 'info',
@@ -277,7 +286,8 @@ function App(): JSX.Element {
     }
   }, [diffMode, loadDiff, loadStagedDiff, refreshBranches, refreshRemotes, refreshStatus])
 
-  /* ── File watcher ── */
+  /* ── File watcher (throttled diff reload to prevent cascade in large repos) ── */
+  const diffReloadTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   useEffect(() => {
     if (!window.api?.onStatusChange) {
       return
@@ -286,15 +296,26 @@ function App(): JSX.Element {
     const unsubscribe = window.api.onStatusChange((payload) => {
       useRepoStore.getState().applyStatusUpdate(payload.repoPath, payload.status)
       if (payload.repoPath === useRepoStore.getState().activeRepoPath) {
-        if (diffMode === 'staged') {
-          void useRepoStore.getState().loadStagedDiff()
-        } else {
-          void useRepoStore.getState().loadDiff('unstaged')
-        }
+        // Throttle diff reloads to max once per 800ms to avoid hammering IPC on rapid file changes
+        if (diffReloadTimer.current) return
+        diffReloadTimer.current = setTimeout(() => {
+          diffReloadTimer.current = null
+          if (diffMode === 'staged') {
+            void useRepoStore.getState().loadStagedDiff()
+          } else {
+            void useRepoStore.getState().loadDiff('unstaged')
+          }
+        }, 800)
       }
     })
 
-    return () => unsubscribe()
+    return () => {
+      unsubscribe()
+      if (diffReloadTimer.current) {
+        clearTimeout(diffReloadTimer.current)
+        diffReloadTimer.current = null
+      }
+    }
   }, [diffMode])
 
   /* ── Refresh on repo / diff-mode change ── */

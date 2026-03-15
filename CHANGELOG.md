@@ -3,6 +3,21 @@
 ## Unreleased
 
 - Raouf: (entries appended below)
+- Raouf: 2026-03-15 (Australia/Sydney) - Large Repo Crash Audit
+  - Scope: Performance & Stability Audit for Huge Repositories
+  - Summary: Full audit of crash vectors when opening large repos (10k+ files, hundreds of branches, large diffs). Fixed 10 issues across 6 files.
+    1. CRITICAL: `getStagedDiff()` now applies same size guards as `getDiff()` — `checkDiffSize()`, byte limit, and 512 KB IPC hard cap. Previously returned unlimited data through IPC, causing renderer OOM.
+    2. CRITICAL: Chokidar watcher limited to `depth: 4`, expanded ignore list (vendor, .cache, .turbo, .nuxt, __pycache__). Debounce raised from 300 ms to 500 ms. Prevents file-descriptor exhaustion on monorepos.
+    3. CRITICAL: DiffView no longer uses full `diffText` as React key (was causing massive string comparisons). Now uses `diffText.length`.
+    4. CRITICAL: DiffView caps `parseDiff()` input to 256 KB to prevent renderer freeze on huge diffs.
+    5. HIGH: FileList caps rendered items at 200 DOM nodes with truncation warning banner.
+    6. HIGH: Branch list capped at 500 entries in `listBranches()`.
+    7. HIGH: `getStatus()` now sets `diff.renames=false` to skip costly rename computation in large repos.
+    8. HIGH: Watcher-driven diff reloads throttled to max once per 800 ms in renderer, preventing IPC flood.
+    9. HIGH: `GitStatus` type now includes `truncated?: boolean`; UI warns when 1000-file cap is hit.
+    10. MEDIUM: `getStatus` signals truncation to UI so users know the list is incomplete.
+  - Files: src/index.ts, src/main/git/git-service.ts, src/main/git/watcher.ts, src/renderer/src/App.tsx, src/renderer/src/components/diff/DiffView.tsx, src/renderer/src/components/sidebar/FileList.tsx
+  - Verification: lint, typecheck, test (15 pass), build all pass.
 - Raouf: 2026-03-14 (Australia/Sydney) - UI/UX Audit
   - Scope: UI/UX Production-Readiness Audit & Remediation
   - Summary: Full renderer audit targeting accessibility, contrast, interaction feedback, microcopy, and desktop usability.

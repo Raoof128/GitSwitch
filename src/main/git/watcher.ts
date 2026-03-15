@@ -55,21 +55,27 @@ export function createRepoWatcher(repoPath: string, onStatus: StatusHandler): FS
           }, ERROR_BACKOFF_MS)
         }
       }
-    }, 300) // Increase debounce to 300ms
+    }, 500) // 500ms debounce to absorb rapid multi-file changes in large repos
   }
 
-  // Watch the entire repo path to ensure we catch changes in root files or other directories
-  // The ignored filter handles node_modules and .git effectively
+  // Watch the repo path with depth limit and expanded ignores for large-repo safety.
+  // Depth 4 covers typical src/foo/bar/baz paths without recursing into deep dependency trees.
   const watcher = chokidar.watch(repoPath, {
     ignored: (path) => {
       if (path.length > 4096) return true
       if (path.includes('node_modules')) return true
       if (path.includes('.next')) return true
+      if (path.includes('vendor')) return true
+      if (path.includes('.cache')) return true
+      if (path.includes('.turbo')) return true
+      if (path.includes('.nuxt')) return true
+      if (path.includes('__pycache__')) return true
       if (path.includes('.git')) {
         return !(path.endsWith('HEAD') || path.endsWith('index') || path.endsWith('config'))
       }
       return false
     },
+    depth: 4,
     ignoreInitial: true,
     persistent: true,
     ignorePermissionErrors: true,

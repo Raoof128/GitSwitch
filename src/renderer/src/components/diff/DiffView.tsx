@@ -26,16 +26,25 @@ export function DiffView({ diffText, mode }: DiffViewProps): JSX.Element {
   const isLimited = diffText.startsWith('[DIFF TOO LARGE]')
   const hasRenderableDiff = Boolean(diffText.trim()) && !isError && !isLimited
 
+  // Cap the text we hand to parseDiff to avoid freezing the renderer on huge diffs.
+  // 256 KB is generous for display while staying safe for the parser.
+  const MAX_PARSEABLE_BYTES = 256 * 1024
+  const safeDiffText =
+    hasRenderableDiff && diffText.length > MAX_PARSEABLE_BYTES
+      ? diffText.slice(0, MAX_PARSEABLE_BYTES) +
+        '\n\n[DIFF DISPLAY TRUNCATED — Use git diff in terminal for full view]'
+      : diffText
+
   const allFiles = useMemo(() => {
     if (!hasRenderableDiff) {
       return []
     }
     try {
-      return parseDiff(diffText)
+      return parseDiff(safeDiffText)
     } catch {
       return []
     }
-  }, [diffText, hasRenderableDiff])
+  }, [safeDiffText, hasRenderableDiff])
 
   const MAX_DISPLAY_FILES = 50
   const files = allFiles.slice(0, MAX_DISPLAY_FILES)
@@ -81,7 +90,7 @@ export function DiffView({ diffText, mode }: DiffViewProps): JSX.Element {
   return (
     <AnimatePresence mode="wait">
       <motion.div
-        key={`${mode}-${diffViewType}-${ignoreWhitespace}-${diffText}`}
+        key={`${mode}-${diffViewType}-${ignoreWhitespace}-${diffText.length}`}
         variants={variants}
         initial="hidden"
         animate="visible"

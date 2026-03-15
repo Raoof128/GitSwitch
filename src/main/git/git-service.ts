@@ -170,11 +170,13 @@ process.on('exit', () => {
 })
 
 export async function getStatus(repoPath: string): Promise<GitStatus> {
-  const git = simpleGit({ baseDir: repoPath })
+  // Use --no-renames to avoid expensive rename detection in huge repos
+  const git = simpleGit({ baseDir: repoPath, config: ['diff.renames=false'] })
   const status = await git.status()
 
   // Limit number of files reported to renderer to prevent IPC congestion
   const MAX_FILES = 1000
+  const truncated = status.files.length > MAX_FILES
   const files = status.files.slice(0, MAX_FILES).map((file) => ({
     path: file.path,
     index: file.index,
@@ -186,7 +188,8 @@ export async function getStatus(repoPath: string): Promise<GitStatus> {
     ahead: status.ahead,
     behind: status.behind,
     files,
-    staged: status.staged.slice(0, MAX_FILES)
+    staged: status.staged.slice(0, MAX_FILES),
+    truncated
   }
 }
 
@@ -207,7 +210,9 @@ export async function listBranches(repoPath: string): Promise<BranchSummary[]> {
   try {
     const git = simpleGit({ baseDir: repoPath })
     const summary = await git.branch(['--list'])
-    return summary.all.map((name) => ({
+    const MAX_BRANCHES = 500
+    const branchNames = summary.all.slice(0, MAX_BRANCHES)
+    return branchNames.map((name) => ({
       name,
       current: summary.current === name,
       remote: false
@@ -372,9 +377,34 @@ export async function getDiff(
 }
 
 export async function getStagedDiff(repoPath: string): Promise<string> {
+  const git = simpleGit({ baseDir: repoPath })
+  const settings = getSettings()
+  const maxBytes = settings.diffLimitKb > 0 ? settings.diffLimitKb * 1024 : DEFAULT_DIFF_BYTES
+  const maxLines = settings.diffLimitLines > 0 ? settings.diffLimitLines : DEFAULT_DIFF_LINES
+
+  // Safety check before loading full diff into memory (same as getDiff)
+  const sizeCheck = await checkDiffSize(git, ['--cached'], maxLines)
+  if (!sizeCheck.ok) {
+    return `[DIFF TOO LARGE] ${sizeCheck.reason}\n\nConsider adjusting limits in Settings > Advanced.`
+  }
+
   try {
-    const git = simpleGit({ baseDir: repoPath })
-    return await git.diff(['--cached'])
+    const rawDiff = await git.diff(['--cached'])
+    const rawBytes = Buffer.byteLength(rawDiff, 'utf8')
+    if (rawBytes > maxBytes) {
+      const actualKb = Math.ceil(rawBytes / 1024)
+      const limitKb = Math.ceil(maxBytes / 1024)
+      return `[DIFF TOO LARGE] Staged diff is too large (${actualKb} KB > ${limitKb} KB limit).\n\nConsider adjusting limits in Settings > Advanced.`
+    }
+    // Final guard for IPC and Renderer stability
+    const MAX_IPC_SIZE = 512 * 1024 // 512KB hard limit for IPC
+    if (rawBytes > MAX_IPC_SIZE) {
+      return (
+        rawDiff.slice(0, MAX_IPC_SIZE) +
+        '\n\n[TRUNCATED DUE TO IPC LIMITS - Use git diff --cached via terminal for full view]'
+      )
+    }
+    return rawDiff
   } catch (error) {
     throw new Error(getGitErrorMessage(error, 'Failed to get staged diff.'))
   }

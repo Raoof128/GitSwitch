@@ -46,10 +46,15 @@ export function FileList({ mode }: FileListProps): JSX.Element {
     const staged = new Set(status?.staged ?? [])
     return changedFiles.filter((file) => staged.has(file.path))
   }, [mode, status])
+  // Cap rendered file items to prevent DOM thrashing in huge repos
+  const MAX_RENDERED_FILES = 200
+  const displayFiles = files.slice(0, MAX_RENDERED_FILES)
+  const isFileListTruncated = files.length > MAX_RENDERED_FILES
+
   const reduceMotion = useReducedMotionSafe(reducedMotion)
   const listVariants = useMemo(() => listItem(reduceMotion), [reduceMotion])
   const containerVariants = useMemo(() => fadeSlideIn(reduceMotion), [reduceMotion])
-  const shouldAnimate = files.length <= 20
+  const shouldAnimate = displayFiles.length <= 20
 
   // In-app confirmation dialog state instead of browser confirm()
   const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState>({
@@ -133,16 +138,21 @@ export function FileList({ mode }: FileListProps): JSX.Element {
         )}
       </AnimatePresence>
 
-      {files.length === 0 && (
+      {displayFiles.length === 0 && (
         <div className="border border-dashed border-[#2a2a2a] bg-[#0a0a0a] px-3 py-5 text-center text-xs text-[#888888]">
           {mode === 'staged'
             ? 'No staged files. Use "Stage All" or click files to stage them.'
             : 'No modified files. Edit files or fetch changes to see diffs here.'}
         </div>
       )}
+      {isFileListTruncated && (
+        <div className="mb-1 border border-[#ffcc00] bg-[#141414] px-3 py-2 text-[10px] text-[#ffcc00]">
+          Showing {MAX_RENDERED_FILES} of {files.length} files. Use the terminal for the full list.
+        </div>
+      )}
       <div className="space-y-1">
         <AnimatePresence initial={false}>
-          {files.map((file) => {
+          {displayFiles.map((file) => {
             const code = getStatusCode(file.index, file.working_dir)
             const isFocused = focusedDiffFile === file.path
             return (

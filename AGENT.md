@@ -11,6 +11,21 @@
 ## Log
 
  - Raouf: (entries appended below)
+ - Raouf: 2026-03-15 (Australia/Sydney) - Large Repo Crash Audit
+   - Scope: Performance & Stability Audit for Huge Repositories
+   - Summary: Full audit of crash vectors when opening large repos. Fixed 10 issues across 6 files.
+     1. CRITICAL: `getStagedDiff()` now has same size guards as `getDiff()` (checkDiffSize, byte limit, IPC 512KB hard cap).
+     2. CRITICAL: Chokidar watcher limited to `depth: 4`, expanded ignore list (vendor, .cache, .turbo, .nuxt, __pycache__), debounce raised to 500ms.
+     3. CRITICAL: DiffView no longer uses full `diffText` as React key (was causing massive string comparisons). Now uses `diffText.length`.
+     4. CRITICAL: DiffView caps parseDiff input to 256KB to prevent renderer freeze.
+     5. HIGH: FileList caps rendered items at 200 with truncation warning.
+     6. HIGH: Branch list capped at 500 entries.
+     7. HIGH: Status now uses `diff.renames=false` config to skip expensive rename detection.
+     8. HIGH: Watcher-driven diff reloads throttled to max once per 800ms in renderer.
+     9. HIGH: GitStatus type now includes `truncated` flag; UI warns when file list is capped.
+     10. MEDIUM: Status `getStatus` already sliced to 1000 but now signals truncation to the UI.
+   - Files: src/index.ts, src/main/git/git-service.ts, src/main/git/watcher.ts, src/renderer/src/App.tsx, src/renderer/src/components/diff/DiffView.tsx, src/renderer/src/components/sidebar/FileList.tsx
+   - Verification: lint, typecheck, test (15 pass), build all pass.
  - Raouf: 2026-03-14 (Australia/Sydney) - UI/UX Audit
    - Scope: UI/UX Production-Readiness Audit & Remediation
    - Summary: Full renderer audit. Improved contrast ratios (muted text, placeholders, disabled buttons, diff gutters, rail icons), added focus-visible rings, aria-labels, status tooltips, character counter, elapsed time on tasks, step numbers in onboarding, platform-aware shortcuts, actionable empty states, git jargon tooltips, cleaner dangerous action copy, and better remote URL hints.

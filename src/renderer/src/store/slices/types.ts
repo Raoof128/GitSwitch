@@ -82,6 +82,7 @@ export type SettingsSliceState = {
   aiLocalModel: string
   aiLocalUrl: string
   aiProvider: 'offline' | 'local' | 'cloud'
+  aiCloudConsented: boolean
   aiPersona: 'standard' | 'cybersecurity'
   aiRedactionEnabled: boolean
   aiTimeoutSec: number

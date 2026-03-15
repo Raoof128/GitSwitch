@@ -7,6 +7,7 @@ export function SettingsIntegrations(): JSX.Element {
     aiLocalModel,
     aiLocalUrl,
     aiProvider,
+    aiCloudConsented,
     aiPersona,
     hasAiKey,
     hasGitHubToken,
@@ -25,6 +26,7 @@ export function SettingsIntegrations(): JSX.Element {
   const [localUrl, setLocalUrl] = useState(aiLocalUrl)
   const [localModel, setLocalModel] = useState(aiLocalModel)
   const [cloudModel, setCloudModel] = useState(aiCloudModel)
+  const [consented, setConsented] = useState(aiCloudConsented)
   const [cloudKey, setCloudKey] = useState('')
   const [githubToken, setGithubToken] = useState('')
   const [gitlabToken, setGitlabToken] = useState('')
@@ -51,6 +53,10 @@ export function SettingsIntegrations(): JSX.Element {
   useEffect(() => {
     setCloudModel(aiCloudModel)
   }, [aiCloudModel])
+
+  useEffect(() => {
+    setConsented(aiCloudConsented)
+  }, [aiCloudConsented])
 
   const providerLabel = useMemo(() => {
     if (provider === 'local') return 'Local LLM'
@@ -283,6 +289,31 @@ export function SettingsIntegrations(): JSX.Element {
               <option value="gemini-1.0-pro">Gemini 1.0 Pro</option>
             </optgroup>
           </select>
+          <div className="mb-3 mt-3 border border-[#ffcc00]/30 bg-[#ffcc00]/5 p-3">
+            <div className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                checked={consented}
+                onChange={(event) => {
+                  setConsented(event.target.checked)
+                  void updateSettings({ aiCloudConsented: event.target.checked })
+                }}
+                className="mt-0.5 h-4 w-4 accent-[#00ffaa]"
+                id="ai-cloud-consent"
+              />
+              <label htmlFor="ai-cloud-consent" className="text-[10px] leading-4 text-[#e0e0e0]">
+                <span className="font-bold text-[#ffcc00]">DATA DISCLOSURE:</span> I consent to
+                sending my git diffs, file names, and branch names to the selected cloud AI provider
+                for commit message generation. Data is processed according to each provider&apos;s
+                terms. Redaction can be enabled in Settings &gt; Advanced.
+              </label>
+            </div>
+            {provider === 'cloud' && !consented && (
+              <div className="mt-2 text-[10px] font-bold text-[#ff3366]">
+                Cloud AI generation is blocked until consent is given.
+              </div>
+            )}
+          </div>
           <div className="flex items-center gap-2">
             <button
               type="button"

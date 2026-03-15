@@ -70,6 +70,7 @@ GitSwitch is an Electron desktop application that manages git repositories, SSH 
 - `process.on('exit')` cleanup for crash scenarios
 - Error messages redact commit hashes and user home paths
 - AI diff content optionally redacted before transmission
+- Structured audit log tracks all key access, save, and delete operations
 
 ### T5: Temp File Persistence
 
@@ -103,24 +104,47 @@ GitSwitch is an Electron desktop application that manages git repositories, SSH 
 - AI hallucination detection blocks responses referencing files not in the diff
 - Rate limiting (15 requests/minute) prevents abuse
 - Local LLM option keeps all data on-device
+- Cloud AI requires explicit user consent (`aiCloudConsented` setting)
+- Expanded redaction covers emails, URLs, AWS keys, token patterns
 
 ### T8: Denial of Service
 
 **Risk:** Large repositories, rapid polling, or excessive IPC calls degrade performance.
 
 **Mitigations:**
-- File watcher debounced at 300ms with error backoff (5 errors -> 30s pause)
+- File watcher debounced at 500ms with error backoff (5 errors -> 30s pause)
+- Watcher depth limited to 4 levels
+- Watcher count capped at 50 with LRU eviction
+- Renderer file list capped at 200 items
+- parseDiff input capped at 256KB
 - Git status limited to 1000 files per IPC response
 - Diff size checked via `--shortstat` before loading full content
 - IPC hard limit of 512KB for diff payloads
 - UI truncates diff display at 50 files
 - Auto-fetch interval at 30 seconds (not continuous polling)
 
+### T9: SSRF via Local LLM URL
+
+**Risk:** User-configurable `aiLocalUrl` could target internal services or cloud metadata endpoints.
+
+**Mitigations:**
+- Blocked hosts list (`169.254.169.254`, `metadata.google.internal`)
+- HTTPS required for non-localhost
+- URL parsed and validated before use
+
+### T10: Prototype Pollution via IPC
+
+**Risk:** Attacker sends `__proto__` or `constructor` keys in IPC settings payload.
+
+**Mitigations:**
+- `assertKeys()` explicitly rejects `__proto__`, `constructor`, `prototype` keys before processing
+
 ## Known Limitations
 
 - `safeStorage` requires a working OS keychain; fallback is graceful failure, not plaintext storage
 - Self-hosted GitHub Enterprise and GitLab instances are not supported (hardcoded `.com` domains)
-- macOS notarization is currently disabled in the build configuration
+- macOS notarization is enabled (requires Apple credentials at build time)
+- Auto-updater requires GitHub Releases publishing for update distribution
 - The offline commit generator uses heuristic pattern matching, not semantic analysis
 - Rate limiting is process-local and resets on app restart
 

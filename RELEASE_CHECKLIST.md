@@ -53,12 +53,28 @@ Use this checklist before every GitSwitch release.
 - [ ] Temp SSH key files are cleaned up after push/pull/fetch
 - [ ] External URLs restricted to trusted GitHub/GitLab hosts
 
+## Privacy & Compliance
+
+- [ ] PRIVACY.md is up to date with current data practices
+- [ ] Cloud AI consent toggle works in Settings > Integrations
+- [ ] Cloud AI generation is blocked when consent is not given
+- [ ] Data export downloads valid JSON via Settings > Advanced
+- [ ] Delete All Data clears all keys, tokens, settings, and audit log
+- [ ] Audit log records key access, AI requests, push, pull, and PR operations
+
 ## Documentation
 
 - [ ] CHANGELOG.md updated with release scope
 - [ ] README.md reflects current feature set
 - [ ] ARCHITECTURE.md matches actual code structure
 - [ ] Version number bumped in package.json if applicable
+
+## Auto-Update
+
+- [ ] `electron-builder.yml` has correct publish configuration (provider: github)
+- [ ] Auto-update check runs on startup (production only)
+- [ ] Update banner appears when a new version is downloaded
+- [ ] "Restart Now" button triggers `quitAndInstall()`
 
 ## Platform-Specific
 

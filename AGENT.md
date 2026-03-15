@@ -11,6 +11,28 @@
 ## Log
 
  - Raouf: (entries appended below)
+ - Raouf: 2026-03-15 (Australia/Sydney) - Enterprise Production Readiness
+   - Scope: Full enterprise-grade hardening across 3 parallel tracks (15 tasks)
+   - Summary: Closed all remaining production gaps for enterprise deployment.
+     Track 1 — Quick Wins:
+       1. CI branch fix (main→master) + coverage threshold management.
+       2. Package metadata (license, repository, engines, bugs).
+       3. Cloud AI consent toggle in Settings > Integrations with data disclosure.
+       4. PRIVACY.md covering APP/GDPR, linked from Settings > General.
+       5. Graceful shutdown with shuttingDown guard on network IPC handlers.
+     Track 2 — Core Features:
+       6. Audit logger (JSONL at ~/.gitswitch/audit.log, 5MB rotation, wired into key-manager, commit-generate, push/pull/PR).
+       7. Auto-updater (electron-updater, 4h check, non-intrusive banner, restart button).
+       8. Data export + delete-all for GDPR (IPC handlers, UI in Settings > Advanced).
+     Track 3 — Test Coverage (6.5% → 14.5%):
+       9. git-service.ts tests (status truncation, diff guards, branch cap, error translation).
+       10. commit-generate.ts tests (offline, consent gate, rate limit, missing key).
+       11. helpers.ts expanded redaction tests (emails, URLs, AWS keys, token patterns).
+       12. watcher.ts tests (path validation, chokidar config, event registration).
+       13. types.ts store helper tests (getRepoName, bumpRecent, updateRecentBranches, error messages, action suggestions).
+       14. Coverage thresholds raised to 12%/8%/8%/12%.
+   - Files: 25+ files created/modified across all tracks
+   - Verification: typecheck, lint, 57 tests pass, build pass, coverage thresholds met.
  - Raouf: 2026-03-15 (Australia/Sydney) - Swiss-Cheese Security/Reliability/Compliance Audit
    - Scope: Three-agent audit (Alpha: security, Beta: reliability, Gamma: compliance)
    - Summary: Fixed 12 blocker-level findings across security, reliability, and data privacy.

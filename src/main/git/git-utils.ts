@@ -1,6 +1,5 @@
 /**
- * Shared Git utilities for pull-request.ts and publish-status.ts
- * Extracted to avoid code duplication
+ * Shared Git utilities for pull-request.ts
  */
 
 /** Git provider type */

@@ -4,6 +4,7 @@ import { join } from 'path'
 import { randomUUID } from 'crypto'
 import ElectronStore from 'electron-store'
 import type { Account, AiPersona, AiProvider, AppTheme, SettingsPublic } from '../../index'
+import { auditLog } from '../audit/audit-logger'
 
 /** Current settings schema version. Bump when adding/removing/renaming fields. */
 const SETTINGS_SCHEMA_VERSION = 2
@@ -179,6 +180,7 @@ export async function deleteAccount(id: string): Promise<void> {
   const accounts = listAccounts().filter((account) => account.id !== id)
   store.set('accounts', accounts)
   await fs.rm(join(getKeysDir(), `${id}.enc`), { force: true })
+  await auditLog('key.delete', 'Account deleted: ' + id)
 }
 
 export async function saveKey(accountId: string, privateKeyString: string): Promise<void> {
@@ -188,6 +190,7 @@ export async function saveKey(accountId: string, privateKeyString: string): Prom
   const encrypted = safeStorage.encryptString(privateKeyString)
   const filePath = join(getKeysDir(), `${accountId}.enc`)
   await fs.writeFile(filePath, encrypted)
+  await auditLog('key.save', 'SSH key saved for account ' + accountId)
 }
 
 export async function loadKey(accountId: string): Promise<string> {
@@ -212,6 +215,7 @@ export async function loadKey(accountId: string): Promise<string> {
     throw new Error('Invalid key format. Expected PEM-encoded SSH private key.')
   }
 
+  await auditLog('key.access', 'SSH key loaded for account ' + accountId)
   return decrypted
 }
 
@@ -387,4 +391,23 @@ export async function clearGitLabToken(): Promise<void> {
 export function resetSettings(): StoreSchema['settings'] {
   store.set('settings', DEFAULT_SETTINGS)
   return store.get('settings')
+}
+
+export async function resetAllData(): Promise<void> {
+  store.clear()
+  const keysDir = getKeysDir()
+  try {
+    const files = await fs.readdir(keysDir)
+    for (const file of files) {
+      await fs.rm(join(keysDir, file), { force: true })
+    }
+  } catch {
+    /* keys dir may not exist */
+  }
+}
+
+export function exportAllData(): Record<string, unknown> {
+  const settings = getSettings()
+  const accounts = listAccounts().map(({ id, name, createdAt }) => ({ id, name, createdAt }))
+  return { settings, accounts, exportedAt: new Date().toISOString() }
 }

@@ -42,7 +42,9 @@ import {
   saveGitLabToken,
   saveKey,
   seedAiKeyFromEnv,
-  updateSettings
+  updateSettings,
+  exportAllData,
+  resetAllData
 } from './secure/key-manager'
 import { createPullRequest } from './git/pull-request'
 import { generateCommitMessage } from './ai/commit-generate'
@@ -54,6 +56,8 @@ import type {
   SettingsUpdateInput
 } from '../index'
 import { isAllowedExternalUrl } from './security/url-policy'
+import { auditLog, exportAuditLog } from './audit/audit-logger'
+import { initAutoUpdater, quitAndInstall } from './auto-update'
 
 let mainWindow: BrowserWindow | null = null
 const watchers = new Map<string, ReturnType<typeof createRepoWatcher>>()
@@ -445,7 +449,13 @@ async function registerIpcHandlers(): Promise<void> {
       const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
       const safeAccountId = assertString(accountId, 'accountId')
       const settings = getSettings()
-      return pushWithIdentity(normalized, safeAccountId, settings.strictHostKeyChecking)
+      const result = await pushWithIdentity(
+        normalized,
+        safeAccountId,
+        settings.strictHostKeyChecking
+      )
+      await auditLog('push', 'Push completed', normalized)
+      return result
     }
   )
 
@@ -456,7 +466,13 @@ async function registerIpcHandlers(): Promise<void> {
       const normalized = await ensureAllowedRepo(assertString(repoPath, 'repoPath'))
       const safeAccountId = assertString(accountId, 'accountId')
       const settings = getSettings()
-      return pullWithIdentity(normalized, safeAccountId, settings.strictHostKeyChecking)
+      const result = await pullWithIdentity(
+        normalized,
+        safeAccountId,
+        settings.strictHostKeyChecking
+      )
+      await auditLog('pull', 'Pull completed', normalized)
+      return result
     }
   )
 
@@ -491,7 +507,7 @@ async function registerIpcHandlers(): Promise<void> {
       }
       const githubToken = await loadGitHubToken()
       const gitlabToken = await loadGitLabToken()
-      return createPullRequest(
+      const result = await createPullRequest(
         normalized,
         { title, body, baseBranch, headBranch, draft },
         {
@@ -499,6 +515,8 @@ async function registerIpcHandlers(): Promise<void> {
           gitlabToken
         }
       )
+      await auditLog('pr.create', 'PR created', normalized)
+      return result
     }
   )
 
@@ -735,11 +753,20 @@ async function registerIpcHandlers(): Promise<void> {
     }
   })
 
+  ipcMain.handle('audit:export', async () => {
+    await auditLog('data.export', 'User exported audit log')
+    return exportAuditLog()
+  })
+
   ipcMain.handle('git:unwatchRepo', async (_event: IpcMainInvokeEvent, repoPath: string) => {
     const safe = assertString(repoPath, 'repoPath')
     removeWatcher(safe)
     allowedRepoPaths.delete(safe)
     return { ok: true }
+  })
+
+  ipcMain.handle('update:install', () => {
+    quitAndInstall()
   })
 
   ipcMain.handle('shell:openExternal', async (_event: IpcMainInvokeEvent, url: string) => {
@@ -748,6 +775,27 @@ async function registerIpcHandlers(): Promise<void> {
       throw new Error('URL not allowed.')
     }
     await shell.openExternal(safeUrl)
+    return { ok: true }
+  })
+
+  ipcMain.handle('data:export', async () => {
+    const data = exportAllData()
+    let auditLogContent = ''
+    try {
+      auditLogContent = await exportAuditLog()
+    } catch {
+      /* audit log may not exist */
+    }
+    return { data, auditLog: auditLogContent }
+  })
+
+  ipcMain.handle('data:delete-all', async () => {
+    await resetAllData()
+    for (const watcher of watchers.values()) {
+      watcher.close()
+    }
+    watchers.clear()
+    allowedRepoPaths.clear()
     return { ok: true }
   })
 }
@@ -793,6 +841,10 @@ app.whenReady().then(() => {
   void registerIpcHandlers()
 
   createWindow()
+
+  if (!isDev && mainWindow) {
+    initAutoUpdater(mainWindow)
+  }
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

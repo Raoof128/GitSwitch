@@ -80,7 +80,30 @@ const api = {
   gitUnwatchRepo: (repoPath: string): Promise<{ ok: boolean }> =>
     ipcRenderer.invoke('git:unwatchRepo', repoPath),
   openExternal: (url: string): Promise<{ ok: boolean }> =>
-    ipcRenderer.invoke('shell:openExternal', url)
+    ipcRenderer.invoke('shell:openExternal', url),
+  onUpdateAvailable: (
+    callback: (info: { version: string }) => void
+  ): (() => void) => {
+    const listener = (_event: unknown, info: unknown): void => {
+      callback(info as { version: string })
+    }
+    ipcRenderer.on('update:available', listener)
+    return () => ipcRenderer.removeListener('update:available', listener)
+  },
+  onUpdateDownloaded: (
+    callback: (info: { version: string }) => void
+  ): (() => void) => {
+    const listener = (_event: unknown, info: unknown): void => {
+      callback(info as { version: string })
+    }
+    ipcRenderer.on('update:downloaded', listener)
+    return () => ipcRenderer.removeListener('update:downloaded', listener)
+  },
+  installUpdate: (): Promise<void> => ipcRenderer.invoke('update:install'),
+  exportAuditLog: (): Promise<string> => ipcRenderer.invoke('audit:export'),
+  exportData: (): Promise<{ data: Record<string, unknown>; auditLog: string }> =>
+    ipcRenderer.invoke('data:export'),
+  deleteAllData: (): Promise<{ ok: boolean }> => ipcRenderer.invoke('data:delete-all')
 }
 
 contextBridge.exposeInMainWorld('api', api)

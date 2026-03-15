@@ -84,6 +84,25 @@ export function SettingsGeneral(): JSX.Element {
           Save General
         </button>
       </div>
+      <div className="mt-4 rounded-none border border-[#2a2a2a] bg-[#141414] p-4 text-xs">
+        <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#00ffaa]">
+          Privacy
+        </div>
+        <div className="text-[10px] text-[#666666]">
+          GitSwitch collects no telemetry. Cloud AI features require explicit consent.
+        </div>
+        <button
+          type="button"
+          onClick={() =>
+            void window.api.openExternal(
+              'https://github.com/Raoof128/GitSwitch/blob/master/PRIVACY.md'
+            )
+          }
+          className="btn-neon mt-2 rounded-none px-3 py-1 text-[10px]"
+        >
+          View Privacy Policy
+        </button>
+      </div>
     </section>
   )
 }

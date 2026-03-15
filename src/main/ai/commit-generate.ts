@@ -14,6 +14,7 @@ import { LocalProvider } from './providers/local'
 
 import type { AiContext, AiProvider } from './interfaces'
 import { redactSecrets } from './helpers'
+import { auditLog } from '../audit/audit-logger'
 
 // -------------------------------------------------------------------------- //
 //                                  CONSTANTS                                 //
@@ -294,6 +295,11 @@ export async function generateCommitMessage(repoPath: string): Promise<CommitMes
   // 7. Generate
   try {
     const timeout = settings.aiTimeoutSec > 0 ? settings.aiTimeoutSec * 1000 : DEFAULT_TIMEOUT_MS
+    await auditLog(
+      'ai.cloud.request',
+      `Provider: ${settings.aiProvider}, Model: ${selection.model}`,
+      repoPath
+    )
     const result = await selection.provider.generate(context, apiKey, selection.model, timeout)
 
     // Wipe key

@@ -3,6 +3,21 @@
 ## Unreleased
 
 - Raouf: (entries appended below)
+- Raouf: 2026-03-15 (Australia/Sydney) - Enterprise Production Readiness
+  - Scope: Enterprise-grade hardening — 3 parallel tracks, 15 tasks
+  - Summary:
+    1. CI fixed to trigger on `master` branch. Coverage thresholds managed.
+    2. Package metadata completed (license MIT, repository, engines >=20, bugs URL).
+    3. Cloud AI consent toggle added to Settings > Integrations with data disclosure warning.
+    4. PRIVACY.md created (APP/GDPR compliant), linked from Settings > General.
+    5. Graceful shutdown: `shuttingDown` flag blocks new push/pull/fetch/PR on quit.
+    6. Audit logger: JSONL at ~/.gitswitch/audit.log, 5MB rotation, wired into key-manager (key.access/save/delete), commit-generate (ai.cloud.request), push, pull, PR creation. Export via IPC.
+    7. Auto-updater: electron-updater checks on startup + every 4h, non-intrusive banner, user-initiated restart.
+    8. Data export + delete-all: GDPR-compliant IPC handlers, UI in Settings > Advanced with confirmation flow.
+    9. Test coverage raised from 6.5% to 14.5% (57 tests): git-service, commit-generate, helpers (redaction), watcher, store helpers.
+    10. Coverage thresholds set to 12/8/8/12 (statements/branches/functions/lines).
+  - Files: 25+ files across all 3 tracks
+  - Verification: typecheck, lint, 57 tests pass, build pass.
 - Raouf: 2026-03-15 (Australia/Sydney) - Swiss-Cheese Security/Reliability/Compliance Audit
   - Scope: Three-agent audit (security, reliability, compliance)
   - Summary: Fixed 12 blocker-level findings.

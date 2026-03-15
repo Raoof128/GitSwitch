@@ -49,6 +49,12 @@ export interface PreloadApi {
   onStatusChange: (callback: (payload: GitStatusPayload) => void) => () => void
   gitUnwatchRepo: (repoPath: string) => Promise<{ ok: boolean }>
   openExternal: (url: string) => Promise<{ ok: boolean }>
+  onUpdateAvailable: (callback: (info: { version: string }) => void) => () => void
+  onUpdateDownloaded: (callback: (info: { version: string }) => void) => () => void
+  installUpdate: () => Promise<void>
+  exportAuditLog: () => Promise<string>
+  exportData: () => Promise<{ data: Record<string, unknown>; auditLog: string }>
+  deleteAllData: () => Promise<{ ok: boolean }>
 }
 
 declare global {

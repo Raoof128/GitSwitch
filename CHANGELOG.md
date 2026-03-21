@@ -1,749 +1,100 @@
-# CHANGELOG
+# Changelog
 
-## Unreleased
+All notable changes to GitSwitch are documented in this file.
 
-- Raouf: (entries appended below)
-- Raouf: 2026-03-15 (Australia/Sydney) - Repo Cleanup & Professionalization
-  - Removed tracked build artifact (tsconfig.web.tsbuildinfo). Removed duplicate build/ directory from git (resources/ is authoritative). Deleted 3 dead files (publish-status.ts, electron.svg, wavy-lines.svg). Fixed stale comment in git-utils.ts. Reorganized .gitignore with clear category headers.
-  - Verification: typecheck, lint, test (57 pass), build pass.
-- Raouf: 2026-03-15 (Australia/Sydney) - Full Documentation Audit & Upgrade
-  - Scope: Audit and upgrade all 12 project docs to reflect current codebase
-  - Summary: Updated README (highlights, security notes, privacy link), ARCHITECTURE (audit logger, auto-updater, watcher, security model), SECURITY (branch fix, 8 new controls), THREAT_MODEL (T8 updates, new T9 SSRF + T10 prototype pollution, notarization fix), RELEASE_CHECKLIST (privacy/compliance + auto-update sections), api-reference (12 missing methods, aiCloudConsented type), usage-examples (4 new workflows), troubleshooting (3 new sections), CONTRIBUTING (consent/audit requirements, coverage thresholds), PR template (3 new checklist items).
-  - Files: 10 documentation files updated
-  - Verification: typecheck, lint, test (57 pass), build pass.
-- Raouf: 2026-03-15 (Australia/Sydney) - Enterprise Production Readiness
-  - Scope: Enterprise-grade hardening — 3 parallel tracks, 15 tasks
-  - Summary:
-    1. CI fixed to trigger on `master` branch. Coverage thresholds managed.
-    2. Package metadata completed (license MIT, repository, engines >=20, bugs URL).
-    3. Cloud AI consent toggle added to Settings > Integrations with data disclosure warning.
-    4. PRIVACY.md created (APP/GDPR compliant), linked from Settings > General.
-    5. Graceful shutdown: `shuttingDown` flag blocks new push/pull/fetch/PR on quit.
-    6. Audit logger: JSONL at ~/.gitswitch/audit.log, 5MB rotation, wired into key-manager (key.access/save/delete), commit-generate (ai.cloud.request), push, pull, PR creation. Export via IPC.
-    7. Auto-updater: electron-updater checks on startup + every 4h, non-intrusive banner, user-initiated restart.
-    8. Data export + delete-all: GDPR-compliant IPC handlers, UI in Settings > Advanced with confirmation flow.
-    9. Test coverage raised from 6.5% to 14.5% (57 tests): git-service, commit-generate, helpers (redaction), watcher, store helpers.
-    10. Coverage thresholds set to 12/8/8/12 (statements/branches/functions/lines).
-  - Files: 25+ files across all 3 tracks
-  - Verification: typecheck, lint, 57 tests pass, build pass.
-- Raouf: 2026-03-15 (Australia/Sydney) - Swiss-Cheese Security/Reliability/Compliance Audit
-  - Scope: Three-agent audit (security, reliability, compliance)
-  - Summary: Fixed 12 blocker-level findings.
-    1. SSRF blocked on aiLocalUrl — metadata endpoints rejected, HTTPS enforced for non-localhost.
-    2. Path-traversal blocked on git:ignore filePath (no `..`, no absolute paths).
-    3. Prototype pollution blocked — assertKeys now rejects __proto__/constructor/prototype.
-    4. Commit body capped at 5000 chars.
-    5. CSP header now includes frame-ancestors 'none'.
-    6. Watcher getStatus() calls serialized with statusInFlight guard (no concurrent git index access).
-    7. Watcher count capped at 50 with LRU eviction (prevents FD exhaustion).
-    8. RemoteConfig setTimeout leak fixed (useRef + useEffect cleanup).
-    9. gitSlice refresh chains deduplicated with refreshChainInFlight guard.
-    10. Cloud AI requires explicit consent (aiCloudConsented setting, defaults to false).
-    11. Redaction expanded: AWS keys, emails, URLs, token= patterns.
-    12. AI provider console.error calls sanitized — response bodies no longer logged.
-  - Files: 14 files modified
-  - Verification: lint, typecheck, test (15 pass), build all pass.
-- Raouf: 2026-03-15 (Australia/Sydney) - Large Repo Crash Audit
-  - Scope: Performance & Stability Audit for Huge Repositories
-  - Summary: Full audit of crash vectors when opening large repos (10k+ files, hundreds of branches, large diffs). Fixed 10 issues across 6 files.
-    1. CRITICAL: `getStagedDiff()` now applies same size guards as `getDiff()` — `checkDiffSize()`, byte limit, and 512 KB IPC hard cap. Previously returned unlimited data through IPC, causing renderer OOM.
-    2. CRITICAL: Chokidar watcher limited to `depth: 4`, expanded ignore list (vendor, .cache, .turbo, .nuxt, __pycache__). Debounce raised from 300 ms to 500 ms. Prevents file-descriptor exhaustion on monorepos.
-    3. CRITICAL: DiffView no longer uses full `diffText` as React key (was causing massive string comparisons). Now uses `diffText.length`.
-    4. CRITICAL: DiffView caps `parseDiff()` input to 256 KB to prevent renderer freeze on huge diffs.
-    5. HIGH: FileList caps rendered items at 200 DOM nodes with truncation warning banner.
-    6. HIGH: Branch list capped at 500 entries in `listBranches()`.
-    7. HIGH: `getStatus()` now sets `diff.renames=false` to skip costly rename computation in large repos.
-    8. HIGH: Watcher-driven diff reloads throttled to max once per 800 ms in renderer, preventing IPC flood.
-    9. HIGH: `GitStatus` type now includes `truncated?: boolean`; UI warns when 1000-file cap is hit.
-    10. MEDIUM: `getStatus` signals truncation to UI so users know the list is incomplete.
-  - Files: src/index.ts, src/main/git/git-service.ts, src/main/git/watcher.ts, src/renderer/src/App.tsx, src/renderer/src/components/diff/DiffView.tsx, src/renderer/src/components/sidebar/FileList.tsx
-  - Verification: lint, typecheck, test (15 pass), build all pass.
-- Raouf: 2026-03-14 (Australia/Sydney) - UI/UX Audit
-  - Scope: UI/UX Production-Readiness Audit & Remediation
-  - Summary: Full renderer audit targeting accessibility, contrast, interaction feedback, microcopy, and desktop usability.
-    1. ACCESSIBILITY: Bumped muted text from #666 to #888 (4.6:1 contrast ratio), placeholder from #444 to #555 (3.6:1), disabled button from #333 to #555, rail inactive icons from #444 to #777, diff gutter from #333 to #555. Added focus-visible outline rings (2px solid accent) to all buttons, selects, and links. Added aria-label to activity rail tabs. Added role="status" and aria-live to OperationBanner. Added status code tooltips (M=Modified, A=Added, etc.) to file list indicators with aria-label.
-    2. UX CLARITY: Added character counter (72/200) to commit title with yellow warning color at 72+. Platform-aware keyboard shortcut display (⌘K on Mac, Ctrl+K elsewhere). Improved empty state messages with actionable hints. Added step numbers to onboarding panel. Added tooltips to git jargon (Ahead/Behind, Working Tree). Changed "Hide" to "Dismiss" on onboarding. Replaced misplaced "Review AI setup" link in Last Fetch card with contextual "Fetch now" link.
-    3. INTERACTION FEEDBACK: Added elapsed time counter to OperationBanner (shows "3s", "5s" etc. during operations). Improved confirmation dialog detail text contrast (#666 to #c0c0). Improved dangerous actions copy for clarity.
-    4. MICROCOPY: Better remote URL placeholder showing both SSH and HTTPS formats. Cleaner dangerous actions explanation. More actionable empty states in file list.
-  - Files: src/renderer/src/assets/main.css, src/renderer/src/App.tsx, src/renderer/src/components/sidebar/CommitPanel.tsx, src/renderer/src/components/sidebar/FileList.tsx, src/renderer/src/components/sidebar/RemoteConfig.tsx, src/renderer/src/components/dashboard/OnboardingPanel.tsx, src/renderer/src/components/dashboard/OperationBanner.tsx, src/renderer/src/components/dashboard/RepoOverview.tsx, src/renderer/src/components/ui/ConfirmActionModal.tsx, AGENT.md, CHANGELOG.md
-  - Verification: `npm run lint`, `npm run typecheck`, `npm test` (15 pass), `npm run build` all pass.
-  - Follow-ups: Add focus trap to CommandPalette, form validation states, syntax highlighting in diff view, branch autocomplete in PR modal.
-- Raouf: 2026-03-14 (Australia/Sydney) - Pass 2
-  - Scope: Remaining Recommendations Implementation
-  - Summary: Implemented all 7 remaining audit recommendations from the production-readiness pass.
-    1. NOTARIZATION: Enabled macOS notarization in electron-builder.yml (requires APPLE_ID/APPLE_APP_SPECIFIC_PASSWORD/APPLE_TEAM_ID env vars).
-    2. INTEGRATION TESTS: Added Playwright Electron test suite (e2e/app.spec.ts) covering window launch, activity rail, tab switching, command palette, and console error checks. Added `test:e2e` script. Installed @playwright/test.
-    3. DEPENDABOT: Created .github/dependabot.yml with npm + github-actions ecosystems, weekly schedule, grouped updates (electron, testing, linting, build), and reviewer assignment.
-    4. STORE SPLIT: Decomposed the 1348-line monolithic Zustand store into 5 domain slices (gitSlice, settingsSlice, accountsSlice, uiSlice, reposSlice) + shared types. Consumer API (`useRepoStore`) unchanged.
-    5. SETTINGS MIGRATION: Added schema versioning (`settingsVersion`) and `migrateSettingsIfNeeded()` to key-manager.ts. Runs at startup, fills missing fields from defaults on version bump.
-    6. REQUEST CANCELLATION: Added `loadGeneration` counter to abandon stale diff/status responses when the active repo changes mid-load.
-    7. COVERAGE CI: Updated ci.yml to run `test:coverage` instead of `test`, upload lcov report as artifact on push to main.
-  - Files: electron-builder.yml, .github/dependabot.yml, .github/workflows/ci.yml, e2e/app.spec.ts, playwright.config.ts, package.json, vitest.config.ts, src/main/secure/key-manager.ts, src/renderer/src/store/useRepoStore.ts, src/renderer/src/store/slices/types.ts, src/renderer/src/store/slices/gitSlice.ts, src/renderer/src/store/slices/settingsSlice.ts, src/renderer/src/store/slices/accountsSlice.ts, src/renderer/src/store/slices/uiSlice.ts, src/renderer/src/store/slices/reposSlice.ts, AGENT.md, CHANGELOG.md
-  - Verification: `npm run lint`, `npm run typecheck`, `npm test` (15 pass), `npm run build` all pass.
-  - Follow-ups: None - all 7 recommendations from the audit are now implemented.
-- Raouf: 2026-03-14 (Australia/Sydney)
-  - Scope: Deep Production-Readiness Audit & Remediation
-  - Summary: Full file-by-file repository audit with targeted security, performance, reliability, and documentation fixes.
-    1. SECURITY: Unified macOS entitlements (removed dyld-env-vars, added disable-library-validation and network-client consistently), raised Gemini safety filters from BLOCK_NONE to BLOCK_ONLY_HIGH, hardened GIT_SSH_COMMAND temp path against shell metacharacters, fixed detectGitProvider to reject lookalike domains (github.com.evil.com), added will-navigate handler to block renderer navigation attacks, added Anthropic API to CSP connect-src, added Google Fonts to CSP style-src/font-src, added bounds validation for aiTimeoutSec/diffLimitKb/diffLimitLines, added http/https protocol enforcement for aiLocalUrl.
-    2. PERFORMANCE: Fixed rate-limit array memory leak in commit-generate.ts (shift-based cleanup instead of filter+spread), added git:unwatchRepo IPC handler + watcher cleanup on repo removal, wired removeRepo store action to release file watchers.
-    3. RELIABILITY: Added React ErrorBoundary wrapping the entire app (crash recovery UI), fixed pre-existing react-hooks/set-state-in-effect lint errors blocking build, refactored App.tsx tab switching to use switchTab() callback for consistent state sync.
-    4. TESTING: Added lookalike-domain rejection test for detectGitProvider (15 tests total), added coverage thresholds (10% baseline) in vitest.config.ts.
-    5. DOCS: Created THREAT_MODEL.md (trust boundaries, 8 threat categories with mitigations, known limitations), created RELEASE_CHECKLIST.md (code quality, build, smoke tests, security, platform-specific items), linked both from README.md.
-  - Files: build/entitlements.mac.plist, resources/entitlements.mac.plist, src/main/ai/providers/gemini.ts, src/main/ai/commit-generate.ts, src/main/git/git-service.ts, src/main/git/git-utils.ts, src/main/git/git-utils.test.ts, src/main/git/watcher.ts, src/main/index.ts, src/preload/index.ts, src/preload/index.d.ts, src/renderer/src/main.tsx, src/renderer/src/App.tsx, src/renderer/src/store/useRepoStore.ts, vitest.config.ts, README.md, THREAT_MODEL.md, RELEASE_CHECKLIST.md, AGENT.md, CHANGELOG.md
-  - Verification: `npm run lint`, `npm run typecheck`, `npm test` (15 pass), `npm run build` all pass.
-  - Follow-ups: Enable macOS notarization for distribution, expand integration test coverage (requires Electron test harness), add Dependabot configuration, consider splitting large Zustand store.
-- Raouf: 2026-03-11 (Australia/Sydney)
-  - Scope: Production Audit & Hardening
-  - Summary: Completed a comprehensive repository audit covering security, reliability, testing, documentation, CI, and packaging polish.
-    1. SECURITY: Hardened external URL validation, exposed secret-storage failures to the UI, and added trusted-host coverage tests.
-    2. RELIABILITY: Fixed default-account fallback for pull/fetch flows, aligned renderer settings defaults with persisted defaults, and tightened shared IPC typing.
-    3. TESTING: Added focused tests for URL policy, AI helpers, git URL parsing, and account-selection logic; enabled `vitest` coverage reporting.
-    4. DOCS/CONFIG: Rewrote README, architecture, security, contributing, and conduct docs; added API reference, usage examples, troubleshooting docs, CODEOWNERS, security workflow, devcontainer support, build-resource fixes, and macOS entitlements.
-    5. DEPENDENCIES: Added `@vitest/coverage-v8`, refreshed the lockfile, and ran `npm audit fix` to reduce the audit report to 0 vulnerabilities.
-  - Files: src/index.ts, src/main/index.ts, src/main/security/*, src/main/ai/helpers.test.ts, src/main/git/git-utils.test.ts, src/main/secure/key-manager.ts, src/preload/*, src/renderer/src/**/*, vitest.config.ts, package.json, package-lock.json, README.md, ARCHITECTURE.md, SECURITY.md, CONTRIBUTING.md, CODE_OF_CONDUCT.md, electron-builder.yml, .gitignore, .github/*, docs/*, .devcontainer/*, resources/entitlements.mac.plist
-  - Verification: `npm run lint`, `npm run typecheck`, `npm test`, `npm run test:coverage`, `npm run build`, and `npm audit --audit-level=high` all pass.
-  - Follow-ups: Broaden main-process integration coverage for git execution and keychain-dependent flows.
-- Raouf: 2026-02-17 (Australia/Sydney)
-  - Scope: Metadata Update
-  - Summary: Updated developer contact email to raoof.r12@gmail.com across project metadata (package.json, electron-builder.yml).
-  - Files: package.json, electron-builder.yml
-  - Verification: Manual verification of file content.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-- Raouf: 2026-02-17 (Australia/Sydney)
-  - Scope: Production Readiness & Installer
-  - Summary: Finalized app for production release. Unified build scripts, added `dist` for installers, and corrected app identity.
-    1. SCRIPTS: Added `npm run dist` to create installers for the current OS.
-    2. SCRIPTS: Unified `build:*` scripts to include mandatory `npm run typecheck` and `npm run lint` for release safety.
-    3. BUILD: Corrected `AppUserModelId` to `com.gitswitch.app` for proper Windows taskbar/notification behavior.
-    4. CONFIG: Refined `electron-builder.yml` categories and targets; updated maintainer metadata.
-    5. DOCS: Updated README.md with clearer build instructions and current homepage.
-  - Files: package.json, src/main/index.ts, electron-builder.yml, README.md
-  - Verification: `npm run build`, `npm run typecheck`, and `npm run lint` all pass.
+## [Unreleased]
 
-- Raouf: 2026-01-12 (Australia/Sydney)
-  - Scope: Project Audit & Professional Standards
-  - Summary: Comprehensive audit to align with production-grade standards.
-    1. DOCS: Added `ARCHITECTURE.md` detailing system design and security model. Updated `README.md`, `CONTRIBUTING.md`, and `CODE_OF_CONDUCT.md` to professional standards.
-    2. CI/CD: Added `npm test` step to GitHub Actions workflow for automated verification.
-    3. CLEANUP: Removed debug console logging from AI commit generation logic.
-    4. QUALITY: Verified full lint/typecheck/test pass.
-  - Files: ARCHITECTURE.md, README.md, CONTRIBUTING.md, CODE_OF_CONDUCT.md, .github/workflows/ci.yml, src/main/ai/commit-generate.ts
-  - Verification: `npm run lint` (clean), `npm run typecheck` (clean), `npm test` (passed).
-  - Follow-ups: None.
+### Added
 
-- Raouf: 2026-01-12 (Australia/Sydney)
-  - Scope: Build System (Runtime Fix)
-  - Summary: Fixed `Uncaught Exception: Error: Could not resolve "bufferutil"` by explicitly externalizing `ws` optional peer dependencies.
-    1. FIX: Added `rollupOptions.external` for `bufferutil` and `utf-8-validate` in `electron.vite.config.ts`. This allows the bundled `ws` module to fail gracefully when these optional native modules are missing, instead of the bundler injecting throwing stubs.
-  - Files: electron.vite.config.ts
-  - Verification: `npm run build` passed.
-  - Follow-ups: None.
+- **AI-powered commit generation** with multi-provider support (Google Gemini, OpenAI, Anthropic) and local model fallback via configurable endpoint
+- **Hybrid AI pipeline** with 3-stage response parsing (strict JSON, sanitized re-parse, regex extraction), hallucination detection, and file-reference validation to prevent fabricated paths in commit messages
+- **Cloud AI consent gate** requiring explicit user opt-in before any data leaves the device, with data disclosure warning in Settings
+- **Audit logging system** writing JSONL to `~/.gitswitch/audit.log` with 5 MB rotation, covering key access, AI requests, push, pull, and PR creation events; exportable via IPC
+- **Auto-updater** using `electron-updater` with startup and 4-hour interval checks, non-intrusive banner notification, and user-initiated restart
+- **Pull and dynamic reconciliation** with background fetch loop, ahead/behind status tracking, and auto-push option after commit
+- **Branch management** with create, switch, delete, and merge operations accessible from the command palette
+- **Command palette** (Cmd/Ctrl+K) for quick access to branches, repos, settings, and git operations
+- **First-run onboarding panel** with step-by-step guidance for new users, dismissable with actionable hints
+- **Repository health dashboard** showing branch status, remote configuration, last fetch time, and sync state at a glance
+- **Pull request creation** for GitHub and GitLab with provider auto-detection, token-secured API calls, and post-push status badge
+- **File watcher** using Chokidar with depth limits, debouncing, LRU eviction (max 50 watchers), and error recovery with backoff
+- **Diff viewer** with unified/split modes, size guards (256 KB parse cap, 512 KB IPC hard limit), and pre-flight `--shortstat` estimation
+- **Settings persistence** with schema versioning, startup migration, and strict merge against defaults to prevent partial-config bugs
+- **GDPR-compliant data controls** including full data export and delete-all functionality in Settings with confirmation flow
+- **PRIVACY.md** documenting data handling practices (APP/GDPR compliant), linked from Settings
+- **Graceful shutdown** blocking new git operations when the app is quitting to prevent data corruption
+- **Playwright E2E test suite** covering window launch, activity rail navigation, tab switching, command palette, and console error assertions
+- **Comprehensive documentation suite** including ARCHITECTURE.md, THREAT_MODEL.md, RELEASE_CHECKLIST.md, SECURITY.md, CONTRIBUTING.md, API reference, usage examples, and troubleshooting guide
 
-- Raouf: 2026-01-12 (Australia/Sydney)
-  - Scope: Build System (ESM Interop Fix)
-  - Summary: Fixed `TypeError: ElectronStore is not a constructor` and potential runtime errors with other ESM dependencies.
-    1. FIX: Configured `electron-vite` to bundle ESM-only dependencies (`electron-store`, `chokidar`, `@google/genai`) into the Main process CJS build. This ensures correct default export handling and prevents `ERR_REQUIRE_ESM`.
-  - Files: electron.vite.config.ts
-  - Verification: `npm run build` passed. Main bundle size increased ~1.2MB reflecting bundled deps.
-  - Follow-ups: None.
+### Changed
 
-- Raouf: 2026-01-12 (Australia/Sydney)
-  - Scope: AI Integration (Model Updates)
-  - Summary: Added support for latest Google Gemini models (Gemini 3, 2.5, 2.0).
-    1. NEW: Added `gemini-3-pro`, `gemini-3-flash`, `gemini-2.5-pro`, `gemini-2.5-flash`, `gemini-2.0-flash` (stable), and `gemini-2.0-pro-exp`.
-    2. DEFAULT: Updated default cloud model to `gemini-3-flash` for improved speed and cost-efficiency.
-    3. UX: Reorganized model selection dropdown into clear groups (Gemini 3, 2.5, 2.0, 1.5, Legacy).
-  - Files: src/index.ts, src/main/secure/key-manager.ts, src/main/ai/providers/gemini.ts, src/renderer/src/components/settings/SettingsIntegrations.tsx
-  - Verification: `npm run typecheck`, `npm run lint` (clean).
-  - Follow-ups: None.
+- **Zustand store decomposed** from a 1348-line monolith into 5 domain slices (git, settings, accounts, UI, repos) with unchanged consumer API
+- **Nord-to-custom theme migration** with tokenized palette (Jungle Green, Strawberry Red, Pacific Blue, Sand Dune), Liquid Glass surface language, and consistent status/accent colors across all components
+- **AI provider architecture rewritten** with `AiProvider` interface, centralized prompts, separated provider modules, and configurable timeout (default 30s)
+- **Gemini models updated** to latest generation (Gemini 3 Pro/Flash, 2.5 Pro/Flash, 2.0 Flash) with organized dropdown groups and `gemini-3-flash` as default
+- **Background fetch interval tuned** from 60s down to 30s with flicker-free status updates using lightweight comparison before re-render
+- **Dependency upgrades** across Electron, Google GenAI SDK, Vite, Tailwind, Framer Motion, and testing libraries with zero audit vulnerabilities
+- **CJS-to-ESM migration** for git-service, watcher, and key-manager modules; ESM-only dependencies bundled into Main process CJS build
+- **Build scripts unified** with mandatory typecheck and lint gates before any release build
+- **Polling replaced with event-driven updates** reducing aggressive 1-second intervals to 30-second reconciliation with change-aware diffing
 
-- Raouf: 2026-01-12 (Australia/Sydney)
-  - Scope: Production Readiness Audit (Final Polish)
-  - Summary: Completed final hardening pass. Fixed security timeouts, watcher correctness, and build configuration.
-    1. SECURITY: Added 30s timeout to `git pull` and `git fetch` operations to prevent network hangs.
-    2. CORRECTNESS: Updated file watcher to monitor the entire repository root (respecting .gitignore) instead of just `src/app/lib`, fixing change detection for projects with different structures.
-    3. RELEASE: Disabled placeholder code signing identity in `electron-builder.yml` to allow successful ad-hoc/unsigned builds in CI/dev environments.
-  - Files: src/main/git/git-service.ts, src/main/git/watcher.ts, electron-builder.yml
-  - Verification: `npm run typecheck`, `npm run lint` (clean), manual review of logic.
-  - Follow-ups: None. Ready for release candidate.
+### Fixed
 
-- Raouf: 2026-01-12 (Australia/Sydney)
-  - Scope: Dependency Updates & Test Infrastructure
-  - Summary: Updated all outdated dependencies and added test scripts to package.json for improved test coverage.
-    1. HIGH: Updated 8 outdated dependencies (@google/genai 1.34.0→1.35.0, @types/node 22.19.1→25.0.6, @types/react 19.2.7→19.2.8, electron-builder 26.0.12→26.4.0, eslint-plugin-react-hooks 5.2.0→7.0.1, framer-motion 12.23.26→12.25.0, tailwindcss 3.4.13→3.4.19, vite 7.2.6→7.3.1).
-    2. MEDIUM: Added new test scripts (test:unit, test:integration, test:all, test:coverage) to package.json.
-    3. MEDIUM: Verified build, lint, typecheck, and original tests pass after updates.
-    4. LOW: Confirmed 0 vulnerabilities after dependency updates via `npm audit`.
-  - Files: package.json
-  - Verification: `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build` all pass with 0 errors.
-  - Follow-ups: Add comprehensive unit and integration tests for git operations, AI providers, and key management once test environment is properly configured with mocked electron-store.
+- **Renderer OOM on large repos** — `getStagedDiff()` now applies the same size guards (byte limit, 512 KB IPC cap) as `getDiff()`
+- **File descriptor exhaustion** — Chokidar watcher limited to depth 4 with expanded ignore list (vendor, .cache, .turbo, node_modules, .next)
+- **DiffView freeze** — stopped using full diff text as React key (massive string comparison); capped `parseDiff()` input to 256 KB
+- **Application freeze on large repo add** — targeted directory watching instead of global recursive watch; debounce raised to 500 ms
+- **Rate-limit array memory leak** in commit-generate fixed with shift-based cleanup instead of filter+spread
+- **React ErrorBoundary** added wrapping entire app for crash recovery UI
+- **Request cancellation** via `loadGeneration` counter abandoning stale diff/status responses on repo switch
+- **RemoteConfig setTimeout leak** fixed with useRef + useEffect cleanup
+- **Git store refresh chains** deduplicated with `refreshChainInFlight` guard preventing concurrent reloads
+- **Status flicker eliminated** by preserving last known ahead/behind status during transient git failures
+- **`bufferutil` build error** resolved by externalizing `ws` optional peer dependencies in Rollup config
+- **`ElectronStore` constructor error** fixed by bundling ESM-only dependencies into CJS build
+- **Git provider lookalike domain attack** — `detectGitProvider` now rejects patterns like `github.com.evil.com`
+- **Gemini SDK response drilling** — corrected `result.response.text()` call chain to match actual SDK structure
 
-- Raouf: 2026-01-07 (Australia/Sydney)
-  - Scope: Code Quality Audit (Comprehensive Fix)
-  - Summary: Fixed 17 audit issues across Critical, High, and Medium severity levels. Resolved all TypeScript, error handling, security, and performance issues identified in the codebase audit.
-    1.  CRITICAL: Removed `@ts-ignore` in `gemini.ts` by adding proper `SafetySetting[]` type and `GeminiResponse`/`GeminiCandidate` interfaces.
-    2.  CRITICAL: Replaced `api: unknown` in `preload/index.d.ts` with fully typed `PreloadApi` interface.
-    3.  HIGH: Fixed empty catch block in `local.ts` with proper JSON parse error handling and extracted hardcoded URL to constant.
-    4.  HIGH: Converted CJS `require()` to ESM `import` in `git-service.ts`, `watcher.ts`, and `key-manager.ts`.
-    5.  HIGH: Removed unnecessary `@types/chokidar` from `package.json`.
-    6.  HIGH: Replaced browser `confirm()` in `FileList.tsx` with in-app React modal dialog.
-    7.  HIGH: Changed aggressive 1-second polling to 30-second interval in `App.tsx`.
-    8.  MEDIUM: Created `git-utils.ts` to extract duplicated utilities (`fetchWithTimeout`, `parseGitHubRepo`, `parseGitLabProjectPath`, `detectGitProvider`).
-    9.  MEDIUM: Added error context to catch blocks in `anthropic.ts` and `openai.ts`.
-    10. MEDIUM: Added `IpcMainInvokeEvent` type to all 16 IPC handler `_event` parameters in `index.ts`.
-    11. MEDIUM: Added JSDoc documentation to `helpers.ts` for nullable return type.
-    12. MEDIUM: Fixed `useRepoStore.getState()` called inside render in `CommitPanel.tsx`.
-    13. MEDIUM: Added error recovery with backoff mechanism in `watcher.ts` (max 5 consecutive errors, 30s backoff).
-  - Files: src/main/ai/providers/gemini.ts, src/preload/index.d.ts, src/main/ai/providers/local.ts, src/main/git/git-service.ts, src/main/git/watcher.ts, src/main/secure/key-manager.ts, package.json, src/renderer/src/components/sidebar/FileList.tsx, src/renderer/src/App.tsx, src/main/git/git-utils.ts (NEW), src/main/git/pull-request.ts, src/main/git/publish-status.ts, src/main/ai/providers/anthropic.ts, src/main/ai/providers/openai.ts, src/main/index.ts, src/main/ai/helpers.ts, src/renderer/src/components/sidebar/CommitPanel.tsx
-  - Verification: `npm run lint` and `npx tsc --noEmit` both pass with 0 errors. AI Orchestrator audit: PASSED.
-  - Follow-ups: None - all identified issues resolved.
-- Raouf: 2026-01-06 (Australia/Sydney)
-  - Scope: UI/UX (Loader Width)
-  - Summary: Widened the spider loader footprint for better spacing in the title area.
-    1.  Increased the title loader and container width to 24em.
-  - Files: src/renderer/src/assets/main.css
-  - Verification: Not run (not requested).
-  - Follow-ups: Let me know if you want a specific pixel width instead.
-- Raouf: 2026-01-06 (Australia/Sydney)
-  - Scope: UI/UX (Loader Scale)
-  - Summary: Increased the spider loader size by 10% for better visibility next to the title.
-    1.  Bumped the title loader scale token from 1.8px to 1.98px.
-  - Files: src/renderer/src/assets/main.css
-  - Verification: Not run (not requested).
-  - Follow-ups: If you want another size tweak, share the target percentage.
-- Raouf: 2026-01-06 (Australia/Sydney)
-  - Scope: UI/UX (Loader Swap)
-  - Summary: Replaced the hamster loader with the spider swing animation and mapped its palette to the Nord theme tokens.
-    1.  Updated the header loader markup and ported the animation CSS into the shared stylesheet.
-  - Files: src/renderer/src/App.tsx, src/renderer/src/assets/main.css
-  - Verification: Not run (not requested).
-  - Follow-ups: If you want the loader larger or slower, tell me the preferred size/speed.
-- Raouf: 2026-01-06 (Australia/Sydney)
-  - Scope: UI/UX (Sync Loader Placement)
-  - Summary: Moved the hamster loader beside the app title and scaled it up for better visibility.
-    1.  Relocated the loader to the left header cluster and introduced a larger title variant.
-  - Files: src/renderer/src/App.tsx, src/renderer/src/assets/main.css
-  - Verification: Not run (not requested).
-  - Follow-ups: Adjust the size/offset if you want it tighter to the title.
-- Raouf: 2026-01-06 (Australia/Sydney)
-  - Scope: UI/UX (Sync Loader Visibility)
-  - Summary: Made the hamster loader always visible in the top bar with a slightly larger header variant.
-    1.  Removed the conditional sync gating and added a header-sized variant to ensure the animation is visible.
-  - Files: src/renderer/src/App.tsx, src/renderer/src/assets/main.css
-  - Verification: Not run (not requested).
-  - Follow-ups: If you want it smaller or aligned differently, tell me the preferred size/position.
-- Raouf: 2026-01-06 (Australia/Sydney)
-  - Scope: UI/UX (Sync Loader)
-  - Summary: Added a top-bar hamster loader that animates during push/pull and respects reduced-motion settings.
-    1.  Wired sync state into the store and surfaced it in the header next to the account control.
-    2.  Ported the hamster wheel animation into the shared stylesheet with Nord-aligned colors.
-  - Files: src/renderer/src/App.tsx, src/renderer/src/assets/main.css, src/renderer/src/store/useRepoStore.ts
-  - Verification: Not run (not requested).
-  - Follow-ups: Trigger push/pull and confirm the loader appears and stops cleanly.
-- Raouf: 2026-01-06 (Australia/Sydney)
-  - Scope: UX (Status Flicker)
-  - Summary: Prevented header ahead/behind flicker by preserving the last known status during transient git status failures.
-    1.  Tracked the repo path associated with the latest status and kept it intact on refresh errors.
-  - Files: src/renderer/src/store/useRepoStore.ts
-  - Verification: Not run (not requested).
-  - Follow-ups: Push/pull again to confirm the header status no longer blinks.
-- Raouf: 2026-01-06 (Australia/Sydney)
-  - Scope: UI/UX (Settings Icon Motion)
-  - Summary: Added a more expressive settings control with a rotating glass ring and pulsing accent orb.
-    1.  Applied motion-safe spin and pulse to the settings glyph while keeping reduced-motion support.
-  - Files: src/renderer/src/App.tsx
-  - Verification: Not run (not requested).
-  - Follow-ups: Optional: adjust spin/pulse durations if the motion feels too loud.
-- Raouf: 2026-01-06 (Australia/Sydney)
-  - Scope: UI/UX (Settings Control)
-  - Summary: Upgraded the settings control to a layered glass icon with an accent orb for a more distinctive presence.
-    1.  Added a subtle halo and accent dot around the gear glyph while preserving the existing button layout.
-  - Files: src/renderer/src/App.tsx
-  - Verification: Not run (not requested).
-  - Follow-ups: Optional: tweak icon size or glow intensity if you want it quieter or louder.
-- Raouf: 2026-01-06 (Australia/Sydney)
-  - Scope: UI/UX (Settings Icon)
-  - Summary: Replaced the settings emoji with a consistent inline SVG icon for a cleaner, theme-aligned control.
-    1.  Added an accessible gear icon to the settings button while retaining existing hover and glass styling.
-  - Files: src/renderer/src/App.tsx
-  - Verification: Not run (not requested).
-  - Follow-ups: Visual check in the header to confirm the icon weight feels right.
-- Raouf: 2026-01-06 (Australia/Sydney)
-  - Scope: UI Theme (Color Consistency)
-  - Summary: Normalized status and accent colors to theme tokens across the renderer, and aligned accent buttons and alerts with consistent tokenized backgrounds.
-    1.  Added accent and status background/border tokens to the theme and applied them to alerts, badges, and action buttons.
-    2.  Replaced hardcoded success/warn/error utilities in badges, warnings, and banners with theme variables.
-    3.  Ran Prettier on the AI guard block to keep lint clean (no logic change).
-  - Files: src/renderer/src/assets/main.css, src/renderer/src/App.tsx, src/renderer/src/components/diff/DiffView.tsx, src/renderer/src/components/pr/PullRequestModal.tsx, src/renderer/src/components/settings/SettingsIntegrations.tsx, src/renderer/src/components/settings/SettingsView.tsx, src/renderer/src/components/sidebar/CommitPanel.tsx, src/renderer/src/components/sidebar/FileList.tsx, src/renderer/src/components/sidebar/RemoteConfig.tsx, src/renderer/src/components/sidebar/RepoList.tsx, src/main/ai/commit-generate.ts
-  - Verification: `npm run lint` (warns about existing prettier issue in src/main/git/git-service.ts).
-  - Follow-ups: Optional: run `npx prettier --write src/main/git/git-service.ts` to clear the remaining lint warning.
-- Raouf: 2026-01-06 (Australia/Sydney)
-  - Scope: AI Safety (Hallucination Filter)
-  - Summary: Reduced false positives for short alphabetic pairs (e.g., UI/UX) in the file-reference validation.
-    1.  Ignored two-part alpha pairs with 1–2 letter segments to avoid misclassifying shorthand as paths.
-  - Files: src/main/ai/commit-generate.ts
-  - Verification: Not run (not requested).
-  - Follow-ups: Retry AI generation with UI/UX or CI/CD phrasing to confirm the warning is gone.
-- Raouf: 2026-01-06 (Australia/Sydney)
-  - Scope: AI Safety (False Positive Guard)
-  - Summary: Reduced false positives in AI file-reference validation for common UI/UX and version abbreviations.
-    1.  Ignored short uppercase pairs (e.g., UI/UX), numeric ratios, and version pairs when checking unknown paths.
-  - Files: src/main/ai/commit-generate.ts
-  - Verification: Not run (not requested).
-  - Follow-ups: Generate a commit message mentioning UI/UX to confirm no false block occurs.
-- Raouf: 2026-01-06 (Australia/Sydney)
-  - Scope: UI/UX (Header Stability)
-  - Summary: Stabilized the ahead/behind header label during push/pull by reserving space and using tabular numerals.
-    1.  Added a fixed minimum width and tabular numeric alignment to prevent layout shifts as counts change.
-  - Files: src/renderer/src/App.tsx
-  - Verification: `npm run lint` (warns about existing prettier issue in src/main/git/git-service.ts).
-  - Follow-ups: If you want the warning cleared, I can format `src/main/git/git-service.ts`.
-- Raouf: 2026-01-06 (Australia/Sydney)
-  - Scope: UI/UX (Liquid Glass Polish)
-  - Summary: Applied Liquid Glass styling to core toolbars and controls, aligned borders to glass tokens, and softened scanlines for clarity.
-    1.  Updated header, toolbar, and selector borders to use glass tokens for a consistent Liquid Glass surface language.
-    2.  Retuned diff containers and active repo highlights to align with the new glass surface treatment.
-    3.  Softened scanline overlays and default form borders to improve legibility with translucent layers.
-  - Files: src/renderer/src/assets/main.css, src/renderer/src/App.tsx, src/renderer/src/components/diff/DiffView.tsx, src/renderer/src/components/settings/SettingsAccounts.tsx, src/renderer/src/components/sidebar/RepoList.tsx
-  - Verification: Not run (visual change only).
-  - Follow-ups: Launch the renderer to validate the glass clarity and contrast on real data.
-- Raouf: 2026-01-06 (Australia/Sydney)
-  - Scope: UI/UX (Audit Fixes)
-  - Summary: Fixed UI regressions in settings/account rows, scoped tab keyboard navigation, improved keyboard access for file actions, aligned timeout limits, and added focused UI tests.
-    1.  Repaired broken Tailwind classes in Accounts rows and added focus-visible affordances in repo and file lists.
-    2.  Scoped settings tab arrow navigation to the settings sidebar and aligned AI timeout limits with defaults.
-    3.  Added SettingsView tests to cover tab switching via click and arrow keys.
-  - Files: src/renderer/src/components/settings/SettingsAccounts.tsx, src/renderer/src/components/settings/SettingsView.tsx, src/renderer/src/components/sidebar/FileList.tsx, src/renderer/src/components/settings/SettingsAdvanced.tsx, src/renderer/src/components/sidebar/RepoList.tsx, src/renderer/src/App.test.tsx
-  - Verification: Not run (not requested).
-  - Follow-ups: Run `npm test` to validate UI tests in your environment.
-- Raouf: 2026-01-06 (Australia/Sydney)
-  - Scope: UX (Sync Stability)
-  - Summary: Reduced UI flicker at 1s fetch intervals by only updating the "Updated" timestamp when status meaningfully changes.
-    1.  Added a lightweight status comparison to avoid re-triggering the header animation on identical polling results.
-  - Files: src/renderer/src/store/useRepoStore.ts
-  - Verification: Not run (not requested).
-  - Follow-ups: Monitor the header badge behavior during rapid fetches and adjust thresholds if needed.
-- Raouf: 2026-01-06 (Australia/Sydney)
-  - Scope: UX (Sync Interval)
-  - Summary: Reduced the background fetch interval to 1 second to make remote status updates near-instant.
-    1.  Updated the reconciliation loop timer to 1s for faster change pickup.
-  - Files: src/renderer/src/App.tsx
-  - Verification: Not run (not requested).
-  - Follow-ups: Monitor CPU/network impact on large repos and adjust if needed.
-- Raouf: 2026-01-06 (Australia/Sydney)
-  - Scope: UX (Auto-Push + Sync)
-  - Summary: Fixed auto-push account fallback and accelerated background fetch so changes are picked up within a few seconds.
-    1.  Auto-push now falls back to the default account when no selection is active, and settings updates can adopt the default account automatically.
-    2.  Reduced the background fetch interval to 5 seconds for near-instant status updates.
-  - Files: src/renderer/src/store/useRepoStore.ts, src/renderer/src/App.tsx
-  - Verification: Not run (not requested).
-  - Follow-ups: Commit with auto-push enabled and confirm the push triggers without manually selecting an account.
-- Raouf: 2026-01-06 (Australia/Sydney)
-  - Scope: Reliability & Security (Settings + Git)
-  - Summary: Fixed settings persistence for auto-push, corrected unstaged diff behavior, enforced diff size limits, and hardened git operations against timeouts and option injection.
-    1.  Added auto-push to the persisted settings schema and IPC validation so the toggle reliably saves and reloads.
-    2.  Switched unstaged diffs to index-vs-working-tree, enforced byte limits for diff payloads, and improved git push timeout handling by terminating runaway processes.
-    3.  Hardened git commands to avoid option injection in push and gitignore removal flows.
-  - Files: src/main/secure/key-manager.ts, src/main/index.ts, src/preload/index.ts, src/main/git/git-service.ts
-  - Verification: Not run (not requested).
-  - Follow-ups: Run a quick push/pull and diff sanity check in the UI once convenient.
-- Raouf: 2026-01-06 (Australia/Sydney)
-  - Scope: UI Theme (Quick Nord)
-  - Summary: Swapped the renderer's palette to the requested Quick Nord colors and aligned interactive states with the Frost accent.
-    1.  Overhauled the root CSS variables so backgrounds, surfaces, borders, text, accent, and status colors follow the supplied palette.
-    2.  Updated hover/diff/selection treatments and gradients to rely on the Frost accent and softer supporting neutrals.
-  - Files: src/renderer/src/assets/main.css
-  - Verification: Not run (visual-only change).
-  - Follow-ups: Run the renderer (`npm run dev`) to confirm the Nord palette renders as expected.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: Bug Fix (AI)
-  - Summary: Improved AI hallucination detection to eliminate false positives.
-    1.  Modified `extractPaths` to ignore URLs (http/https), preventing them from being flagged as unknown files.
-    2.  Updated `hasUnknownPaths` to allow referencing parent directories of changed files (critical for commit scopes like `api/auth`).
-    3.  Added a whitelist for common external paths like `github.com` and `npm`.
-  - Files: src/main/ai/commit-generate.ts
-  - Verification: Logic check ensures parent directories are now correctly categorized as "allowed".
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: Maintenance (Stability & Performance)
-  - Summary: Implemented comprehensive stability guards for large repositories and massive code changes.
-    1.  Main Process: Added `checkDiffSize` using Git's `--shortstat` to estimate diff size _before_ loading content into memory.
-    2.  Main Process: Implemented a 512KB hard limit on IPC string transmission for diffs to prevent Electron event loop freezes.
-    3.  Main Process: Capped `getStatus` file reporting to 1,000 files to avoid IPC congestion in massive repos.
-    4.  AI Pipeline: Added safety pre-checks in `collectContext` to skip fetching massive diffs that would crash the AI request.
-    5.  Renderer: Added a 50-file display cap in `DiffView` to keep React rendering snappy even when thousands of files change.
-  - Files: src/main/git/git-service.ts, src/main/ai/commit-generate.ts, src/renderer/src/components/diff/DiffView.tsx
-  - Verification: Manual review of buffers and list slicing.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: Bug Fix (Performance)
-  - Summary: Fixed application freezing when adding large repositories.
-    1.  Optimized the Git file watcher to use targeted directory watching (`src`, `app`, `lib`, and specific `.git` files) instead of a global recursive watch.
-    2.  Increased debounce timer for status updates from 150ms to 300ms to reduce CPU load.
-    3.  Added explicit ignores for `node_modules`, `.next`, and nested `.git` directories.
-    4.  Enabled `atomic` save detection in `chokidar` for better stability.
-  - Files: src/main/git/watcher.ts
-  - Verification: Manual verification of code paths (no deep recursion on large node_modules).
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: Maintenance (Linting & Typing)
-  - Summary: Fixed all ESLint and TypeScript errors/warnings across the codebase.
-    1.  Resolved `no-unused-vars` in `commit-generate.ts`, `useRepoStore.ts`, and `SettingsAccounts.tsx`.
-    2.  Fixed all `prettier/prettier` formatting issues via `eslint --fix`.
-    3.  Added missing return types and `JSX` namespace imports to all renderer components.
-    4.  Fixed 20+ TypeScript errors in `helpers.ts`, `local.ts`, `gemini.ts`, and `useRepoStore.ts`.
-    5.  Synchronized `env.d.ts` and `preload/index.ts` with missing API methods (`gitPull`, `gitFetch`) and added `autoPush` to settings.
-    6.  Replaced implicit/explicit `any` with strict types or safe structural casting.
-    7.  Fixed `no-useless-escape` regex error in `git-service.ts`.
-  - Files: src/main/**/\*, src/renderer/src/**/_, src/preload/_, src/env.d.ts
-  - Verification: `npm run lint` and `npm run typecheck` now pass with 0 errors/warnings.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: Repository Cleanup
-  - Summary: Removed accidental commit of `npm-cache` directory (bloating repo) and added it to `.gitignore` along with `coverage`.
-  - Files: `.gitignore`, `npm-cache/` (deleted from git)
-  - Verification: `git status` check confirmed cache files are removed and ignore rules are active.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: Configuration (`.gitignore`)
-  - Summary: Expanded `.gitignore` to strictly ignore personal IDE files (`.vscode/settings.json`, `.idea/`, etc.) and OS junk files (`.DS_Store`, `Thumbs.db`), while preserving shared team configurations (`launch.json`, `extensions.json`).
-  - Files: `.gitignore`
-  - Verification: Manual review of ignore rules.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: AI Configuration (Fix)
-  - Summary: Increased default AI generation timeout from 8s to 30s to prevent premature timeouts on slower connections.
-  - Files: src/main/secure/key-manager.ts, src/main/ai/commit-generate.ts
-  - Verification: Manual check of default values.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: Security & Maintenance (Fix)
-  - Summary: Upgraded `jsdom` (v27) and `vitest` (v4) to latest versions. Added `overrides` for `esbuild ^0.27.2` to resolve high-severity audit vulnerabilities.
-  - Files: package.json
-  - Verification: Manual verification of `npm install` (by user).
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: Configuration (Fix)
-  - Summary: Upgraded `@testing-library/react` and `vitest` dependencies to versions compatible with React 19 to fix `npm install` resolution errors.
-  - Files: package.json
-  - Verification: Manual verification of `npm install` (by user).
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: Project Audit (Major Upgrade)
-  - Summary: Conducted comprehensive production-readiness audit. Added MISSING release assets (LICENSE, CONTRIBUTING, SECURITY, CODE_OF_CONDUCT). Upgraded README.md. Implemented CI/CD workflows and Vitest testing infrastructure.
-  - Files: README.md, LICENSE, CONTRIBUTING.md, SECURITY.md, CODE_OF_CONDUCT.md, .github/\*, package.json, vitest.config.ts
-  - Verification: Validation of file creation.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: Bug Fix (Critical)
-  - Summary: Fixed "canCreatePr is not defined" runtime error in App.tsx by ensuring the variable is defined in the component scope.
-  - Files: src/renderer/src/App.tsx
-  - Verification: Manual verification of code structure.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: UX (Improvement)
-  - Summary: Removed annoying "Create Pull Request?" prompt after every push. Added a dedicated "PR" button in the header (visible if tokens are set) to allow manual PR creation instead.
-  - Files: src/renderer/src/App.tsx
-  - Verification: Manual check of UI.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: AI Configuration (Fix)
-  - Summary: Disabled strict `responseSchema` for Gemini provider. Research confirmed Gemini 1.5 Flash often fails to populate required fields when schema is active. Switched to Prompt-driven JSON generation which is more reliable for this model.
-  - Files: src/main/ai/providers/gemini.ts
-  - Verification: Manual test (expected).
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: AI Configuration (Fix)
-  - Summary: Enhanced `parseAiResponse` to aggressively strip markdown code block syntax (backticks) even if unclosed, preventing JSON parse errors from formatted AI responses.
-  - Files: src/main/ai/helpers.ts
-  - Verification: Code check.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: AI Configuration (Fix)
-  - Summary: Renamed `body` to `description` in AI schema and prompts to strictly interpret the field as required content. Added parsing support for the new field while maintaining backward compatibility.
-  - Files: src/main/ai/providers/gemini.ts, src/main/ai/prompts.ts, src/main/ai/helpers.ts
-  - Verification: Code check.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: AI Configuration (Fix)
-  - Summary: Fixed JSON parsing logic that was aggressively stripping newlines and breaking valid responses. Improved Regex fallback to correctly extract commit body. Updated prompt to explicitly forbid `null` values for descriptions.
-  - Files: src/main/ai/helpers.ts, src/main/ai/prompts.ts
-  - Verification: Code review of parsing logic.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: AI Configuration (Fix)
-  - Summary: Enforced `body` field in Gemini JSON schema and updated prompt to prevent description merging into the title. The AI will now reliably populate the description field.
-  - Files: src/main/ai/providers/gemini.ts, src/main/ai/prompts.ts
-  - Verification: Code check of schema and prompt.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: AI Configuration (Tweak)
-  - Summary: Updated AI prompt to strictly require a Commit Body (Description) for all generated messages, not just large ones. Reinforced the `Raouf-` prefix template.
-  - Files: src/main/ai/prompts.ts
-  - Verification: Code check of prompt rules.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: Git Workflow (Tweak)
-  - Summary: Updated the auto-fetch interval from 60 seconds to 40 seconds for faster reconciliation with remote changes.
-  - Files: src/renderer/src/App.tsx
-  - Verification: Code check.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: Git Workflow (Feature)
-  - Summary: Implemented "Pull" and "Dynamic Reconciliation". Added a "Pull" button to the header and established a background `fetch` loop (every 60s) to automatically detect remote changes (updating "Ahead/Behind" status).
-  - Files: src/main/git/git-service.ts, src/main/index.ts, src/preload/index.ts, src/renderer/src/store/useRepoStore.ts, src/renderer/src/App.tsx
-  - Verification: Manual test of Pull button and observing status updates.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: Git Workflow (Feature)
-  - Summary: Implemented "Auto Push" functionality. Added a checkbox "Push immediately after commit" in the Commit Panel. When enabled, successful commits will automatically trigger a `git push` command, resolving the issue where local commits weren't being synced to remote.
-  - Files: src/renderer/src/store/useRepoStore.ts, src/renderer/src/components/sidebar/CommitPanel.tsx
-  - Verification: Manual test of commit + auto-push flow.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: AI Configuration (Clean)
-  - Summary: Removed OpenAI and Anthropic models from the UI as requested, focusing the app entirely on Google Gemini models. Updated backend logic to default to Gemini for all "cloud" operations.
-  - Files: src/renderer/src/components/settings/SettingsIntegrations.tsx, src/main/ai/commit-generate.ts
-  - Verification: Visual check of settings dropdown.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: AI Reliability (Gemini)
-  - Summary: Implemented proper `responseSchema` in Gemini provider to enforce strictly structured JSON output. This uses the API's native "JSON mode" to guarantee the response matches `{ title: string, body: string }`, eliminating parsing errors caused by markdown blocks or conversational text.
-  - Files: src/main/ai/providers/gemini.ts
-  - Verification: Manual verification of strict JSON output.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: AI Reliability (Timeout)
-  - Summary: Increased default AI request timeout from 7s to 20s. The strict 7-8s timeout was causing "Request timed out" errors on slower connections or model cold starts. Updated `store` default and provider logic.
-  - Files: src/main/ai/commit-generate.ts, src/renderer/src/store/useRepoStore.ts, src/main/ai/providers/gemini.ts
-  - Verification: Manual confirmation of longer wait time before timeout.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: AI Debugging (Parser)
-  - Summary: Hardened `parseAiResponse` with a 3-stage fallback strategy: (1) Standard `JSON.parse`, (2) Sanitized Re-parse (escaping unescaped newlines which LLMs often emit), (3) Regex Extraction (fuzzy matching "title" properties). This ensures valid content isn't discarded due to minor syntax errors.
-  - Files: src/main/ai/helpers.ts
-  - Verification: Clean parsing of previous failure cases.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: AI Debugging (Gemini)
-  - Summary: Improved `parseAiResponse` in `src/main/ai/helpers.ts` to be more resilient. It now regex-matches the first `{...}` block to handle models that wrap JSON in conversational text ("Here is your JSON: ..."), and reliably strips Markdown code blocks.
-  - Files: src/main/ai/helpers.ts
-  - Verification: Trigger with known messy AI output.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: React UI (Fix)
-  - Summary: Fixed JSX syntax error in `SettingsIntegrations.tsx` where an `<optgroup>` opening tag for Claude models was accidentally clobbered during the previous edit. Restored the tag to fix the build.
-  - Files: src/renderer/src/components/settings/SettingsIntegrations.tsx
-  - Verification: Manual review of code.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: AI Debugging (Gemini)
-  - Summary: Fixed `response.text is not a function` crash. The Google GenAI SDK returns a `GenerateContentResult` wrapper; the actual helper method is `result.response.text()`, not `result.text()`. Updated the provider to correctly drill down into the response object.
-  - Files: src/main/ai/providers/gemini.ts
-  - Verification: Manual verification of SDK typings and runtime check.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: AI Configuration (Fix)
-  - Summary: Updated Gemini model list to match currently available API models. Removed hypothetical "Gemini 3.0" and "Gemini 2.5" entries which were causing legitimate 404 errors. Added verified `gemini-1.5-flash`, `gemini-1.5-pro`, and `gemini-2.0-flash-exp`.
-  - Files: src/renderer/src/components/settings/SettingsIntegrations.tsx
-  - Verification: User to retry with valid model.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: AI Debugging (Gemini)
-  - Summary: Improved Gemini provider error handling.
-    1.  Removed internal `try/catch` to allow actual API errors (403, 404, etc.) to bubble up to the UI.
-    2.  Disabled Safety Filters (`BLOCK_NONE`) to prevent valid code diffs from being silently flagged and returning empty responses.
-    3.  Added explicit JSON parsing validation to report malformed responses.
-  - Files: src/main/ai/providers/gemini.ts
-  - Verification: Manual error triggering.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: Settings Stability (Fix)
-  - Summary: Hardened `getSettings()` in `key-manager.ts` to strictly merge stored settings with `DEFAULT_SETTINGS`. This fixes the "Error: Invalid provider" bug caused by undefined `aiProvider` in partial config files. Added debug logging to `commit-generate.ts` to trace provider selection.
-  - Files: src/main/secure/key-manager.ts, src/main/ai/commit-generate.ts
-  - Verification: Manual verification of code logic.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: AI Debugging
-  - Summary: Removed silent "offline fallback" for AI generation. If the AI provider fails (timeout, auth, rate limit), the app will now strictly return an Error commit message describing the issue, rather than silently defaulting to "chore: update files".
-  - Files: src/main/ai/commit-generate.ts
-  - Verification: Manual trigger of error states.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: AI Integration (Fix)
-  - Summary: Wired up `refreshSettings()` and `refreshAccounts()` on app mount in `App.tsx`. This ensures the AI provider selection is correctly loaded from disk on startup, preventing the "no API request sent" issue (where the app defaulted to 'offline' mode).
-  - Files: src/renderer/src/App.tsx
-  - Verification: Manual review of execution flow.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: AI Integration (Rewrite)
-  - Summary: Rewrote AI integration layer from zero to support Gemini, ChatGPT (OpenAI), and Claude (Anthropic). Introduced `AiProvider` interface, centralized prompts, and separated provider logic for cleaner maintenance and fewer mistakes.
-  - Files: src/main/ai/interfaces.ts, src/main/ai/prompts.ts, src/main/ai/helpers.ts, src/main/ai/providers/\*, src/main/ai/commit-generate.ts
-  - Verification: Code compiles, types align, logic handles timeouts/redaction/offline fallback robustly.
-  - Follow-ups: User to verify with their specific API keys.
-- Raouf: 2026-01-05 (Australia/Sydney)
-  - Scope: Production readiness audit (Phases 1-8)
-  - Summary: Comprehensive 8-phase security hardening and code quality pass including: added IPC-based shell:openExternal handler to enforce external URL allowlist validation in main process, removed dead Versions.tsx component that referenced non-existent window.electron, refactored Gemini provider with proper Promise.race timeout handling and immediate API key memory wiping, fixed function declaration syntax errors across 10 React components (removed errant `:` before `()`), fixed template literal escaping in commit-generator.ts, added explanatory comment for dev-only console.log statements, ran prettier formatting pass
-  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts, src/main/ai/providers/gemini.ts, src/main/git/commit-generator.ts, src/preload/index.ts, src/renderer/src/env.d.ts, src/renderer/src/App.tsx, src/renderer/src/components/pr/PullRequestModal.tsx, src/renderer/src/components/settings/_.tsx, src/renderer/src/components/sidebar/_.tsx, deleted: src/renderer/src/components/Versions.tsx
-  - Security Verified: nodeIntegration=false, contextIsolation=true, sandbox=true, webSecurity=true, strict CSP in production only, all IPC handlers validate input with assertString/assertBoolean/assertNumber/assertKeys, secrets encrypted with safeStorage (never exposed to renderer), temp SSH keys use 0600 permissions with try/finally cleanup, API keys wiped from memory after use, external URLs restricted to github.com/gitlab.com via main process validation
-  - Verification: typecheck passed, build successful (main: 56KB, preload: 1.5KB, renderer: 430KB), 18 minor lint warnings (return type annotations) remain but do not affect functionality or security
-  - Follow-ups: update electron-builder.yml identity placeholder before macOS release
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: Gemini 2.0 Flash integration, lint fixes
-  - Summary: add secure Gemini 2.0 Flash as cloud AI provider with official Google GenAI SDK, detailed project-aware prompt, strict input limits, redaction, timeout, and offline fallback; fix remaining lint issues (return type annotations, prettier formatting)
-  - Files: AGENT.md, CHANGELOG.md, package.json, src/index.ts, src/main/ai/commit-generate.ts, src/main/ai/providers/gemini.ts, src/main/index.ts, src/main/secure/key-manager.ts, src/main/git/commit-generator.ts, src/main/git/publish-status.ts, src/preload/index.ts, src/renderer/src/App.tsx, src/renderer/src/components/diff/DiffView.tsx, src/renderer/src/components/motion/motion.ts, src/renderer/src/components/pr/PullRequestModal.tsx, src/renderer/src/components/settings/_.tsx, src/renderer/src/components/sidebar/_.tsx, src/renderer/src/store/useRepoStore.ts
-  - Verification: typecheck and lint both pass; 18 minor lint warnings remain (return type annotations) but do not affect functionality
-  - Follow-ups: run `npm run dev` and test commit generation with Gemini
-- Raouf: 2026-01-03 (Australia/Sydney)
-  - Scope: push/PR flow, IPC settings sync, UI event handling safety
-  - Summary: harden push->PR gating, align settings typing, add safe external open, and clear commit timers on teardown
-  - Files: AGENT.md, CHANGELOG.md, src/preload/index.ts, src/renderer/src/env.d.ts, src/renderer/src/App.tsx, src/renderer/src/components/pr/PullRequestModal.tsx, src/renderer/src/components/sidebar/Sidebar.tsx, src/renderer/src/store/useRepoStore.ts
-  - Verification: not run (not requested)
-  - Follow-ups: run `npm run dev` and validate push→PR flow with token
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: publish status, secure token handling, PR status UI
-  - Summary: detect GitHub/GitLab PR status after push, hide tokens from renderer, and add publish status badge
-  - Files: AGENT.md, CHANGELOG.md, src/index.ts, src/main/index.ts, src/main/git/publish-status.ts, src/main/secure/key-manager.ts, src/preload/index.ts, src/renderer/src/App.tsx, src/renderer/src/components/pr/PullRequestModal.tsx, src/renderer/src/components/sidebar/Sidebar.tsx, src/renderer/src/env.d.ts, src/renderer/src/store/useRepoStore.ts
-  - Verification: not run (not requested)
-  - Follow-ups: run `npm run dev`, push changes, and confirm PR status badge/link
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: build fix
-  - Summary: remove stray parenthesis in IPC handler registration
-  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts
-  - Verification: not run (error reproduction only)
-  - Follow-ups: rerun `npm run dev`
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: build fix
-  - Summary: add parentheses around nullish coalescing to satisfy esbuild
-  - Files: AGENT.md, CHANGELOG.md, src/renderer/src/store/useRepoStore.ts
-  - Verification: not run (error reproduction only)
-  - Follow-ups: rerun `npm run dev`
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: AI commit generation, scrollbars
-  - Summary: add hybrid AI commit generator with redaction, secure key storage, and themed smooth scrollbars
-  - Files: AGENT.md, CHANGELOG.md, src/main/ai/commit-generate.ts, src/main/index.ts, src/main/secure/key-manager.ts, src/renderer/src/assets/main.css, src/renderer/src/components/sidebar/CommitPanel.tsx
-  - Verification: not run (not requested)
-  - Follow-ups: run `npm run dev` and test Generate ✨ with and without local/cloud AI
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: AI generator polish
-  - Summary: stop cloud fallback after local success, redact prompts, handle diff errors, and prevent AI key seeding crashes
-  - Files: AGENT.md, CHANGELOG.md, src/main/ai/commit-generate.ts, src/main/secure/key-manager.ts
-  - Verification: not run (not requested)
-  - Follow-ups: run `npm run dev` and test Generate ✨ with new fallback order
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: settings stability, diff rendering
-  - Summary: harden electron-store constructor resolution and allow diff tables to size to content
-  - Files: AGENT.md, CHANGELOG.md, src/main/secure/key-manager.ts, src/renderer/src/assets/main.css
-  - Verification: not run (not requested)
-  - Follow-ups: run `npm run dev` and confirm the diff view no longer wraps mid-word
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: UI header
-  - Summary: add quick account switcher next to Push for fast identity swaps
-  - Files: AGENT.md, CHANGELOG.md, src/renderer/src/App.tsx
-  - Verification: not run (not requested)
-  - Follow-ups: run `npm run dev` and verify account selection updates Push state
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: theme consistency
-  - Summary: centralize status and diff colors into theme tokens and align publish badge styling
-  - Files: AGENT.md, CHANGELOG.md, src/renderer/src/App.tsx, src/renderer/src/assets/main.css
-  - Verification: not run (not requested)
-  - Follow-ups: run `npm run dev` and confirm status + diff colors match the unified palette
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: theme polish
-  - Summary: standardize form control backgrounds, borders, and checkbox accent colors
-  - Files: AGENT.md, CHANGELOG.md, src/renderer/src/assets/main.css
-  - Verification: not run (not requested)
-  - Follow-ups: run `npm run dev` and confirm selects/checkboxes match the dark theme
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: theme polish
-  - Summary: restyle checkboxes/radios to match panel/border palette with custom checked indicator
-  - Files: AGENT.md, CHANGELOG.md, src/renderer/src/assets/main.css
-  - Verification: not run (not requested)
-  - Follow-ups: run `npm run dev` and confirm checkbox colors match the theme
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: security hardening, git errors
-  - Summary: normalize and validate repo paths in IPC and improve simple-git commit error reporting
-  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts, src/main/git/git-service.ts
-  - Verification: not run (not requested)
-  - Follow-ups: run `npm run dev` and confirm repo selection + commits still work
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: Phase 10 hardening
-  - Summary: tighten CSP, restrict IPC to allowlist, validate inputs, harden external opens, and route secrets via secure IPC with token scrubbing
-  - Files: AGENT.md, CHANGELOG.md, src/index.ts, src/main/index.ts, src/main/ai/commit-generate.ts, src/main/git/git-service.ts, src/main/git/publish-status.ts, src/main/git/pull-request.ts, src/preload/index.ts, src/renderer/index.html, src/renderer/src/App.tsx, src/renderer/src/env.d.ts, src/renderer/src/store/useRepoStore.ts, src/renderer/src/components/pr/PullRequestModal.tsx, src/renderer/src/components/settings/SettingsAdvanced.tsx, src/renderer/src/components/settings/SettingsIntegrations.tsx
-  - Verification: not run (not requested)
-  - Follow-ups: run `npm run dev` and verify add-repo prompt, secrets flows, and PR creation still work
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: CSP dev unblock
-  - Summary: move CSP to main process with dev-only inline style allowance for HMR while keeping strict prod policy
-  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts, src/renderer/index.html
-  - Verification: not run (not requested)
-  - Follow-ups: run `npm run dev` and confirm renderer no longer white-screens
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: repo onboarding
-  - Summary: expand home paths in repo allowlist checks and surface a user-friendly add-repo error
-  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts, src/renderer/src/store/useRepoStore.ts
-  - Verification: not run (not requested)
-  - Follow-ups: run `npm run dev` and confirm Add repo accepts ~/ paths
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: CSP dev unblock
-  - Summary: allow inline/eval scripts in dev CSP for Vite preamble while keeping strict prod policy
-  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts
-  - Verification: not run (not requested)
-  - Follow-ups: run `npm run dev` and confirm renderer loads without CSP errors
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: CSP dev unblock
-  - Summary: ensure CSP override replaces any existing header by normalizing header keys
-  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts
-  - Verification: not run (not requested)
-  - Follow-ups: run `npm run dev` and confirm the CSP now reflects dev policy
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: dev boot fixes
-  - Summary: harden CSP header override and force dev renderer URL fallback to avoid stale local HTML
-  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts
-  - Verification: not run (not requested)
-  - Follow-ups: run `npm run dev` and confirm Vite preamble loads without CSP errors
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: dev boot fixes
-  - Summary: align dev server URL fallback to electron-vite port and allow 127.0.0.1 CSP connections
-  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts
-  - Verification: not run (not requested)
-  - Follow-ups: run `npm run dev` and confirm CSP errors are resolved
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: dev boot fixes
-  - Summary: use electron-vite preload env path and disable CSP in dev to unblock Vite preamble
-  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts
-  - Verification: not run (not requested)
-  - Follow-ups: run `npm run dev` and verify window.api is defined
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: dev boot fixes
-  - Summary: resolve preload path from env/app/out fallback to ensure window.api is defined in dev
-  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts
-  - Verification: not run (not requested)
-  - Follow-ups: run `npm run dev` and verify preload API exists
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: dev boot fixes
-  - Summary: prefer dev out/preload path in preload resolution to ensure window.api is exposed
-  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts
-  - Verification: not run (not requested)
-  - Follow-ups: run `npm run dev` and verify preload API exists
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: dev boot fixes
-  - Summary: prefer ELECTRON_PRELOAD when available before falling back to dev out/preload
-  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts
-  - Verification: not run (not requested)
-  - Follow-ups: run `npm run dev` and verify window.api is defined
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: dev boot fixes
-  - Summary: log resolved preload path and ELECTRON_PRELOAD to diagnose missing window.api
-  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts
-  - Verification: not run (not requested)
-  - Follow-ups: run `npm run dev` and share preload log output
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: dev boot fixes, repo input
-  - Summary: simplify preload resolution and dev CSP handling, add inline repo path input, and guard settings/IPC calls when preload is missing
-  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts, src/renderer/src/App.tsx, src/renderer/src/components/sidebar/RepoList.tsx, src/renderer/src/store/useRepoStore.ts
-  - Verification: not run (not requested)
-  - Follow-ups: run `npm run dev` and confirm Add repo input and preload API availability
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: dev boot fix
-  - Summary: remove stale addRepo dependency in App hotkey effect
-  - Files: AGENT.md, CHANGELOG.md, src/renderer/src/App.tsx
-  - Verification: not run (not requested)
-  - Follow-ups: run `npm run dev` and confirm app loads without addRepo errors
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: repo selection
-  - Summary: switch Add repo back to system folder picker via IPC and clean up repo list UI
-  - Files: AGENT.md, CHANGELOG.md, src/main/index.ts, src/preload/index.ts, src/renderer/src/App.tsx, src/renderer/src/components/sidebar/RepoList.tsx, src/renderer/src/env.d.ts, src/renderer/src/store/useRepoStore.ts
-  - Verification: not run (not requested)
-  - Follow-ups: run `npm run dev` and confirm Add repo opens a native folder picker
-- Raouf: 2026-01-04 (Australia/Sydney)
-  - Scope: git diff
-  - Summary: handle repos without HEAD by falling back to index/working tree diffs
-  - Files: AGENT.md, CHANGELOG.md, src/main/git/git-service.ts
-  - Verification: not run (not requested)
-  - Follow-ups: run `npm run dev` and confirm new repos no longer error on diff
-- Raouf: 2026-03-11 (Australia/Sydney)
-  - Scope: renderer theme
-  - Summary: apply the Jungle Green, Strawberry Red, Orange, Pacific Blue, and Sand Dune palette across renderer theme tokens, status colors, diff highlights, glass surfaces, and accent glows
-  - Files: AGENT.md, CHANGELOG.md, src/renderer/src/App.tsx, src/renderer/src/assets/main.css
-  - Verification: `npm run lint`
-  - Follow-ups: run `npm run dev` and visually confirm the refreshed theme across desktop views
-- Raouf: 2026-03-11 (Australia/Sydney)
-  - Scope: repo automation
-  - Summary: remove the GitHub Dependabot configuration and clean up the changelog reference so dependency updates remain manual
-  - Files: AGENT.md, CHANGELOG.md, .github/dependabot.yml
-  - Verification: not run (not requested)
-  - Follow-ups: none
-- Raouf: 2026-03-11 (Australia/Sydney)
-  - Scope: app ux, onboarding, responsive workflow
-  - Summary: add first-run onboarding, repo health overview, responsive shell behavior, branch management, command palette actions, stronger diff controls, safer destructive confirmations, and clearer operation feedback across sync and AI flows
-  - Files: AGENT.md, CHANGELOG.md, src/index.ts, src/main/index.ts, src/main/git/git-service.ts, src/preload/index.ts, src/preload/index.d.ts, src/renderer/src/App.tsx, src/renderer/src/App.test.tsx, src/renderer/src/components/branch/*, src/renderer/src/components/command/*, src/renderer/src/components/dashboard/*, src/renderer/src/components/diff/DiffView.tsx, src/renderer/src/components/settings/SettingsView.tsx, src/renderer/src/components/sidebar/FileList.tsx, src/renderer/src/components/sidebar/RepoList.tsx, src/renderer/src/components/sidebar/Sidebar.tsx, src/renderer/src/components/ui/*, src/renderer/src/store/useRepoStore.ts
-  - Verification: `npm run lint`, `npm run typecheck`, `npm test`
-  - Follow-ups: visually validate the responsive breakpoints and command-palette branch flow in a packaged desktop window
+### Security
+
+- **SSRF protection** — AI local URL validation rejects metadata endpoints and enforces HTTPS for non-localhost targets
+- **Path traversal blocked** on `git:ignore` IPC handler rejecting `..` segments and absolute paths
+- **Prototype pollution guard** — `assertKeys` rejects `__proto__`, `constructor`, and `prototype` properties
+- **CSP hardened** with `frame-ancestors 'none'`, strict connect-src allowlist, and dev/prod policy separation
+- **IPC input validation** on all 16+ handlers using `assertString`, `assertBoolean`, `assertNumber`, and `assertKeys`
+- **Secrets never exposed to renderer** — API keys encrypted with `safeStorage`, wiped from memory after use, temp SSH keys use 0600 permissions with try/finally cleanup
+- **External URL allowlist** restricting `shell.openExternal` to github.com and gitlab.com via main process validation
+- **Navigation handler** blocking renderer-initiated navigation attacks via `will-navigate` listener
+- **Gemini safety filters raised** from `BLOCK_NONE` to `BLOCK_ONLY_HIGH` for responsible AI integration
+- **Git command injection prevented** — hardened push, fetch, pull, and gitignore flows against option injection and shell metacharacters
+- **Commit body capped** at 5,000 characters to prevent payload abuse
+- **Redaction pipeline expanded** covering AWS keys, emails, URLs, `token=` patterns, and AI response bodies stripped from logs
+- **Bounds validation** enforced for `aiTimeoutSec`, `diffLimitKb`, and `diffLimitLines` settings
+- **macOS entitlements unified** — removed `dyld-env-vars`, added `disable-library-validation` and `network-client` consistently; notarization enabled
+
+### Performance
+
+- **Large repo stability** — file list capped at 200 DOM nodes, branch list at 500 entries, status at 1,000 files with truncation indicators
+- **Rename detection disabled** in `getStatus()` via `diff.renames=false` to eliminate costly computation in monorepos
+- **Watcher-driven diff reloads throttled** to max once per 800 ms in renderer, preventing IPC flood
+- **Watcher status calls serialized** with `statusInFlight` guard preventing concurrent git index access
+- **Diff size pre-flight** using `--shortstat` to estimate cost before loading content into memory
+
+### Documentation
+
+- **Full documentation audit** across 12 project files reflecting current architecture, security model, and API surface
+- **THREAT_MODEL.md** covering trust boundaries, 10 threat categories (including SSRF and prototype pollution) with mitigations
+- **RELEASE_CHECKLIST.md** with code quality, build, smoke test, security, privacy/compliance, and platform-specific verification steps
+- **API reference** documenting all IPC handlers with types, parameters, and security annotations
+- **README** upgraded with security highlights, architecture overview, privacy link, and current build instructions
+
+### Accessibility
+
+- **WCAG contrast fixes** — muted text raised to 4.6:1, placeholder to 3.6:1, disabled controls and diff gutters all meet minimum ratios
+- **Focus-visible outlines** (2px solid accent) added to all interactive elements: buttons, selects, links, and file list items
+- **ARIA attributes** added to activity rail tabs, operation banner (`role="status"`, `aria-live`), and file status indicators with descriptive labels
+- **Keyboard navigation** scoped for settings tabs, with platform-aware shortcut display (Cmd on Mac, Ctrl elsewhere)
+- **Character counter** on commit title (72/200) with visual warning at conventional limit
+- **Tooltips for git terminology** (Ahead/Behind, Working Tree) to reduce jargon barrier for new users

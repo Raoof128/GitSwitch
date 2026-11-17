@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Documentation
+
+- **README claims checked against the code (2026-11-17).** Key material was described as "zeroed from memory"; a JavaScript string cannot be wiped, and the code only drops the reference. "SSRF protections" is now described as what it is: a scheme check, a three-host metadata blocklist and an HTTPS rule for non-local hosts. "GDPR-compliant" and "APP compliance" are labelled as the author's mapping, not a legal assessment. Auto-update, signing and notarization are described as configured and never exercised, since no release has been published. A status line and a Known gaps section were added, including the 52 `npm audit` advisories (27 high, 4 critical) behind the failing weekly `security` workflow. `SECURITY.md` offers GitHub private vulnerability reporting and no longer promises response times.
+
 ### Added
 
 - **AI-powered commit generation** with multi-provider support (Google Gemini, OpenAI, Anthropic) and local model fallback via configurable endpoint

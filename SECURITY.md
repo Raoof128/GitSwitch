@@ -20,7 +20,7 @@ Security fixes are applied to the current `master` branch and the latest publish
 
 ### Process
 
-1. **Email** `raoof.r12@gmail.com` with the subject line: `GitSwitch security report`.
+1. **Report privately** through GitHub's private vulnerability reporting (the *Report a vulnerability* button on this repository's Security tab), or email `raoof.r12@gmail.com` with the subject line `GitSwitch security report`.
 2. **Include** the following in your report:
    - A clear description of the vulnerability
    - Affected version, branch, or commit hash
@@ -29,13 +29,9 @@ Security fixes are applied to the current `master` branch and the latest publish
    - Any suggested mitigation or fix, if available
 3. **Proof of concept:** If you have one, provide the smallest safe reproduction possible. Avoid running exploits against production systems or other users' data.
 
-### Response Targets
+### Response
 
-| Stage | Target |
-|-------|--------|
-| Initial acknowledgement | Within 2 business days |
-| Triage and severity assessment | Within 5 business days |
-| Remediation plan or workaround | Communicated after validation |
+This is a personal project maintained by one person. Reports are read and answered as time allows; there is no guaranteed response time.
 
 ### Coordinated Disclosure
 

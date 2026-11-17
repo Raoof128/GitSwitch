@@ -61,5 +61,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # --publish never: on a push to master electron-builder otherwise tries to
+      # upload a draft release and fails for want of a token. This job only
+      # checks that the package builds.
       - name: Linux package build
-        run: npm run build:linux
+        run: npm run build:linux -- --publish never

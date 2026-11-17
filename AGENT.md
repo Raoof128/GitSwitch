@@ -760,3 +760,8 @@
   - Files: README.md, SECURITY.md, PRIVACY.md, ARCHITECTURE.md, AGENT.md, CHANGELOG.md
   - Verification: `npm run lint`, `npm run typecheck`, `npm test` (57 passed in 10 files); `npm audit` counts taken on the committed lockfile. No code changed.
   - Follow-ups: run `npm audit fix`, then the major upgrades (Electron 43), exercising the app by hand after each; publish a release to prove the packaging and update path
+ - Raouf: 2026-11-17 (Australia/Sydney) - CI package smoke test no longer tries to publish
+   - Scope: .github/workflows/ci.yml
+   - Summary: On a push to master the package smoke job failed because electron-builder attempted to publish a draft release without a token. Added `--publish never` to the step. No application code changed.
+   - Files: .github/workflows/ci.yml, CHANGELOG.md, AGENT.md
+   - Verification: actionlint clean; CI on the pull request; the push run on master after merge is the real check, since pull-request runs never publish.

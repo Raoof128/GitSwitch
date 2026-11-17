@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **CI package smoke test on master (2026-11-17).** The job ran `electron-builder --linux` with no publish setting, so on a push to `master` electron-builder tried to upload a draft GitHub release and failed with "GitHub Personal Access Token is not set". Pull-request runs never publish, which is why the job passed there. The step now passes `--publish never`; it only checks that the package builds.
+
 ### Documentation
 
 - **README claims checked against the code (2026-11-17).** Key material was described as "zeroed from memory"; a JavaScript string cannot be wiped, and the code only drops the reference. "SSRF protections" is now described as what it is: a scheme check, a three-host metadata blocklist and an HTTPS rule for non-local hosts. "GDPR-compliant" and "APP compliance" are labelled as the author's mapping, not a legal assessment. Auto-update, signing and notarization are described as configured and never exercised, since no release has been published. A status line and a Known gaps section were added, including the 52 `npm audit` advisories (27 high, 4 critical) behind the failing weekly `security` workflow. `SECURITY.md` offers GitHub private vulnerability reporting and no longer promises response times.

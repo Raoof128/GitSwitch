@@ -1,10 +1,10 @@
 # GitSwitch
 
-**A security-first Electron desktop Git client for developers managing multiple repositories and identities.**
+**An Electron desktop Git client for developers who work across several repositories and SSH identities, built with the renderer treated as untrusted.**
 
-Most Git GUIs treat security as an afterthought -- tokens stored in plaintext, renderer processes with full Node.js access, no input validation on IPC channels. GitSwitch was built from the ground up to prove that a desktop Git client can be both powerful and hardened. Every architectural decision, from the sandboxed renderer to the encrypted keychain integration, reflects a privacy-by-design philosophy that treats the renderer as untrusted code and keeps secrets where they belong: in the main process, encrypted at rest.
+GitSwitch combines multi-account SSH key management, staged and unstaged diff views, AI-assisted commit messages (offline heuristics, a local model, or a cloud provider), and GitHub/GitLab pull-request creation. The renderer is sandboxed; secrets, git, the filesystem and the network are handled in the main process behind validated IPC handlers.
 
-GitSwitch combines multi-account SSH management, repository-aware diff tooling, multi-provider AI commit generation, and GitHub/GitLab PR workflows into a single cross-platform application -- with structured audit logging and GDPR compliance built in from day one.
+**Status.** A personal project. Lint, typecheck and 57 unit tests pass on Linux, macOS and Windows in CI, and CI builds a package. No release has been published, so the installers, code signing, notarization and the auto-update path are configured but have never been exercised. Nobody other than the author has reviewed the security design. The pinned dependencies are behind: `npm audit` currently reports high-severity advisories, including in Electron 39, and the weekly `security` workflow fails for that reason (see [Known gaps](#known-gaps)).
 
 ---
 
@@ -25,20 +25,20 @@ Developers who contribute to multiple organizations -- personal projects, open-s
 - All privileged operations (filesystem, git, network, secrets) isolated to the main process behind validated IPC handlers
 - Strict Content Security Policy with `frame-ancestors 'none'` and hardened external link allowlist
 - Prototype pollution blocked on all IPC input via `assertKeys` validation
-- SSRF protections validate local LLM endpoint URLs before any network call
+- The local-LLM endpoint setting must be `http(s)`, must not be one of three cloud metadata hosts, and must use HTTPS unless it is `localhost`. It does not block other private addresses or follow-up redirects
 
 ### Encrypted Secret Management
 - SSH private keys and API tokens encrypted at rest using Electron `safeStorage` (OS keychain)
 - Renderer receives only boolean presence flags (`hasAiKey`, `hasGitHubToken`) -- never raw secrets
-- Temporary SSH key files created with `0600` permissions, zeroed from memory immediately, and removed in `finally` blocks
-- Graceful shutdown guards ensure secrets and temp files are cleaned up even on crash
+- Temporary SSH key files created with `0600` permissions and removed in `finally` blocks. (The decrypted key is a JavaScript string; the code drops its reference, but a string cannot be wiped from memory)
+- A process `exit` handler removes any temp key files that are still present. A hard kill or power loss skips it
 
 ### Multi-Provider AI Commit Generation
 - Four provider backends: Google Gemini, OpenAI, Anthropic, and local LLM endpoints
 - Offline heuristic mode for fully air-gapped environments
 - Diff content optionally redacted (emails, URLs, AWS keys, token patterns) before cloud transmission
 - Cloud AI requires explicit user consent before any data leaves the device
-- AI hallucination detection blocks responses referencing files not present in the diff
+- A generated message that names files not present in the diff is rejected
 - Rate-limited to 15 requests per minute with configurable diff size limits
 
 ### Repository and Diff Tooling
@@ -50,27 +50,26 @@ Developers who contribute to multiple organizations -- personal projects, open-s
 - Pull request and merge request creation with secure token handling
 - External links restricted to trusted GitHub and GitLab HTTPS hosts via allowlist validation
 
-### Compliance and Audit
+### Audit Log and Data Controls
 - Structured JSONL audit logging for security-relevant events (key access, commits, pushes, AI requests)
 - Automatic log rotation at 5 MB to bound disk usage
-- GDPR-compliant data export, deletion, and consent management
-- Australian Privacy Principles (APP) compliance
-- Zero telemetry -- no analytics, no crash reporters, no background data collection
+- Export of stored data and a delete-all action, and a consent switch for cloud AI
+- No telemetry: no analytics, no crash reporter, no background data collection
+- [PRIVACY.md](PRIVACY.md) sets out how the author thinks this design lines up with the GDPR and the Australian Privacy Principles. That is the author's own reading, not a legal assessment
 
 ### Cross-Platform Distribution
-- macOS, Windows, and Linux packaging via `electron-builder`
-- Automatic updates through `electron-updater` and GitHub Releases
-- macOS notarization and code signing support
+- macOS, Windows and Linux packaging configured with `electron-builder`; CI builds the Linux package
+- `electron-updater` is wired to GitHub Releases, and macOS notarization is switched on in the build configuration. No release has been published, so neither has run
 
 ---
 
 ## Technical Highlights
 
-This section captures the engineering decisions behind GitSwitch -- the kind of depth that distinguishes a portfolio project from a tutorial app.
+The engineering decisions behind GitSwitch.
 
 ### Electron Security Model
 
-Electron's default configuration is notoriously insecure: `nodeIntegration` enabled, no sandbox, no context isolation. GitSwitch inverts every default. The renderer is treated as untrusted UI -- it cannot touch the filesystem, spawn processes, or access decrypted secrets. Every operation flows through a typed preload bridge (`contextBridge`) into validated IPC handlers in the main process. This is the same trust boundary model recommended by the Electron security documentation, implemented end to end.
+GitSwitch sets `contextIsolation: true`, `nodeIntegration: false` and `sandbox: true` explicitly. The renderer is treated as untrusted UI -- it cannot touch the filesystem, spawn processes, or access decrypted secrets. Every operation flows through a typed preload bridge (`contextBridge`) into validated IPC handlers in the main process. This follows the trust boundary the Electron security documentation recommends.
 
 ### IPC Input Validation
 
@@ -78,7 +77,7 @@ Every IPC handler validates its payload before dispatch. `assertString`, `assert
 
 ### Secret Lifecycle
 
-The secret management layer was designed around the principle that private key material should exist in memory for the shortest possible duration. Keys are decrypted from `safeStorage`, written to a temporary file with `0600` permissions for the git operation, and immediately deleted in a `finally` block. A process-level exit handler provides a second cleanup pass. The renderer never sees key material -- it receives only boolean flags indicating whether credentials are configured.
+The secret management layer tries to keep private key material on disk in the clear for as short a time as possible. Keys are decrypted from `safeStorage`, written to a temporary file with `0600` permissions for the git operation, and immediately deleted in a `finally` block. A process-level exit handler provides a second cleanup pass. The renderer never sees key material -- it receives only boolean flags indicating whether credentials are configured.
 
 ### AI Provider Abstraction
 
@@ -90,7 +89,7 @@ The renderer uses Zustand with five domain-specific slices (`accountsSlice`, `gi
 
 ### Testing Strategy
 
-The test suite includes 57 unit tests across 10 test files, covering security helpers, git operations, AI generation, audit logging, URL policy enforcement, file watchers, and store logic. E2E tests are configured with Playwright. Coverage reporting uses Vitest with V8 instrumentation.
+The test suite includes 57 unit tests across 10 test files, covering security helpers, git operations, AI generation, audit logging, URL policy enforcement, file watchers, and store logic. Playwright end-to-end tests exist in `e2e/` (they need a display and are not run in CI). Coverage reporting uses Vitest with V8 instrumentation.
 
 ---
 
@@ -214,9 +213,9 @@ GitSwitch's security posture is documented in detail across [THREAT_MODEL.md](TH
 - **Process isolation.** Secrets never cross the IPC boundary. The renderer receives only presence flags.
 - **Encryption at rest.** All keys and tokens encrypted via `safeStorage` (OS keychain integration).
 - **Input validation.** Every IPC handler validates type, shape, and content. Prototype pollution, path traversal, and shell injection are blocked at the boundary.
-- **Network hardening.** SSRF protections on local LLM URLs. External links restricted to trusted HTTPS hosts. CSP blocks framing attacks.
+- **Network hardening.** Checks on the local LLM URL (scheme, three metadata hosts, HTTPS off-host). External links restricted to trusted HTTPS hosts. CSP blocks framing.
 - **Data minimisation.** Cloud AI receives only the relevant diff, optionally redacted. No telemetry. No crash reporters.
-- **Audit trail.** Structured JSONL logging of security-relevant events for enterprise compliance review.
+- **Audit trail.** Structured JSONL logging of security-relevant events.
 - **Graceful degradation.** If `safeStorage` is unavailable, the application fails gracefully rather than falling back to plaintext storage.
 
 Report vulnerabilities privately via [SECURITY.md](SECURITY.md).
@@ -235,22 +234,19 @@ Report vulnerabilities privately via [SECURITY.md](SECURITY.md).
 | [Release Checklist](RELEASE_CHECKLIST.md) | Pre-release verification process |
 | [Contributing](CONTRIBUTING.md) | Development setup, conventions, and PR process |
 | [Security Policy](SECURITY.md) | Vulnerability reporting and response targets |
-| [Privacy Policy](PRIVACY.md) | Data handling, GDPR compliance, zero telemetry |
+| [Privacy Policy](PRIVACY.md) | Data handling, the author's GDPR and APP mapping, no telemetry |
 | [Code of Conduct](CODE_OF_CONDUCT.md) | Community standards |
 
 ---
 
-## Project Metrics
+## Known gaps
 
-| Metric | Value |
-|---|---|
-| Source lines (TypeScript) | ~10,500 |
-| React components | 18 |
-| Zustand state slices | 5 |
-| AI providers | 4 + offline mode |
-| Unit tests | 57 |
-| Test files | 10 |
-| Threat categories modeled | 10 |
+- **Dependencies.** `npm audit` reports 52 advisories against the committed lockfile (27 high, 4 critical; counted 17 November 2026). A non-breaking `npm audit fix` brings that to 11, and the rest need major upgrades, Electron 39 to 43 among them. Neither has been done, because the app has to be exercised by hand afterwards.
+- **No published release.** Packaging, signing, notarization and auto-update are configuration that has not been run for real.
+- **End-to-end tests are not in CI.** The 57 unit tests cover the main-process helpers, git and AI services, the audit log, URL policy, watchers and store logic; the UI is covered by two component tests.
+- **No outside review** of the threat model or the code.
+- **The local LLM URL check is a short blocklist**, not a full defence against requests to internal addresses.
+- GitHub.com and GitLab.com only; self-hosted instances are not supported.
 
 ---
 
@@ -260,4 +256,4 @@ Report vulnerabilities privately via [SECURITY.md](SECURITY.md).
 
 ---
 
-**Built by [Raouf](https://github.com/Raoof128)** -- security-first desktop tooling for the multi-identity developer workflow.
+Built by [Raouf](https://github.com/Raoof128).

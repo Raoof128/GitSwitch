@@ -65,7 +65,7 @@ You have full control over your data at all times:
 
 ## 7. Australian Privacy Principles (APP) Compliance
 
-GitSwitch is designed in compliance with the Australian Privacy Principles under the *Privacy Act 1988* (Cth):
+The list below is the author's own reading of how GitSwitch's design lines up with the Australian Privacy Principles under the *Privacy Act 1988* (Cth). It is not a legal assessment and nobody qualified has reviewed it:
 
 - **APP 1 --- Open and transparent management:** This policy is publicly available in the repository and clearly describes all data practices.
 - **APP 3 --- Collection of solicited personal information:** Data is collected only with explicit user consent and only where reasonably necessary for the application's stated functionality.
@@ -78,7 +78,7 @@ GitSwitch is designed in compliance with the Australian Privacy Principles under
 
 ## 8. GDPR Compliance
 
-For users in the European Economic Area:
+The same caveat applies: this is the author's reading, not a legal assessment. For users in the European Economic Area:
 
 - **Lawful basis for cloud AI processing:** Consent (Art. 6(1)(a) GDPR). You may withdraw consent at any time via Settings > AI. Withdrawal is immediate and does not affect the lawfulness of processing prior to withdrawal.
 - **Lawful basis for local operations:** Legitimate interest (Art. 6(1)(f) GDPR) in providing the core functionality of the application.
